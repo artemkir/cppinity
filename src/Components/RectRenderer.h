@@ -20,7 +20,7 @@ public:
 		color.b = b_;
 	}
 
-	int Order()
+	int Order() override
 	{
 		return renderOrder;
 	}
