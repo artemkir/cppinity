@@ -37,7 +37,7 @@ public:
 		if (renderComponent != nullptr)
 		{
 			renderComponent->SetRenderer(renderer);
-			gameObjectsRenderers.insert({ renderComponent->Order(),renderComponent });
+			gameObjectsRenderers.insert({ renderComponent->GetRenderOrder(),renderComponent });
 		}
 
 		auto collider = go->GetComponent<SimpleCollider>();
@@ -63,7 +63,7 @@ public:
 	void Render() {
 		for (auto& [_, go] : gameObjectsRenderers) go->Render();
 
-		//renderer.Present();
+		renderer.Present();
 	}
 
 	bool IsRunning() const { return running; }

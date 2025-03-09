@@ -10,7 +10,7 @@ INCLUDE_DIRS="-I./src"
 # INCLUDE_DIRS+=" -I./OtherIncludeDir"
 
 # Define Emscripten flags
-EM_FLAGS="USE_SDL=2 -s -O3"
+EM_FLAGS="-s USE_SDL=2 -s -O3"
 
 # Create the output directory if it does not exist
 mkdir -p $OUTPUT_DIR

@@ -15,7 +15,7 @@ public:
 };
 
 // Transform Controller Component
-class TileTransform : public BaseComponent, BaseTransform {
+class TileTransform : public BaseComponent, public BaseTransform {
 private:
 	float x, y;
 	float width, height;
