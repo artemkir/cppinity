@@ -12,6 +12,6 @@ public:
 		: renderOrder(renderOrder_) {}
 	virtual ~RendererComponent() = default;
 	virtual void Render() = 0;
-	int Order() { return renderOrder; };
+	int GetRenderOrder() const { return renderOrder; };
 	void SetRenderer(IRenderer& renderer_) { renderer = &renderer_; }
 };
