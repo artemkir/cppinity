@@ -1,10 +1,5 @@
 #pragma once
 
-#pragma once
-
-#include <array>
-#include "../Scene.h"
-
 // Sprite Renderer Class
 class SpriteRenderer : public RendererComponent {
 private:
@@ -17,7 +12,7 @@ public:
     {
     }
 
-    //To proper texture cleanup
+    // No explicit cleanup needed as shared_ptr handles texture destruction
     ~SpriteRenderer() override = default;
 
     void Render() override {

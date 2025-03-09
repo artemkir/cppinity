@@ -1,8 +1,5 @@
 #pragma once
 
-#include <array>
-#include "../Scene.h"
-
 // Renderer Component
 class RectRenderer : public RendererComponent {
 private:
