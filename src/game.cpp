@@ -33,6 +33,7 @@ const int TILE_SIZE = 10;
 #include "Components/RendererComponent.h"
 #include "Components/SimpleCollider.h"
 #include "Components/RectRenderer.h"
+#include "Components/SpriteRenderer.h"
 #include "Components/InputHandler.h"
 #include "Components/Animation.h"
 
