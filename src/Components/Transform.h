@@ -17,13 +17,16 @@ public:
 // Transform Controller Component
 class TileTransform : public BaseComponent, public BaseTransform {
 private:
-	float x, y;
-	float width, height;
-	float scaleX, scaleY;
+	float x;
+	float y;
+	float width;
+	float height;
+	float scaleX = 1.0f;
+	float scaleY = 1.0f;
 
 public:
 	TileTransform(float x_ = 0.0f, float y_ = 0.0f, float w = 0.0f, float h = 0.0f)
-		: x(x_), y(y_), width(w), height(h), scaleX(1.0f), scaleY(1.0f) {}
+		: x(x_), y(y_), width(w), height(h) {}
 
 	float GetX() const { return x; }
 	float GetY() const { return y; }
@@ -35,7 +38,7 @@ public:
 	float GetWidth() const { return width; }
 	float GetHeight() const { return height; }
 
-	Transform GetScreenTransform() 
+	Transform GetScreenTransform() override 
 	{ 
 		return { 
 			x * width - (scaleX - 1.0f) * width/2.0f,

@@ -7,7 +7,8 @@ class Texture : public ITexture
 public:
 
 	explicit Texture(SDL_Texture* tex) : texture(tex) {}
-	~Texture() {
+	
+	~Texture() final {
 		if (texture) {
 			SDL_DestroyTexture(texture);
 		}

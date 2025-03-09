@@ -26,7 +26,7 @@ public:
 
 	void Render() override {
         auto t = gameObject->GetTransform()->GetScreenTransform();
-        auto& renderer = GetRenderer();
+        const auto& renderer = GetRenderer();
 
 		renderer.SetDrawColor(color.r, color.g, color.b, 255);
 		renderer.DrawRect(t.x, t.y, t.width, t.height);
@@ -53,7 +53,7 @@ public:
 
     void Render() override {
         auto t = gameObject->GetTransform()->GetScreenTransform();
-        auto& renderer = GetRenderer();
+        const auto& renderer = GetRenderer();
 
         renderer.DrawTexture(t.x, t.y, t.width, t.height, *texture);
     }

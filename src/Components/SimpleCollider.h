@@ -11,8 +11,8 @@ public:
 
 	bool IsColliding(const SimpleCollider& other) const {
 		if (!active || !other.active || !gameObject || !other.gameObject) return false;
-		TileTransform* t1 = gameObject->GetTransform();
-		TileTransform* t2 = other.gameObject->GetTransform();
+		const TileTransform* t1 = gameObject->GetTransform();
+		const TileTransform* t2 = other.gameObject->GetTransform();
 		if (!t1 || !t2) return false;
 
 		int left1 = t1->GetX();
