@@ -4,12 +4,13 @@
 
 #include "MazeGenerator.h"
 #include "Scene.h"
+#include "AppleLogic.h"
 
 // SnakeLogic Component
 class SnakeLogic : public BaseComponent {
 private:
 	MazeGenerator* mazeGenerator = nullptr;
-	GameObject* apple = nullptr;
+	AppleLogic* apple = nullptr;
 	RectRenderer* rect = nullptr;
 
 	std::vector<GameObject*> tail;
@@ -20,33 +21,18 @@ private:
 	float tail_change_interval = 0.005f;
 
 	IInputHandler* inputHandler = nullptr;
-
-
-	void RegenerateApple() {
-		std::random_device rd;
-		std::mt19937 g(rd());
-		std::uniform_int_distribution<> disX(0, WIDTH - 1);
-		std::uniform_int_distribution<> disY(0, HEIGHT - 1);
-
-		while (true) {
-			int newX = disX(g);
-			int newY = disY(g);
-
-			if (mazeGenerator->IsObstacle(newX, newY))
-				continue;
-
-			apple->GetTransform()->SetPosition(newX, newY);
-			break;
-		}
-
-	}
+	
 
 public:
 	void Start() override {
 		inputHandler = gameObject->GetComponent<IInputHandler>();
 		mazeGenerator = gameObject->GetScene()->FindGameObjectByName("maze_generator")->GetComponent<MazeGenerator>();
-		apple = gameObject->GetScene()->FindGameObjectByName("apple");
+		apple = gameObject->GetScene()->FindGameObjectByName("apple")->GetComponent<AppleLogic>();
 		rect = gameObject->GetComponent<RectRenderer>();
+
+		auto [x, y] = mazeGenerator->GetRandomEmptyPosition();
+		gameObject->GetTransform()->SetPosition(x, y);
+		gameObject->GetTransform()->SetSize(TILE_SIZE, TILE_SIZE);
 	}
 
 	void Update(float deltaTime) override {
@@ -58,7 +44,7 @@ public:
 		updateTimer -= update_interval; // reset timer but keep overflow for accuracy
 
 		auto dir = inputHandler->GetDirection();
-		Transform* headTransform = gameObject->GetTransform();
+		TileTransform* headTransform = gameObject->GetTransform();
 
 		if (dir == Direction::STOP) return;
 
@@ -80,7 +66,7 @@ public:
 		if (headTransform->GetY() >= HEIGHT) headTransform->SetPosition(headTransform->GetX(), 0);
 
 		for (size_t i = 0; i < tail.size(); i++) {
-			Transform* tailTransform = tail[i]->GetTransform();
+			TileTransform* tailTransform = tail[i]->GetTransform();
 			int tempX = tailTransform->GetX();
 			int tempY = tailTransform->GetY();
 			tailTransform->SetPosition(prevX, prevY);
@@ -99,10 +85,10 @@ public:
 			score += 10;
 
 			//move apple to new position
-			RegenerateApple();
+			apple->RegenerateApple();
 
 
-			Transform* headTransform = gameObject->GetTransform();
+			TileTransform* headTransform = gameObject->GetTransform();
 			int prevX = headTransform->GetX();
 			int prevY = headTransform->GetY();
 			if (!tail.empty()) {
@@ -114,7 +100,7 @@ public:
 			auto color = rect->GetColor();
 
 			newTail->AddComponent(std::make_unique<RectRenderer>((int)(color.r*0.75f), (int)(color.g * 0.75f), (int)(color.b * 0.75f)));
-			newTail->AddComponent(std::make_unique<Transform>(prevX, prevY, TILE_SIZE, TILE_SIZE));
+			newTail->AddComponent(std::make_unique<TileTransform>(prevX, prevY, TILE_SIZE, TILE_SIZE));
 			newTail->AddComponent(std::make_unique<SimpleCollider>(false));
 			tail.push_back(newTail.get());
 

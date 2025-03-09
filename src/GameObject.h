@@ -1,7 +1,6 @@
 #pragma once
 
 class Scene;
-class Transform;
 
 // GameObject Class
 class GameObject {
@@ -12,7 +11,7 @@ class GameObject {
 	std::string name;
 	std::vector<std::unique_ptr<BaseComponent>> components;
 
-	Transform* transform = nullptr;  // Cached pointer to Transform component
+	TileTransform* transform = nullptr;  // Cached pointer to Transform component
 
 public:
 	GameObject(const std::string& name_, unsigned tag_ = 0)
@@ -26,7 +25,7 @@ public:
 	void AddComponent(std::unique_ptr<BaseComponent> component) {
 		component->SetGameObject(this);
 
-		if (auto t = dynamic_cast<Transform*>(component.get())) {
+		if (auto t = dynamic_cast<TileTransform*>(component.get())) {
 			transform = t;
 		}
 
@@ -57,6 +56,6 @@ public:
 	const std::string& GetName() const { return name; }
 	const int GetTag() const { return tag; }
 
-	Transform* GetTransform() const { return transform; }
+	TileTransform* GetTransform() const { return transform; }
 	std::vector<std::unique_ptr<BaseComponent>>& GetComponents() { return components; }
 };

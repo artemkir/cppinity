@@ -24,7 +24,7 @@ class MazeGenerator : public BaseComponent {
                     int c = color(g);
 
                     auto block = std::make_unique<GameObject>("maze_block_" + std::to_string(x) + "_" + std::to_string(y), OBSTACLE_TAG);
-                    block->AddComponent(std::make_unique<Transform>(x, y, TILE_SIZE, TILE_SIZE));
+                    block->AddComponent(std::make_unique<TileTransform>(x, y, TILE_SIZE, TILE_SIZE));
                     block->AddComponent(std::make_unique<RectRenderer>(c, c, c));
                     block->AddComponent(std::make_unique<SimpleCollider>());
                     gameObject->GetScene()->AddGameObject(std::move(block));
@@ -153,6 +153,33 @@ public:
         }
 
         return false;
+    }
+
+    std::pair<int,int> GetRandomEmptyPosition() {
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::uniform_int_distribution<> disX(0, WIDTH - 1);
+        std::uniform_int_distribution<> disY(0, HEIGHT - 1);
+
+        int x = 0;
+        int y = 0;
+
+        const int MAX_ATTEMPTS = 1000; // Prevent infinite loops
+        int attempts = 0;
+
+        while (attempts < MAX_ATTEMPTS) {
+            attempts++;
+
+            x = disX(g);
+            y = disY(g);
+
+            if (IsObstacle(x, y))
+                continue;
+                        
+            break;
+        }
+
+        return { x,y };
     }
 
     void Start() override {

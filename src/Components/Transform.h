@@ -1,18 +1,49 @@
 #pragma once
 
+class BaseTransform
+{
+public:
+	struct Transform
+	{
+		float x;
+		float y;
+		float width;
+		float height;
+	};
+
+	virtual Transform GetScreenTransform() = 0;
+};
+
 // Transform Controller Component
-class Transform : public BaseComponent {
+class TileTransform : public BaseComponent, public BaseTransform {
 private:
-	int x, y;
-	int width, height;
+	float x;
+	float y;
+	float width;
+	float height;
+	float scaleX = 1.0f;
+	float scaleY = 1.0f;
 
 public:
-	Transform(int x_, int y_, int w, int h)
+	TileTransform(float x_ = 0.0f, float y_ = 0.0f, float w = 0.0f, float h = 0.0f)
 		: x(x_), y(y_), width(w), height(h) {}
 
-	int GetX() const { return x; }
-	int GetY() const { return y; }
-	void SetPosition(int x_, int y_) { x = x_; y = y_; }
-	int GetWidth() const { return width; }
-	int GetHeight() const { return height; }
+	float GetX() const { return x; }
+	float GetY() const { return y; }
+	float GetScaleX() const { return scaleX; }
+	float GetScaleY() const { return scaleY; }
+	void SetSize(float width_, float height_) { width = width_; height = height_; }
+	void SetPosition(float x_, float y_) { x = x_; y = y_; }
+	void SetScale(float x_, float y_) { scaleX = x_; scaleY = y_; }
+	float GetWidth() const { return width; }
+	float GetHeight() const { return height; }
+
+	Transform GetScreenTransform() override 
+	{ 
+		return { 
+			x * width - (scaleX - 1.0f) * width/2.0f,
+			y * height - (scaleY - 1.0f) * height/2.0f,
+			width*scaleX, 
+			height*scaleY }; 
+	}
 };
