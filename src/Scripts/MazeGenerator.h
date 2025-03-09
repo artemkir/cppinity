@@ -164,7 +164,12 @@ public:
         int x = 0;
         int y = 0;
 
-        while (true) {
+        const int MAX_ATTEMPTS = 1000; // Prevent infinite loops
+        int attempts = 0;
+
+        while (attempts < MAX_ATTEMPTS) {
+            attempts++;
+
             x = disX(g);
             y = disY(g);
 

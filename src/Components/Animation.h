@@ -24,8 +24,13 @@ public:
 		targetY(targetY_),
 		loops(loops_),
 		active(true),
-		startX(1),
-		startY(1) {}
+		startX(0.0f),
+		startY(0.0f)
+	{
+		if (duration_ <= 0.0f) {
+			duration = 0.001f;  // Prevent division by zero
+		}
+	}
 
 	void Start() override {
 		TileTransform* transform = gameObject->GetTransform();

@@ -9,7 +9,7 @@ public:
 class IRenderer {
 public:
 	virtual ~IRenderer() = default;
-	virtual void Clear(int r, int g, int b) const = 0;
+	virtual void Clear() const = 0;
 	virtual void DrawRect(float x, float y, float w, float h) const = 0;
 	virtual void Present() const = 0;
 	virtual void SetDrawColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) const = 0;

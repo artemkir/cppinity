@@ -28,7 +28,7 @@ const int TILE_SIZE = 10;
 
 #include "Components/BaseComponent.h"
 #include "Components/Transform.h"
-#include "Components/IRendererComponent.h"
+#include "Components/RendererComponent.h"
 #include "Components/SimpleCollider.h"
 #include "Components/RectRenderer.h"
 #include "Components/InputHandler.h"
@@ -255,7 +255,6 @@ int main(int argc, char* argv[]) {
 	npcSnake->AddComponent(std::make_unique<TileTransform>());
 	npcSnake->AddComponent(std::make_unique<RectRenderer>(170, 100, 200));
 	npcSnake->AddComponent(std::make_unique<SnakeLogic>());
-	npcSnake->AddComponent(std::make_unique<SimpleCollider>());
 	npcSnake->AddComponent(std::make_unique<NPCInputHandler>());
 	npcSnake->AddComponent(std::make_unique<SimpleCollider>());
 	scene->AddGameObject(std::move(npcSnake));

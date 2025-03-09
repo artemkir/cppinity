@@ -26,7 +26,7 @@ private:
 public:
 	SDLRenderer(SDL_Renderer* r) : renderer(r) {}
 
-	void Clear(int r, int g, int b) const override {
+	void Clear() const override {
 		SDL_RenderClear(renderer);
 	}
 
@@ -36,7 +36,7 @@ public:
 	}
 
 	void SetDrawColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) const override {
-		SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+		SDL_SetRenderDrawColor(renderer, r, g, b, a);
 	}
 
 	void Present() const override {
