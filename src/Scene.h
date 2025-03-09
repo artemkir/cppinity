@@ -7,7 +7,7 @@ class Scene {
 private:
 	std::vector<std::unique_ptr<GameObject>> gameObjects;  // preserves order 
 	std::unordered_map<std::string, GameObject*> gameObjectLookup;  // fast lookup
-	std::multimap<int, IRendererComponent*> gameObjectsRenderers;
+	std::multimap<int, RendererComponent*> gameObjectsRenderers;
 	std::vector<SimpleCollider*> colliders;
 
 	IRenderer& renderer;
@@ -32,11 +32,12 @@ public:
 		go->SetScene(this);
 		gameObjectLookup[go->GetName()] = go.get(); // store raw pointer for lookup
 
-		auto renderer = go->GetComponent<IRendererComponent>();
+		auto renderComponent = go->GetComponent<RendererComponent>();
 
-		if (renderer != nullptr)
+		if (renderComponent != nullptr)
 		{
-			gameObjectsRenderers.insert({ renderer->Order(),renderer });
+			renderComponent->SetRenderer(renderer);
+			gameObjectsRenderers.insert({ renderComponent->Order(),renderComponent });
 		}
 
 		auto collider = go->GetComponent<SimpleCollider>();
@@ -60,9 +61,9 @@ public:
 	}
 
 	void Render() {
-		for (auto& [_, go] : gameObjectsRenderers) go->Render(renderer);
+		for (auto& [_, go] : gameObjectsRenderers) go->Render();
 
-		renderer.Present();
+		//renderer.Present();
 	}
 
 	bool IsRunning() const { return running; }
@@ -81,5 +82,5 @@ public:
 	}
 
 	const std::vector<std::unique_ptr<GameObject>>& GetGameObjects() const { return gameObjects; }
-
+	const IRenderer& GetRenderer() const { return renderer;  }
 };
