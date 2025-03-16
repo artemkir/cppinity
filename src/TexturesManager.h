@@ -1,12 +1,11 @@
 #pragma once
 
-class TextureManager {
-private:
+class TexturesManager {
     IRenderer& renderer;
     std::unordered_map<std::string, std::shared_ptr<ITexture>> textures;
 
 public:
-    explicit TextureManager(IRenderer& renderer_) : renderer(renderer_) {}
+    explicit TexturesManager(IRenderer& renderer_) : renderer(renderer_) {}
 
     std::shared_ptr<ITexture> LoadTexture(const std::string& id, int width, int height, const unsigned char* data) {
         auto it = textures.find(id);
