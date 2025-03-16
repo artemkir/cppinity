@@ -14,7 +14,7 @@ class GameObject {
 	std::vector<std::unique_ptr<BaseComponent>> components;
 
 	TileTransform* transform = nullptr;  // Cached pointer to Transform component
-	std::vector<GameObject*> childs;
+	std::vector<GameObject*> children;
 
 public:
 	GameObject(const std::string& name_, unsigned tag_ = 0)
@@ -26,19 +26,19 @@ public:
 	std::string GetName() { return name; }
 
 	void SetActive(bool active) {
-		for (auto& comp : GetComponents()) {
+		for (const auto& comp : GetComponents()) {
 			comp->SetActive(active); // Enable/disable by nulling GameObject reference
 		}
 
-		for (auto childs : childs)
+		for (auto child : children)
 		{
-			childs->SetActive(active);
+			child->SetActive(active);
 		}
 	}
 
 	void AddGameObject(std::unique_ptr<GameObject> go)
 	{
-		childs.push_back(go.get());
+		children.push_back(go.get());
 
 		scene->AddGameObject(std::move(go));
 	}
@@ -55,7 +55,7 @@ public:
 
 	template<typename T>
 	T* GetComponent() {
-		for (auto& comp : components) {
+		for (const auto& comp : components) {
 			if (T* casted = dynamic_cast<T*>(comp.get()))
 				return casted;
 		}
@@ -63,7 +63,7 @@ public:
 	}
 
 	void Start() {
-		for (auto& comp : components)
+		for (const auto& comp : components)
 		{
 			if (comp->IsActive())
 			{
@@ -73,7 +73,7 @@ public:
 	}
 
 	void Update(float deltaTime) {
-		for (auto& comp : components)
+		for (const auto& comp : components)
 		{
 			if (comp->IsActive())
 			{
@@ -83,7 +83,7 @@ public:
 	}
 
 	void OnCollide(GameObject* other) {
-		for (auto& comp : components)
+		for (const auto& comp : components)
 		{
 			if (comp->IsActive())
 			{

@@ -62,7 +62,7 @@ public:
 	}
 
 	void Render() {
-		for (auto& [_, component] : gameObjectsRenderers)
+		for (const auto& [_, component] : gameObjectsRenderers)
 		{
 			if(component->IsActive())
 			{
