@@ -16,6 +16,6 @@ public:
 	virtual void Update(float deltaTime) {}
 	virtual void OnCollide(GameObject* other) {}
 	void SetActive(bool active_) { active = active_; OnActive(active); }
-	bool IsActive() { return active; }
-	virtual void OnActive(bool active) {}
+	bool IsActive() const { return active; }
+	virtual void OnActive(bool active_) {}
 };
