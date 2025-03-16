@@ -2,6 +2,7 @@
 
 #include <map>
 
+
 // Scene Class
 class Scene {
 private:
@@ -61,9 +62,22 @@ public:
 	}
 
 	void Render() {
-		for (auto& [_, go] : gameObjectsRenderers) go->Render();
+		for (auto& [_, component] : gameObjectsRenderers)
+		{
+			if(component->IsActive())
+			{
+				component->Render();
+			}
+		}
 
 		renderer.Present();
+	}
+
+	void Clear() {
+		gameObjects.clear();
+		gameObjectLookup.clear();
+		gameObjectsRenderers.clear();
+		colliders.clear();
 	}
 
 	bool IsRunning() const { return running; }
@@ -74,6 +88,7 @@ public:
 		float deltaTime = (currentTicks - lastTicks) / 1000.0f;
 		lastTicks = currentTicks;
 
+		renderer.Clear();
 		Update(deltaTime);
 		CheckCollisions();
 		Render();

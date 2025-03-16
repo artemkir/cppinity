@@ -1,5 +1,7 @@
 #pragma once
 
+//#include "Scene.h"
+
 class Scene;
 
 // GameObject Class
@@ -12,6 +14,7 @@ class GameObject {
 	std::vector<std::unique_ptr<BaseComponent>> components;
 
 	TileTransform* transform = nullptr;  // Cached pointer to Transform component
+	std::vector<GameObject*> childs;
 
 public:
 	GameObject(const std::string& name_, unsigned tag_ = 0)
@@ -21,6 +24,24 @@ public:
 	Scene* GetScene() { return scene; }
 
 	std::string GetName() { return name; }
+
+	void SetActive(bool active) {
+		for (auto& comp : GetComponents()) {
+			comp->SetActive(active); // Enable/disable by nulling GameObject reference
+		}
+
+		for (auto childs : childs)
+		{
+			childs->SetActive(active);
+		}
+	}
+
+	void AddGameObject(std::unique_ptr<GameObject> go)
+	{
+		childs.push_back(go.get());
+
+		scene->AddGameObject(std::move(go));
+	}
 
 	void AddComponent(std::unique_ptr<BaseComponent> component) {
 		component->SetGameObject(this);
@@ -42,15 +63,33 @@ public:
 	}
 
 	void Start() {
-		for (auto& comp : components) comp->Start();
+		for (auto& comp : components)
+		{
+			if (comp->IsActive())
+			{
+				comp->Start();
+			}
+		}
 	}
 
 	void Update(float deltaTime) {
-		for (auto& comp : components) comp->Update(deltaTime);
+		for (auto& comp : components)
+		{
+			if (comp->IsActive())
+			{
+				comp->Update(deltaTime);
+			}
+		}
 	}
 
 	void OnCollide(GameObject* other) {
-		for (auto& comp : components) comp->OnCollide(other);
+		for (auto& comp : components)
+		{
+			if (comp->IsActive())
+			{
+				comp->OnCollide(other);
+			}
+		}
 	}
 
 	const std::string& GetName() const { return name; }
