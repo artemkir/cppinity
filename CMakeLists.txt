@@ -17,8 +17,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin)
 
-add_executable(Game src/game.cpp)
-target_include_directories(Game PRIVATE ${sdl2_SOURCE_DIR}/include)
+# Collect all .cpp and .h files recursively
+file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS src/*.cpp)
+file(GLOB_RECURSE GAME_HEADERS CONFIGURE_DEPENDS include/*.h)
+
+add_executable(Game ${GAME_SOURCES} ${GAME_HEADERS})
+target_include_directories(Game PRIVATE ${sdl2_SOURCE_DIR}/include include)
 target_link_libraries(Game PRIVATE SDL2 SDL2main)
 
 # Copy SDL2.dll to output directory

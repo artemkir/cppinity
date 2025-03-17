@@ -1,49 +1,40 @@
 //#define __EMSCRIPTEN__
 
 #include <SDL2/SDL.h>
-#include <vector>
 #include <ctime>
 #include <cstdlib>
 #include <memory>
-#include <unordered_map>
-#include <string>
-#include <stack>
-#include <queue>
-#include <set>
-#include <stdexcept>
 
 #ifdef __EMSCRIPTEN__
-#include <emscripten.h>
+	#include <emscripten.h>
 #endif
 
-const int OBSTACLE_TAG = 1;
-
-const int WIDTH = 40;
-const int HEIGHT = 40;
-const int TILE_SIZE = 10;
-
-#include "DebugTextures.h"
-
 #include "IRenderer.h"
-#include "SDLRenderer.h"
-#include "TexturesManager.h"
 
-#include "Components/BaseComponent.h"
 #include "Components/Transform.h"
-#include "Components/RendererComponent.h"
 #include "Components/SimpleCollider.h"
 #include "Components/RectRenderer.h"
 #include "Components/SpriteRenderer.h"
 #include "Components/InputHandler.h"
 #include "Components/Animation.h"
 
+
+#include "SDLRenderer.h"
+#include "TexturesManager.h"
+#include "Scene.h"
+#include "GameObject.h"
+
+
 #include "Scripts/SnakeLogic.h"
 #include "Scripts/MazeGenerator.h"
 #include "Scripts/NPCInputHandler.h"
 #include "Scripts/AppleLogic.h"
+#include "Scripts/IconImage.h"
+#include "Scripts/MainMenuLogic.h"
+#include "Scripts/EndScreenLogic.h"
+#include "Scripts/GameConsts.h"
+#include "Scripts/GameStateManager.h"
 
-#include "Scene.h"
-#include "GameObject.h"
 
 #ifdef __EMSCRIPTEN__
 struct LoopData { Scene* scene; };
@@ -52,11 +43,6 @@ void emscriptenLoop(void* arg) {
 	if (!data->scene->MainLoop()) emscripten_cancel_main_loop();
 }
 #endif
-
-#define ICON_HEIGHT 16 
-#define ICON_WIDTH 16 
-// array size is 256 
-static const unsigned char icon[] = { 0x00, 0x00, 0x00, 0x00, 0xff, 0xfd, 0xfd, 0xfd, 0xfd, 0xfd, 0xfd, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfe, 0xfd, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfd, 0xfd, 0xfe, 0x00, 0x00, 0x00, 0xfe, 0xfc, 0xff, 0xfa, 0xc1, 0x90, 0x79, 0x79, 0x8f, 0xc0, 0xfa, 0xff, 0xfd, 0xfe, 0x00, 0x00, 0xfd, 0xff, 0xee, 0x8d, 0x76, 0x76, 0x76, 0x76, 0x76, 0x76, 0x9b, 0xff, 0xff, 0xfd, 0x00, 0xff, 0xfe, 0xfa, 0x8c, 0x76, 0x7a, 0xb7, 0xdf, 0xdf, 0xb7, 0x88, 0xea, 0xff, 0xff, 0xfd, 0xf9, 0xfd, 0xff, 0xca, 0x79, 0x79, 0xdf, 0xff, 0xff, 0xff, 0xff, 0xfd, 0xff, 0xff, 0xff, 0xff, 0xfd, 0xfd, 0xff, 0xa8, 0x91, 0xb5, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfd, 0xfd, 0xff, 0x96, 0x94, 0xdf, 0xff, 0xff, 0xff, 0x93, 0x93, 0x93, 0x93, 0x93, 0xb3, 0xff, 0xfd, 0xfd, 0xff, 0x96, 0x94, 0xdf, 0xff, 0xff, 0xff, 0x93, 0x93, 0x93, 0x93, 0x93, 0xaf, 0xff, 0xfd, 0xfd, 0xff, 0xa9, 0x8f, 0xb0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xb8, 0x93, 0xbd, 0xff, 0xfd, 0xfd, 0xff, 0xc8, 0x69, 0x68, 0xd9, 0xff, 0xff, 0xff, 0xff, 0xe9, 0x96, 0x93, 0xdc, 0xff, 0xff, 0xff, 0xfd, 0xfa, 0x7f, 0x65, 0x69, 0xac, 0xd9, 0xdb, 0xb3, 0x7e, 0x92, 0xa8, 0xfd, 0xfd, 0xf9, 0x00, 0xfd, 0xff, 0xed, 0x80, 0x65, 0x65, 0x65, 0x65, 0x65, 0x65, 0x82, 0xf1, 0xff, 0xfd, 0x00, 0x00, 0xfe, 0xfd, 0xff, 0xfa, 0xba, 0x84, 0x69, 0x69, 0x80, 0xb4, 0xf7, 0xff, 0xfd, 0xff, 0x00, 0x00, 0x00, 0xfe, 0xfd, 0xfd, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfd, 0xfd, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf9, 0xfd, 0xfd, 0xfd, 0xfd, 0xfd, 0xff, 0xf9, 0x00, 0x00, 0x00, 0x00 };
 
 int main(int argc, char* argv[]) {
 	srand(time(NULL));
@@ -85,9 +71,9 @@ int main(int argc, char* argv[]) {
 	}
 
 	SDLRenderer renderer(sdlRenderer);
-	TextureManager textureManager(renderer);
-
-	auto scene = std::make_unique<Scene>(renderer);
+	TexturesManager textureManager(&renderer);
+	
+	auto scene = std::make_unique<Scene>(&renderer);
 
 	auto iconTexture = textureManager.LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
@@ -95,6 +81,17 @@ int main(int argc, char* argv[]) {
 	SDL_Texture* debugTexture = CreateDebugTexture2(sdlRenderer, icon, ICON_WIDTH, ICON_HEIGHT);
 #endif	
 
+	// Main Menu Root
+	auto mainMenuRoot = std::make_unique<GameObject>("MainMenuRoot");
+	mainMenuRoot->AddComponent(std::make_unique<MainMenuLogic>(textureManager));
+	scene->AddGameObject(std::move(mainMenuRoot));
+
+	auto gameModeRoot = std::make_unique<GameObject>("GameModeRoot");
+	GameObject* root = gameModeRoot.get();
+
+	scene->AddGameObject(std::move(gameModeRoot));
+
+	
 	// Background
 	/*auto background = std::make_unique<GameObject>("background");
 	background->AddComponent(std::make_unique<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE));
@@ -105,7 +102,9 @@ int main(int argc, char* argv[]) {
 	auto border = std::make_unique<GameObject>("border");
 	border->AddComponent(std::make_unique<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE));
 	border->AddComponent(std::make_unique<RectRenderer>(255, 255, 255));
-	scene->AddGameObject(std::move(border));
+	//scene->AddGameObject(std::move(border));
+
+	root->AddGameObject(std::move(border));
 
 	// Maze Generator
 	auto maze = std::make_unique<GameObject>("maze_generator");
@@ -141,7 +140,17 @@ int main(int argc, char* argv[]) {
 	npcSnake->AddComponent(std::make_unique<NPCInputHandler>());
 	npcSnake->AddComponent(std::make_unique<SimpleCollider>());
 	scene->AddGameObject(std::move(npcSnake));
-	
+		
+	// End Screen Root
+	auto endScreenRoot = std::make_unique<GameObject>("EndScreenRoot");
+	endScreenRoot->AddComponent(std::make_unique<EndScreenLogic>(textureManager));
+	scene->AddGameObject(std::move(endScreenRoot));
+
+	// State Machine Root
+	auto stateMachineRoot = std::make_unique<GameObject>("StateMachineRoot");
+	stateMachineRoot->AddComponent(std::make_unique<GameStateManager>());
+	scene->AddGameObject(std::move(stateMachineRoot));
+
 	//scene.Start();
 
 #ifdef __EMSCRIPTEN__

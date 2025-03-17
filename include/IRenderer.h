@@ -1,10 +1,7 @@
 #pragma once
 
-class ITexture
-{
-public:
-	virtual ~ITexture() = default;
-};
+#include "memory"
+#include "ITexture.h"
 
 class IRenderer {
 public:
