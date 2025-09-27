@@ -3,6 +3,8 @@
 #include "GameObject.h"
 #include "TexturesManager.h"
 
+class GameStateManager;
+
 class EndScreenLogic : public BaseComponent {
 private:
     TexturesManager& textureManager;

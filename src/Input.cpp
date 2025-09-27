@@ -19,7 +19,7 @@ Input::Input() {
     keyMap[SDLK_ESCAPE] = Key::ESC;
 }
 
-void Input::Update(float deltaTime) {
+void Input::Update() {
     quitRequestedThisFrame = false;
     pressed.fill(false);
     released.fill(false);

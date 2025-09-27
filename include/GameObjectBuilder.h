@@ -2,6 +2,7 @@
 
 #include <memory>  // For unique_ptr
 #include <string>
+#include <stdexcept>
 
 #include "GameObject.h"  // Assuming this includes BaseComponent, etc.
 #include "Components/Transform.h"
@@ -16,7 +17,7 @@ public:
         : scene(scene), go(std::make_unique<GameObject>(name, tag)) {}
 
     GameObjectBuilder(GameObject* parent, const std::string& name, unsigned tag)
-        : parent(parent), scene(nullptr), go(std::make_unique<GameObject>(name, tag)) {}
+        : parent(parent), go(std::make_unique<GameObject>(name, tag)) {}
 
     template <typename T, typename... Args>
     GameObjectBuilder& WithComponent(Args&&... args) {
@@ -51,6 +52,6 @@ public:
 
 private:
     GameObject* parent = nullptr;
-    Scene* scene = nullptr;  // Non-owning; assume scene outlives builder
+    Scene* scene = nullptr; 
     std::unique_ptr<GameObject> go;  // Temporary ownership during build
 };

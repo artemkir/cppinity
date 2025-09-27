@@ -80,7 +80,7 @@ bool Scene::MainLoop() {
 
     renderer->Clear();
 
-    inputHandler.Update(deltaTime);
+    inputHandler.Update();
 
     if (inputHandler.WasQuitRequested())
     {

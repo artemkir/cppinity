@@ -6,7 +6,7 @@
 #include "GameObjectBuilder.h"
 
 GameObject::GameObject(const std::string& name_, unsigned tag_)
-    : name(name_), tag(tag_), parent(nullptr) {}
+    : name(name_), tag(tag_) {}
 
 void GameObject::SetScene(Scene* s) {
     scene = s;
@@ -98,12 +98,12 @@ bool GameObject::IsAncestorOf(const std::string& name, unsigned tag) const
     return false;
 }
 
-GameObjectBuilder GameObject::CreateChildBuilder(const std::string& name, unsigned tag)
+GameObjectBuilder GameObject::CreateChildBuilder(const std::string& name_, unsigned tag_)
 {
-    if (IsAncestorOf(name, tag))
+    if (IsAncestorOf(name_, tag_))
     {
-        throw std::runtime_error("Cycle detected in parent-child hierarchy: cannot create child with name '" + name + "' and tag " + std::to_string(tag));
+        throw std::runtime_error("Cycle detected in parent-child hierarchy: cannot create child with name '" + name_ + "' and tag " + std::to_string(tag_));
     }
 
-    return GameObjectBuilder(this, name, tag);
+    return GameObjectBuilder(this, name_, tag_);
 }

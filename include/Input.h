@@ -4,7 +4,7 @@
 
 #include <SDL2/SDL.h>
 
-enum Key {
+enum class Key {
     A,
     D,
     W,
@@ -30,7 +30,7 @@ private:
 public:
     Input();
 
-    void Update(float deltaTime);
+    void Update();
 
     bool IsKeyDown(Key key) const;
     bool IsKeyPressed(Key key) const;

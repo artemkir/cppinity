@@ -7,6 +7,7 @@
 
 class GameObject;
 class TexturesManager;
+class GameStateManager;
 
 class MainMenuLogic : public BaseComponent {
     TexturesManager& textureManager;
