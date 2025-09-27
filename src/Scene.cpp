@@ -3,6 +3,8 @@
 #include "Components/RendererComponent.h"
 #include "Components/SimpleCollider.h"
 #include "IRenderer.h"
+#include "GameObjectBuilder.h"
+#include "Input.h"
 
 #include <SDL2/SDL.h>
 
@@ -77,6 +79,14 @@ bool Scene::MainLoop() {
     lastTicks = currentTicks;
 
     renderer->Clear();
+
+    inputHandler.Update();
+
+    if (inputHandler.WasQuitRequested())
+    {
+        Stop();
+    }
+
     Update(deltaTime);
     CheckCollisions();
     Render();
@@ -90,4 +100,14 @@ const std::vector<std::unique_ptr<GameObject>>& Scene::GetGameObjects() const {
 
 const IRenderer* Scene::GetRenderer() const {
     return renderer;
+}
+
+GameObjectBuilder Scene::CreateGameObjectBuilder(const std::string& name, unsigned tag)
+{
+    return GameObjectBuilder(this, name, tag);
+}
+
+const Input& Scene::GetInput() const
+{
+    return inputHandler;
 }

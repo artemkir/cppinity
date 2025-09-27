@@ -9,6 +9,7 @@
 #include "Scripts/IconImage.h"
 #include "Scene.h"
 #include "TexturesManager.h"
+#include "GameObjectBuilder.h"  // Include the builder header
 
 MainMenuLogic::MainMenuLogic(TexturesManager& textureManager_)
     : textureManager(textureManager_), bg(nullptr), startButton(nullptr)
@@ -18,17 +19,22 @@ MainMenuLogic::MainMenuLogic(TexturesManager& textureManager_)
 void MainMenuLogic::Start() {
     buttonTexture = textureManager.LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
-    auto bg = std::make_unique<GameObject>("MenuBackground");
-    bg->AddComponent(std::make_unique<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE));
-    bg->AddComponent(std::make_unique<RectRenderer>(50, 50, 50));
-    this->bg = bg.get();
-    gameObject->GetScene()->AddGameObject(std::move(bg));
+    auto scene = gameObject->GetScene();
 
-    auto startButton = std::make_unique<GameObject>("StartButton");
-    startButton->AddComponent(std::make_unique<TileTransform>(WIDTH / 2 - 2, HEIGHT / 2 - 2, 32, 32));
-    startButton->AddComponent(std::make_unique<SpriteRenderer>(buttonTexture));
-    this->startButton = startButton.get();
-    gameObject->GetScene()->AddGameObject(std::move(startButton));
+    // Menu Background
+    bg = scene->CreateGameObjectBuilder("MenuBackground", 0)
+        .WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
+        .WithComponent<RectRenderer>(50, 50, 50)
+        .AddToScene();
+
+    // Start Button
+    startButton = scene->CreateGameObjectBuilder("StartButton", 0)
+        .WithComponent<TileTransform>(WIDTH / 2 - 2, HEIGHT / 2 - 2, 32, 32)
+        .WithComponent<SpriteRenderer>(buttonTexture)
+        .AddToScene();
+
+    stateManager = scene->FindGameObjectByName("StateMachineRoot")
+        ->GetComponent<GameStateManager>();
 }
 
 void MainMenuLogic::OnActive(bool active) {
@@ -38,15 +44,15 @@ void MainMenuLogic::OnActive(bool active) {
 
 void MainMenuLogic::Update(float deltaTime) {
     if (!gameObject) return; // Skip if deactivated
-    
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT) {
-            gameObject->GetScene()->Stop();
-        } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_SPACE) {
-            auto stateManager = gameObject->GetScene()->FindGameObjectByName("StateMachineRoot")
-                ->GetComponent<GameStateManager>();
-            if (stateManager) stateManager->TransitionTo(GameState::GameMode);
+
+    auto scene = gameObject->GetScene();
+    auto& input = scene->GetInput();
+
+    if (input.IsKeyPressed(Key::Space))
+    {
+        if (stateManager)
+        {
+            stateManager->TransitionTo(GameState::GameMode);
         }
     }
 }

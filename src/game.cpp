@@ -6,7 +6,7 @@
 #include <memory>
 
 #ifdef __EMSCRIPTEN__
-	#include <emscripten.h>
+#include <emscripten.h>
 #endif
 
 #include "IRenderer.h"
@@ -23,6 +23,7 @@
 #include "TexturesManager.h"
 #include "Scene.h"
 #include "GameObject.h"
+#include "GameObjectBuilder.h"  // Include the builder header
 
 
 #include "Scripts/SnakeLogic.h"
@@ -72,7 +73,7 @@ int main(int argc, char* argv[]) {
 
 	SDLRenderer renderer(sdlRenderer);
 	TexturesManager textureManager(&renderer);
-	
+
 	auto scene = std::make_unique<Scene>(&renderer);
 
 	auto iconTexture = textureManager.LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
@@ -82,74 +83,69 @@ int main(int argc, char* argv[]) {
 #endif	
 
 	// Main Menu Root
-	auto mainMenuRoot = std::make_unique<GameObject>("MainMenuRoot");
-	mainMenuRoot->AddComponent(std::make_unique<MainMenuLogic>(textureManager));
-	scene->AddGameObject(std::move(mainMenuRoot));
+	scene->CreateGameObjectBuilder("MainMenuRoot", 0)
+		.WithComponent<MainMenuLogic>(textureManager)
+		.AddToScene();
 
-	auto gameModeRoot = std::make_unique<GameObject>("GameModeRoot");
-	GameObject* root = gameModeRoot.get();
+	// Game Mode Root
+	auto root = scene->CreateGameObjectBuilder("GameModeRoot", 0)
+		.AddToScene();
 
-	scene->AddGameObject(std::move(gameModeRoot));
+	// Background (commented out, but refactored for completeness)
+	/*scene->CreateGameObjectBuilder("background", 0)
+		.WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
+		.WithComponent<RectRenderer>(0, 0, 0)
+		.Build();*/
 
-	
-	// Background
-	/*auto background = std::make_unique<GameObject>("background");
-	background->AddComponent(std::make_unique<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE));
-	background->AddComponent(std::make_unique<RectRenderer>(0, 0, 0));
-	scene->AddGameObject(std::move(background));*/
-
-	// Border
-	auto border = std::make_unique<GameObject>("border");
-	border->AddComponent(std::make_unique<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE));
-	border->AddComponent(std::make_unique<RectRenderer>(255, 255, 255));
-	//scene->AddGameObject(std::move(border));
-
-	root->AddGameObject(std::move(border));
+		// Border (as child of root)
+	root->CreateChildBuilder("border", 0)
+		.WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
+		.WithComponent<RectRenderer>(255, 255, 255)
+		.AddToScene();
 
 	// Maze Generator
-	auto maze = std::make_unique<GameObject>("maze_generator");
-	maze->AddComponent(std::make_unique<MazeGenerator>());
-	scene->AddGameObject(std::move(maze));
+	scene->CreateGameObjectBuilder("maze_generator", 0)
+		.WithComponent<MazeGenerator>()
+		.AddToScene();
 
 	// Apple
-	auto apple = std::make_unique<GameObject>("apple", OBSTACLE_TAG);
-	apple->AddComponent(std::make_unique<TileTransform>());
-	apple->AddComponent(std::make_unique<SimpleCollider>());
-	apple->AddComponent(std::make_unique<AppleLogic>());
-	apple->AddComponent(std::make_unique<SpriteRenderer>(iconTexture));
-	//apple->AddComponent(std::make_unique<RectRenderer>(255, 0, 0, 100));
-	//apple->AddComponent(std::make_unique<Animation>(0.25f, 1.25f, 1.25f, -1));
-
-	apple->AddComponent(std::make_unique<Animation>(0.25f, 2.25f, 2.25f, -1));
-	scene->AddGameObject(std::move(apple));
+	scene->CreateGameObjectBuilder("apple", OBSTACLE_TAG)
+		.WithComponent<TileTransform>()
+		.WithComponent<SimpleCollider>()
+		.WithComponent<AppleLogic>()
+		.WithComponent<SpriteRenderer>(iconTexture)
+		//.WithComponent<RectRenderer>(255, 0, 0, 100)  // Commented in original
+		//.WithComponent<Animation>(0.25f, 1.25f, 1.25f, -1)  // Commented in original
+		.WithComponent<Animation>(0.25f, 2.25f, 2.25f, -1)
+		.AddToScene();
 
 	// Snake Head
-	auto snake = std::make_unique<GameObject>("snake_head", OBSTACLE_TAG);
-	snake->AddComponent(std::make_unique<TileTransform>());
-	snake->AddComponent(std::make_unique<RectRenderer>(0, 255, 0));
-	snake->AddComponent(std::make_unique<SimpleCollider>());
-	snake->AddComponent(std::make_unique<InputHandler>());
-	snake->AddComponent(std::make_unique<SnakeLogic>());
-	scene->AddGameObject(std::move(snake));
+	scene->CreateGameObjectBuilder("snake_head", OBSTACLE_TAG)
+		.WithComponent<TileTransform>()
+		.WithComponent<RectRenderer>(0, 255, 0)
+		.WithComponent<SimpleCollider>()
+		.WithComponent<InputHandler>()
+		.WithComponent<SnakeLogic>()
+		.AddToScene();
 
 	// NPC Snake
-	auto npcSnake = std::make_unique<GameObject>("npc_snake_head", OBSTACLE_TAG);
-	npcSnake->AddComponent(std::make_unique<TileTransform>());
-	npcSnake->AddComponent(std::make_unique<RectRenderer>(170, 100, 200));
-	npcSnake->AddComponent(std::make_unique<SnakeLogic>());
-	npcSnake->AddComponent(std::make_unique<NPCInputHandler>());
-	npcSnake->AddComponent(std::make_unique<SimpleCollider>());
-	scene->AddGameObject(std::move(npcSnake));
-		
+	scene->CreateGameObjectBuilder("npc_snake_head", OBSTACLE_TAG)
+		.WithComponent<TileTransform>()
+		.WithComponent<RectRenderer>(170, 100, 200)
+		.WithComponent<SnakeLogic>()
+		.WithComponent<NPCInputHandler>()
+		.WithComponent<SimpleCollider>()
+		.AddToScene();
+
 	// End Screen Root
-	auto endScreenRoot = std::make_unique<GameObject>("EndScreenRoot");
-	endScreenRoot->AddComponent(std::make_unique<EndScreenLogic>(textureManager));
-	scene->AddGameObject(std::move(endScreenRoot));
+	scene->CreateGameObjectBuilder("EndScreenRoot", 0)
+		.WithComponent<EndScreenLogic>(textureManager)
+		.AddToScene();
 
 	// State Machine Root
-	auto stateMachineRoot = std::make_unique<GameObject>("StateMachineRoot");
-	stateMachineRoot->AddComponent(std::make_unique<GameStateManager>());
-	scene->AddGameObject(std::move(stateMachineRoot));
+	scene->CreateGameObjectBuilder("StateMachineRoot", 0)
+		.WithComponent<GameStateManager>()
+		.AddToScene();
 
 	//scene.Start();
 
@@ -160,12 +156,12 @@ int main(int argc, char* argv[]) {
 	while (scene->MainLoop()) {
 		SDL_Delay(16); // ~60fps rendering delay
 
-	// DEBUG: Render the debug texture at top-left corner
-	//#ifdef DEBUG
-	//RenderDebugTexture(sdlRenderer, debugTexture, 5, 5, 64, 64);
-	//renderer.Present();
-	//#endif
-		
+		// DEBUG: Render the debug texture at top-left corner
+		//#ifdef DEBUG
+		//RenderDebugTexture(sdlRenderer, debugTexture, 5, 5, 64, 64);
+		//renderer.Present();
+		//#endif
+
 	}
 	//SDL_Log("Game Over! Final Score: %d", snakeLogicPtr->GetScore());
 	SDL_DestroyRenderer(sdlRenderer);
