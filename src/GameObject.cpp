@@ -1,6 +1,7 @@
 #include "GameObject.h"
 #include "Scene.h"
 #include "Components/Transform.h"
+#include "GameObjectBuilder.h"
 
 GameObject::GameObject(const std::string& name_, unsigned tag_)
     : name(name_), tag(tag_) {}
@@ -38,31 +39,31 @@ void GameObject::AddComponent(std::unique_ptr<BaseComponent> component) {
     components.push_back(std::move(component));
 }
 
-void GameObject::Start() const
+template<typename Func>
+void GameObject::ForEachActiveComponent(Func f) const 
 {
-    for (const auto& comp : components) {
-        if (comp->IsActive()) {
-            comp->Start();
+    for (const auto& comp : components) 
+    {
+        if (comp->IsActive()) 
+        {
+            f(comp);
         }
     }
+}
+
+void GameObject::Start() const
+{
+    ForEachActiveComponent([](const auto& comp) { comp->Start(); });
 }
 
 void GameObject::Update(float deltaTime) const
 {
-    for (const auto& comp : components) {
-        if (comp->IsActive()) {
-            comp->Update(deltaTime);
-        }
-    }
+    ForEachActiveComponent([deltaTime](const auto& comp) { comp->Update(deltaTime); });
 }
 
 void GameObject::OnCollide(GameObject* other) const
 {
-    for (const auto& comp : components) {
-        if (comp->IsActive()) {
-            comp->OnCollide(other);
-        }
-    }
+    ForEachActiveComponent([other](const auto& comp) { comp->OnCollide(other); });
 }
 
 const std::string& GameObject::GetName() const {
@@ -79,4 +80,9 @@ TileTransform* GameObject::GetTransform() const {
 
 std::vector<std::unique_ptr<BaseComponent>>& GameObject::GetComponents() {
     return components;
+}
+
+GameObjectBuilder GameObject::CreateChildBuilder(const std::string& name, unsigned tag)
+{
+    return GameObjectBuilder(this, name, tag);
 }

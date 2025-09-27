@@ -6,10 +6,12 @@
 #include <memory>
 
 #include "GameObject.h"
+#include "Input.h"
 
 class RendererComponent;
 class IRenderer;
 class SimpleCollider;
+class GameObjectBuilder;
 
 // Scene Class
 class Scene {
@@ -23,6 +25,8 @@ class Scene {
 	unsigned lastTicks = 0;  // For calculating delta time
 
 	void CheckCollisions();
+
+	Input inputHandler;
 
 public:
 	Scene(IRenderer* r);
@@ -44,4 +48,10 @@ public:
 
 	const std::vector<std::unique_ptr<GameObject>>& GetGameObjects() const;
 	const IRenderer* GetRenderer() const;
+		
+	GameObjectBuilder CreateGameObjectBuilder(const std::string& name, unsigned tag);
+
+	const Input& GetInput() const;
+	
 };
+
