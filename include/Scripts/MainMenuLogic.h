@@ -12,9 +12,9 @@ class GameStateManager;
 class MainMenuLogic : public BaseComponent {
     TexturesManager& textureManager;
     std::shared_ptr<ITexture> buttonTexture;
-    GameObject* bg;
-    GameObject* startButton;
-    GameStateManager* stateManager;
+    GameObject* bg = nullptr;
+    GameObject* startButton = nullptr;
+    GameStateManager* stateManager = nullptr;
 
 public:
     MainMenuLogic(TexturesManager& textureManager_);

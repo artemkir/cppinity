@@ -26,7 +26,7 @@ class SnakeLogic : public BaseComponent {
 	IInputHandler* inputHandler = nullptr;
 
 public:
-	void Start() override;
+	void Awake() override;
 	void Update(float deltaTime) override;
 	void OnCollide(GameObject* other) override;
 	int GetScore();

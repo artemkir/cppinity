@@ -20,6 +20,7 @@ class GameObject {
     TileTransform* transform = nullptr;
     std::vector<GameObject*> children;
     GameObject* parent = nullptr;
+    bool isStarted = false;
 
 public:
     //GameObject() = delete;
@@ -33,6 +34,8 @@ public:
     void AddGameObject(std::unique_ptr<GameObject> go);
     void AddComponent(std::unique_ptr<BaseComponent> component);
 
+    bool HasStarted() const { return isStarted; }
+
     template<typename T>
     T* GetComponent() {
         for (const auto& comp : components) {
@@ -42,7 +45,8 @@ public:
         return nullptr;
     }
 
-    void Start() const;
+    void Awake() const;
+    void Start();
     void Update(float deltaTime) const;
     void OnCollide(GameObject* other) const;
 

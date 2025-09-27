@@ -4,7 +4,7 @@
 #include "Scripts/GameConsts.h"
 #include "Components/Transform.h"
 
-void AppleLogic::Start() {
+void AppleLogic::Awake() {
     mazeGenerator = gameObject->GetScene()->FindGameObjectByName("maze_generator")->GetComponent<MazeGenerator>();
     gameObject->GetTransform()->SetSize(TILE_SIZE, TILE_SIZE);
     RegenerateApple();

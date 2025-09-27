@@ -18,5 +18,5 @@ public:
     MazeGenerator() = default;
     bool IsObstacle(int x, int y);
     std::pair<int,int> GetRandomEmptyPosition();
-    void Start() override;
+    void Awake() override;
 };

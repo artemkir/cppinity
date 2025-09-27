@@ -54,9 +54,15 @@ inline void GameObject::ForEachActiveComponent(Func f) const
     }
 }
 
-void GameObject::Start() const
+void GameObject::Awake() const
+{
+    ForEachActiveComponent([](const auto& comp) { comp->Awake(); });
+}
+
+void GameObject::Start()
 {
     ForEachActiveComponent([](const auto& comp) { comp->Start(); });
+    isStarted = true;
 }
 
 void GameObject::Update(float deltaTime) const

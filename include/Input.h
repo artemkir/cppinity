@@ -25,7 +25,7 @@ private:
 
     std::unordered_map<SDL_Keycode, Key> keyMap;
     
-    bool quitRequestedThisFrame;
+    bool quitRequestedThisFrame = false;
 
 public:
     Input();

@@ -122,6 +122,6 @@ std::pair<int, int> MazeGenerator::GetRandomEmptyPosition() {
     return { x, y };
 }
 
-void MazeGenerator::Start() {
+void MazeGenerator::Awake() {
     GenerateMaze(WIDTH / 2, HEIGHT / 2);
 }
