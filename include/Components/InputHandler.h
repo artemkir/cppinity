@@ -2,7 +2,6 @@
 
 #include "IInputHandler.h"
 
-// InputHandler Component
 class InputHandler : public IInputHandler {
 	Direction dir;
 	

@@ -1,7 +1,7 @@
 #include "Components/Transform.h"
 
 TileTransform::TileTransform(float x_, float y_, float w, float h)
-    : x(x_), y(y_), width(w), height(h) {}
+    : x(x_), y(y_), width(w), height(h), scaleX(1.0f), scaleY(1.0f) {}
 
 float TileTransform::GetX() const { return x; }
 float TileTransform::GetY() const { return y; }
