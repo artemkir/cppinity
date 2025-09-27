@@ -25,7 +25,7 @@ void Scene::AddGameObject(std::unique_ptr<GameObject> go) {
         colliders.push_back(collider);
     }
 
-    go->Start();
+    go->Awake();
     gameObjects.push_back(std::move(go));
 }
 
@@ -46,7 +46,11 @@ void Scene::CheckCollisions() {
 }
 
 void Scene::Update(float deltaTime) {
-    for (auto& go : gameObjects) go->Update(deltaTime);
+    for (auto& go : gameObjects)
+    {
+        go->Start(); //called only once
+        go->Update(deltaTime);
+    }
 }
 
 void Scene::Render() {

@@ -12,7 +12,7 @@
 #include "GameObjectBuilder.h"  // Include the builder header
 
 MainMenuLogic::MainMenuLogic(TexturesManager& textureManager_)
-    : textureManager(textureManager_), bg(nullptr), startButton(nullptr)
+    : textureManager(textureManager_)
 {
 }
 
@@ -33,8 +33,14 @@ void MainMenuLogic::Start() {
         .WithComponent<SpriteRenderer>(buttonTexture)
         .AddToScene();
 
-    stateManager = scene->FindGameObjectByName("StateMachineRoot")
-        ->GetComponent<GameStateManager>();
+    auto stateManagerObject = scene->FindGameObjectByName("StateMachineRoot");
+        
+    if (stateManagerObject == nullptr)
+    {
+        SDL_Log("stateManagerObject == null");
+    }
+
+    stateManager = stateManagerObject->GetComponent<GameStateManager>();
 }
 
 void MainMenuLogic::OnActive(bool active) {

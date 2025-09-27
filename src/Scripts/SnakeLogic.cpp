@@ -14,7 +14,7 @@
 
 #include "Scripts/GameConsts.h"
 
-void SnakeLogic::Start() {
+void SnakeLogic::Awake() {
     inputHandler = gameObject->GetComponent<IInputHandler>();
     mazeGenerator = gameObject->GetScene()->FindGameObjectByName("maze_generator")->GetComponent<MazeGenerator>();
     apple = gameObject->GetScene()->FindGameObjectByName("apple")->GetComponent<AppleLogic>();

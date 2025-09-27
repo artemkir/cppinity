@@ -8,6 +8,6 @@ class AppleLogic : public BaseComponent {
     MazeGenerator* mazeGenerator = nullptr;
 
 public:
-    void Start() override;
+    void Awake() override;
     void RegenerateApple();
 };

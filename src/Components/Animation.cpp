@@ -19,7 +19,7 @@ float Animation::EaseInOutQuad(float t) const {
     return t < 0.5f ? 2.0f * t * t : 1.0f - std::pow(-2.0f * t + 2.0f, 2.0f) / 2.0f;
 }
 
-void Animation::Start() {
+void Animation::Awake() {
     const TileTransform* transform = gameObject->GetTransform();
     startX = transform->GetScaleX();
     startY = transform->GetScaleY();

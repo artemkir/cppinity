@@ -20,6 +20,7 @@ class GameObject {
     TileTransform* transform = nullptr;
     std::vector<GameObject*> children;
     GameObject* parent = nullptr;
+    bool isStartCalled = false;
 
 public:
     //GameObject() = delete;
@@ -42,7 +43,8 @@ public:
         return nullptr;
     }
 
-    void Start() const;
+    void Awake() const;
+    void Start();
     void Update(float deltaTime) const;
     void OnCollide(GameObject* other) const;
 

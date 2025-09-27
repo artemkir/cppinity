@@ -17,6 +17,6 @@ class Animation : public BaseComponent {
 
 public:
 	Animation(float duration_, float targetX_, float targetY_, int loops_ = 1);
-	void Start() override;
+	void Awake() override;
 	void Update(float deltaTime) override;
 };

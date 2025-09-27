@@ -10,7 +10,7 @@ private:
     TexturesManager& textureManager;
     int score = 0;
     std::shared_ptr<ITexture> texture;
-    GameStateManager* stateManager;
+    GameStateManager* stateManager = nullptr;
 
 public:
     EndScreenLogic(TexturesManager& textureManager_);
