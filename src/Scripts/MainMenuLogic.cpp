@@ -49,8 +49,7 @@ void MainMenuLogic::OnActive(bool active) {
 }
 
 void MainMenuLogic::Update(float deltaTime) {
-    if (!gameObject) return; // Skip if deactivated
-
+    
     auto scene = gameObject->GetScene();
     auto& input = scene->GetInput();
 

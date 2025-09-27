@@ -34,7 +34,7 @@ public:
     void AddGameObject(std::unique_ptr<GameObject> go);
     void AddComponent(std::unique_ptr<BaseComponent> component);
 
-    bool HasStarted() { return isStarted; }
+    bool HasStarted() const { return isStarted; }
 
     template<typename T>
     T* GetComponent() {

@@ -35,8 +35,6 @@ void EndScreenLogic::Start() {
 }
 
 void EndScreenLogic::Update(float deltaTime) {
-    if (!gameObject) return; // Skip if deactivated
-
     auto scene = gameObject->GetScene();
     auto& input = scene->GetInput();
 
