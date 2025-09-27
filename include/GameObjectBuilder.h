@@ -32,7 +32,8 @@ public:
 
     //TODO:
     GameObjectBuilder& WithChild(const std::string& childName, unsigned childTag) {
-        //go_->AddChild(childName, childTag);  // Assuming AddChild from previous refactor
+        //go_->AddChild(childName, childTag); 
+        throw std::runtime_error("WithChild is not implemented.");
         return *this;
     }
 
@@ -41,7 +42,7 @@ public:
             transform->SetPosition(x, y);
         }
         else {
-            // Handle error: e.g., throw or log
+            throw std::runtime_error("No transform component attached.");
         }
         return *this;
     }

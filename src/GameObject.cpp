@@ -1,10 +1,12 @@
+#include <stdexcept>
+
 #include "GameObject.h"
 #include "Scene.h"
 #include "Components/Transform.h"
 #include "GameObjectBuilder.h"
 
 GameObject::GameObject(const std::string& name_, unsigned tag_)
-    : name(name_), tag(tag_) {}
+    : name(name_), tag(tag_), parent(nullptr) {}
 
 void GameObject::SetScene(Scene* s) {
     scene = s;
@@ -26,6 +28,7 @@ void GameObject::SetActive(bool active) {
 
 void GameObject::AddGameObject(std::unique_ptr<GameObject> go) {
     children.push_back(go.get());
+    go->parent = this;
     scene->AddGameObject(std::move(go));
 }
 
@@ -40,7 +43,7 @@ void GameObject::AddComponent(std::unique_ptr<BaseComponent> component) {
 }
 
 template<typename Func>
-void GameObject::ForEachActiveComponent(Func f) const 
+inline void GameObject::ForEachActiveComponent(Func f) const
 {
     for (const auto& comp : components) 
     {
@@ -82,7 +85,25 @@ std::vector<std::unique_ptr<BaseComponent>>& GameObject::GetComponents() {
     return components;
 }
 
+bool GameObject::IsAncestorOf(const std::string& name, unsigned tag) const
+{    
+    const GameObject* current = this;
+    while (current)
+    {
+        if (current->GetName() == name && current->GetTag() == tag)
+            return true;
+
+        current = current->parent;
+    }
+    return false;
+}
+
 GameObjectBuilder GameObject::CreateChildBuilder(const std::string& name, unsigned tag)
 {
+    if (IsAncestorOf(name, tag))
+    {
+        throw std::runtime_error("Cycle detected in parent-child hierarchy: cannot create child with name '" + name + "' and tag " + std::to_string(tag));
+    }
+
     return GameObjectBuilder(this, name, tag);
 }

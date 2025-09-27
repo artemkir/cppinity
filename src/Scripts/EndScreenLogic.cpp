@@ -29,6 +29,9 @@ void EndScreenLogic::Start() {
         .WithComponent<TileTransform>(WIDTH / 2 - 2, HEIGHT / 2 - 4, 32, 32)
         .WithComponent<SpriteRenderer>(texture)
         .AddToScene();
+
+    stateManager = scene->FindGameObjectByName("StateMachineRoot")
+        ->GetComponent<GameStateManager>();
 }
 
 void EndScreenLogic::Update(float deltaTime) {
@@ -39,10 +42,6 @@ void EndScreenLogic::Update(float deltaTime) {
 
     if (input.IsKeyPressed(Key::Space))
     {
-        auto stateManager = scene
-            ->FindGameObjectByName("StateMachineRoot")
-            ->GetComponent<GameStateManager>();
-
         if (stateManager)
         {
             stateManager->TransitionTo(GameState::MainMenu);

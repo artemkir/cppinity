@@ -32,6 +32,9 @@ void MainMenuLogic::Start() {
         .WithComponent<TileTransform>(WIDTH / 2 - 2, HEIGHT / 2 - 2, 32, 32)
         .WithComponent<SpriteRenderer>(buttonTexture)
         .AddToScene();
+
+    stateManager = scene->FindGameObjectByName("StateMachineRoot")
+        ->GetComponent<GameStateManager>();
 }
 
 void MainMenuLogic::OnActive(bool active) {
@@ -47,10 +50,6 @@ void MainMenuLogic::Update(float deltaTime) {
 
     if (input.IsKeyPressed(Key::Space))
     {
-        auto stateManager = scene
-            ->FindGameObjectByName("StateMachineRoot")
-            ->GetComponent<GameStateManager>();
-        
         if (stateManager)
         {
             stateManager->TransitionTo(GameState::GameMode);

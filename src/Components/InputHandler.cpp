@@ -18,18 +18,15 @@ void InputHandler::Update(float deltaTime) {
     {
         dir = Direction::LEFT;
     }
-
-    if (input.IsKeyPressed(Key::D))
+    else if (input.IsKeyPressed(Key::D))
     {
         dir = Direction::RIGHT;
     }
-
-    if (input.IsKeyPressed(Key::W))
+    else if (input.IsKeyPressed(Key::W))
     {
         dir = Direction::UP;
     }
-
-    if (input.IsKeyPressed(Key::S))
+    else if (input.IsKeyPressed(Key::S))
     {
         dir = Direction::DOWN;
     }

@@ -16,7 +16,7 @@ Input::Input() {
     keyMap[SDLK_SPACE] = Key::Space;
     keyMap[SDLK_r] = Key::R;
     keyMap[SDLK_x] = Key::X;
-    keyMap[SDLK_ESCAPE] = Key::X;
+    keyMap[SDLK_ESCAPE] = Key::ESC;
 }
 
 void Input::Update(float deltaTime) {

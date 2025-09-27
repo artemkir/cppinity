@@ -82,6 +82,11 @@ bool Scene::MainLoop() {
 
     inputHandler.Update(deltaTime);
 
+    if (inputHandler.WasQuitRequested())
+    {
+        Stop();
+    }
+
     Update(deltaTime);
     CheckCollisions();
     Render();

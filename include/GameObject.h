@@ -19,6 +19,7 @@ class GameObject {
     std::vector<std::unique_ptr<BaseComponent>> components;
     TileTransform* transform = nullptr;
     std::vector<GameObject*> children;
+    GameObject* parent;
 
 public:
     //GameObject() = delete;
@@ -63,7 +64,8 @@ public:
     }
 
     template<typename Func>
-    void ForEachActiveComponent(Func f) const;
+    inline void ForEachActiveComponent(Func f) const;
 
+    bool IsAncestorOf(const std::string& name, unsigned tag) const;
     GameObjectBuilder CreateChildBuilder(const std::string& name, unsigned tag);
 };
