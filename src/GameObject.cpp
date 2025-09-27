@@ -61,11 +61,8 @@ void GameObject::Awake() const
 
 void GameObject::Start()
 {
-    if (!isStartCalled)
-    {
-        ForEachActiveComponent([](const auto& comp) { comp->Start(); });
-        isStartCalled = true;
-    }
+    ForEachActiveComponent([](const auto& comp) { comp->Start(); });
+    isStarted = true;
 }
 
 void GameObject::Update(float deltaTime) const

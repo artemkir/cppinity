@@ -48,7 +48,11 @@ void Scene::CheckCollisions() {
 void Scene::Update(float deltaTime) {
     for (auto& go : gameObjects)
     {
-        go->Start(); //called only once
+        if (!go->HasStarted())
+        {
+            go->Start(); //called only once
+        }
+
         go->Update(deltaTime);
     }
 }

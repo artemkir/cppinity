@@ -20,7 +20,7 @@ class GameObject {
     TileTransform* transform = nullptr;
     std::vector<GameObject*> children;
     GameObject* parent = nullptr;
-    bool isStartCalled = false;
+    bool isStarted = false;
 
 public:
     //GameObject() = delete;
@@ -33,6 +33,8 @@ public:
     void SetActive(bool active);
     void AddGameObject(std::unique_ptr<GameObject> go);
     void AddComponent(std::unique_ptr<BaseComponent> component);
+
+    bool HasStarted() { return isStarted; }
 
     template<typename T>
     T* GetComponent() {
