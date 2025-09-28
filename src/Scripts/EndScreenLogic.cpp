@@ -19,16 +19,16 @@ void EndScreenLogic::Start() {
     auto scene = gameObject->GetScene();
 
     // End Background
-    scene->CreateGameObjectBuilder("EndBackground", 0)
+    bg = gameObject->CreateGameObjectBuilder("EndBackground", 0)
         .WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
-        .WithComponent<RectRenderer>(20, 20, 20)
+        .WithComponent<RectRenderer>(0, 0, 255)
         .AddToScene();
 
     // Game Over Text
-    scene->CreateGameObjectBuilder("GameOverText", 0)
+    /*gameOverText = gameObject->CreateGameObjectBuilder("GameOverText", 0)
         .WithComponent<TileTransform>(WIDTH / 2 - 2, HEIGHT / 2 - 4, 32, 32)
         .WithComponent<SpriteRenderer>(texture)
-        .AddToScene();
+        .AddToScene();*/
 
     stateManager = scene->FindGameObjectByName("StateMachineRoot")
         ->GetComponent<GameStateManager>();

@@ -11,6 +11,8 @@ private:
     int score = 0;
     std::shared_ptr<ITexture> texture;
     GameStateManager* stateManager = nullptr;
+    GameObject* gameOverText = nullptr;
+    GameObject* bg = nullptr;
 
 public:
     EndScreenLogic(TexturesManager& textureManager_);

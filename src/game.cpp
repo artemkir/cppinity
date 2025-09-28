@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
 		.Build();*/
 
 		// Border (as child of root)
-	root->CreateChildBuilder("border", 0)
+	root->CreateGameObjectBuilder("border", 0)
 		.WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
 		.WithComponent<RectRenderer>(255, 255, 255)
 		.AddToScene();

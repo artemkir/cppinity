@@ -20,6 +20,5 @@ public:
     MainMenuLogic(TexturesManager& textureManager_);
 
     void Start() override;
-    void OnActive(bool active) override;
     void Update(float deltaTime) override;
 };
