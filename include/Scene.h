@@ -49,7 +49,7 @@ public:
 	const std::vector<std::unique_ptr<GameObject>>& GetGameObjects() const;
 	const IRenderer* GetRenderer() const;
 		
-	GameObjectBuilder CreateGameObjectBuilder(const std::string& name, unsigned tag);
+	GameObjectBuilder CreateGameObjectBuilder(const std::string& name, unsigned tag = 0);
 
 	const Input& GetInput() const;
 	

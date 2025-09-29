@@ -71,5 +71,5 @@ public:
     void ForEachActiveComponent(Func f) const;
 
     bool IsAncestorOf(const std::string& name, unsigned tag) const;
-    GameObjectBuilder CreateChildBuilder(const std::string& name, unsigned tag);
+    GameObjectBuilder CreateGameObjectBuilder(const std::string& name, unsigned tag);
 };

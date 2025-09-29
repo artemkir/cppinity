@@ -22,30 +22,20 @@ void MainMenuLogic::Start() {
     auto scene = gameObject->GetScene();
 
     // Menu Background
-    bg = scene->CreateGameObjectBuilder("MenuBackground", 0)
-        .WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
-        .WithComponent<RectRenderer>(50, 50, 50)
+    bg = gameObject->CreateGameObjectBuilder("MenuBackground", 0)
+        .WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE/2 , HEIGHT * TILE_SIZE/2)
+        .WithComponent<RectRenderer>(255, 0, 0)
         .AddToScene();
 
     // Start Button
-    startButton = scene->CreateGameObjectBuilder("StartButton", 0)
+    /*startButton = gameObject->CreateGameObjectBuilder("StartButton", 0)
         .WithComponent<TileTransform>(WIDTH / 2 - 2, HEIGHT / 2 - 2, 32, 32)
         .WithComponent<SpriteRenderer>(buttonTexture)
-        .AddToScene();
+        .AddToScene();*/
 
     auto stateManagerObject = scene->FindGameObjectByName("StateMachineRoot");
-        
-    if (stateManagerObject == nullptr)
-    {
-        SDL_Log("stateManagerObject == null");
-    }
-
+   
     stateManager = stateManagerObject->GetComponent<GameStateManager>();
-}
-
-void MainMenuLogic::OnActive(bool active) {
-    bg->SetActive(active);
-    startButton->SetActive(active);
 }
 
 void MainMenuLogic::Update(float deltaTime) {

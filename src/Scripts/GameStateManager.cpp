@@ -13,6 +13,7 @@ void GameStateManager::Start() {
 }
 
 void GameStateManager::TransitionTo(GameState newState) {
+       
     // Deactivate all roots
     if (mainMenuRoot) mainMenuRoot->SetActive(false);
     if (gameModeRoot) gameModeRoot->SetActive(false);

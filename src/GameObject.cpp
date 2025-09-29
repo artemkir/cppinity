@@ -104,7 +104,7 @@ bool GameObject::IsAncestorOf(const std::string& name, unsigned tag) const
     return false;
 }
 
-GameObjectBuilder GameObject::CreateChildBuilder(const std::string& name_, unsigned tag_)
+GameObjectBuilder GameObject::CreateGameObjectBuilder(const std::string& name_, unsigned tag_)
 {
     if (IsAncestorOf(name_, tag_))
     {
