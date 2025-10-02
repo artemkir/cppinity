@@ -40,11 +40,11 @@ struct AppState
           scene(std::make_unique<Scene>(&renderer)) {}
 };
 
-static AppState *state = nullptr;
+static AppState *app_state = nullptr;
 
 void gameInit(Scene *scene, TexturesManager &textureManager)
 {
-    auto iconTexture = state->textureManager.LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
+    auto iconTexture = app_state->textureManager.LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
     // Main Menu Root
     scene->CreateGameObjectBuilder("MainMenuRoot", 0)
@@ -106,25 +106,25 @@ void gameInit(Scene *scene, TexturesManager &textureManager)
 extern "C" void app_init(void)
 {
 
-    state = new AppState();
-    state->renderer = SokolRenderer();
-    state->textureManager = TexturesManager(&state->renderer);
-    state->scene = std::make_unique<Scene>(&state->renderer);
+    app_state = new AppState();
+    app_state->renderer = SokolRenderer();
+    app_state->textureManager = TexturesManager(&app_state->renderer);
+    app_state->scene = std::make_unique<Scene>(&app_state->renderer);
 
-    gameInit(state->scene.get(), state->textureManager);
+    gameInit(app_state->scene.get(), app_state->textureManager);
 }
 
 extern "C" bool app_frame(uint64_t deltaTime)
 {
-    return state->scene->Frame(deltaTime);
+    return app_state->scene->Frame(deltaTime);
 }
 
 extern "C" void app_cleanup(void)
 {
-    delete state;
+    delete app_state;
 }
 
 extern "C" void app_event(const InputEvent *event)
 {
-    state->scene->HandleEvent(event);
+    app_state->scene->HandleEvent(event);
 }

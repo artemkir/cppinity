@@ -4,26 +4,24 @@ extern "C" uint32_t sokol_create_texture(int width, int height, const unsigned c
 extern "C" void sokol_begin_pass();
 extern "C" void sokol_end_pass();
 extern "C" void sokol_setup();
+extern "C" void sokol_draw_rect(const float pos[2], const float size[2], const float color[4]);
 
 SokolRenderer::SokolRenderer() {
     sokol_setup();
 }
 
 void SokolRenderer::BeginPass() const {
-    
     sokol_begin_pass();
 }
 
-void SokolRenderer::DrawRect(float x, float y, float w, float h) const {
+void SokolRenderer::DrawRect(float x, float y, float w, float h, float col[4]) const {
+    float pos[2] = { x,y };
+    float size[2] = { w,h };
 
-}
-
-void SokolRenderer::SetDrawColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) const {
-
+    sokol_draw_rect(pos, size, col);
 }
 
 void SokolRenderer::EndPass() const {
-
     sokol_end_pass();
 }
 

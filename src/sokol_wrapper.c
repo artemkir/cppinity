@@ -6,6 +6,7 @@
 #define SOKOL_IMPL
 
 #include "InputEvent.h"
+#include "Scripts/GameConsts.h"
 
 #include "sokol_gfx.h"
 #include "sokol_app.h"
@@ -23,7 +24,9 @@ static struct
     sg_pass_action pass_action;
     sg_pipeline pip;
     sg_bindings bind;
-} state;
+    int screen_width;
+    int screen_height;
+} app_state;
 
 static uint64_t last_time = 0;
 
@@ -67,13 +70,13 @@ void sokol_setup()
         .environment = sglue_environment(),
         .logger.func = slog_func});
 
-    state.pass_action = (sg_pass_action){
+    app_state.pass_action = (sg_pass_action){
         .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {0.2f, 0.3f, 0.3f, 1.0f}}};
 
     // sg_shader shd = sg_make_shader(triangle_shader_desc(sg_query_backend()));
 
     // create a pipeline object (default render states are fine for triangle)
-    state.pip = sg_make_pipeline(&(sg_pipeline_desc){
+    app_state.pip = sg_make_pipeline(&(sg_pipeline_desc){
         .shader = make_custom_shader(),
         .layout = {
             .attrs = {
@@ -83,16 +86,20 @@ void sokol_setup()
         .label = "triangle-pipeline"});
 }
 
-void create_test_rect()
+void create_test_rect(float pos[2], float size[2], float color[4])
 {
-    // a vertex buffer with 3 vertices and view for binding
+    float x = (pos[0] / app_state.screen_width) * 2.0f - 1.0f;
+    float y = (pos[1] / app_state.screen_height) * 2.0f - 1.0f;
+    float x2 = ((pos[0] + size[0]) / app_state.screen_width) * 2.0f - 1.0f;
+    float y2 = ((pos[1] + size[1]) / app_state.screen_height) * 2.0f - 1.0f;
+
     float vertices[] = {
-        // positions            // colors
-        -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f};
-    state.bind.vertex_buffers[0] = sg_make_buffer(&(sg_buffer_desc){
+        x, y, 0.0f, color[0], color[1], color[2], color[3] ,
+        x, y2, 0.0f, color[0], color[1], color[2], color[3] ,
+        x2, y2, 0.0f, color[0], color[1], color[2], color[3] ,
+        x2, y, 0.0f, color[0], color[1], color[2], color[3] };
+
+    app_state.bind.vertex_buffers[0] = sg_make_buffer(&(sg_buffer_desc){
         .data = SG_RANGE(vertices),
         .label = "vertex-buffer"});
 
@@ -106,7 +113,7 @@ void create_test_rect()
         3,
     };
 
-    state.bind.index_buffer = sg_make_buffer(&(sg_buffer_desc){
+    app_state.bind.index_buffer = sg_make_buffer(&(sg_buffer_desc){
         .usage.index_buffer = true,
         .data = SG_RANGE(indices),
         .label = "cube-indices"});
@@ -114,8 +121,8 @@ void create_test_rect()
 
 void cleanup_test_rect()
 {
-    sg_destroy_buffer(state.bind.vertex_buffers[0]);
-    sg_destroy_buffer(state.bind.index_buffer);
+    sg_destroy_buffer(app_state.bind.vertex_buffers[0]);
+    sg_destroy_buffer(app_state.bind.index_buffer);
 }
 
 void frame(void)
@@ -130,24 +137,35 @@ void frame(void)
     }
 }
 
+void sokol_draw_rect(const float pos[2], const float size[2], const float color[4])
+{
+    create_test_rect(pos,size,color);
+
+    sg_apply_bindings(&app_state.bind);
+
+    sg_draw(0, 6, 1);
+
+    cleanup_test_rect();
+}
+
 void sokol_begin_pass()
 {
     sg_begin_pass(&(sg_pass){
-        .action = state.pass_action,
+        .action = app_state.pass_action,
         .swapchain = sglue_swapchain()});
 
-    sg_apply_pipeline(state.pip);
+    sg_apply_pipeline(app_state.pip);
 
-    for (int i = 0; i < 20; i++)
+    /*for (int i = 0; i < 20; i++)
     {
         create_test_rect();
 
-        sg_apply_bindings(&state.bind);
+        sg_apply_bindings(&app_state.bind);
 
         sg_draw(0, 6, 1);
 
         cleanup_test_rect();
-    }
+    }*/
 }
 
 void sokol_end_pass()
@@ -189,13 +207,16 @@ static void event(const sapp_event *e)
 
 sapp_desc sokol_main(int argc, char *argv[])
 {
+    app_state.screen_width = WIDTH * TILE_SIZE + 2;
+    app_state.screen_height = HEIGHT * TILE_SIZE + 2;
+
     return (sapp_desc){
         .init_cb = init,
         .frame_cb = frame,
         .cleanup_cb = cleanup,
         .event_cb = event,
-        .width = 800,
-        .height = 600,
+        .width = app_state.screen_width,
+        .height = app_state.screen_height,
         .high_dpi = true,
         .window_title = "Application",
     };

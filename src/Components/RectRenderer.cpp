@@ -18,6 +18,9 @@ void RectRenderer::Render()
     auto t = gameObject->GetTransform()->GetScreenTransform();
     const auto &renderer = GetRenderer();
 
-    renderer->SetDrawColor(color.r, color.g, color.b, 255);
-    renderer->DrawRect(t.x, t.y, t.width, t.height);
+    //renderer->SetDrawColor(color.r, color.g, color.b, 255);
+
+    float c[4] = { color.r, color.g, color.b, 255 };
+
+    renderer->DrawRect(t.x, t.y, t.width, t.height, c);
 }
