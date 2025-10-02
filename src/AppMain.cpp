@@ -10,6 +10,7 @@
 #include "Components/SimpleCollider.h"
 #include "Components/RectRenderer.h"
 #include "Components/SpriteRenderer.h"
+#include "Components/InputHandler.h"
 #include "Components/Animation.h"
 
 #include "SokolRenderer.h"
@@ -27,7 +28,7 @@
 #include "Scripts/EndScreenLogic.h"
 #include "Scripts/GameConsts.h"
 #include "Scripts/GameStateManager.h"
-#include "Input.h" // Updated input handler
+#include "Input.h"
 
 struct AppState
 {
@@ -46,61 +47,70 @@ void gameInit(Scene *scene, TexturesManager &textureManager)
 {
     auto iconTexture = app_state->textureManager.LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
-    // Main Menu Root
-    scene->CreateGameObjectBuilder("MainMenuRoot", 0)
-        .WithComponent<MainMenuLogic>(textureManager)
-        .AddToScene();
+	// Main Menu Root
+	scene->CreateGameObjectBuilder("MainMenuRoot", 0)
+		.WithComponent<MainMenuLogic>(textureManager)
+		.AddToScene();
 
-    // Game Mode Root
-    auto root = scene->CreateGameObjectBuilder("GameModeRoot", 0)
-                    .AddToScene();
+	// Game Mode Root
+	auto root = scene->CreateGameObjectBuilder("GameModeRoot", 0)
+		.AddToScene();
 
-    // Border (as child of root)
-    root->CreateGameObjectBuilder("border", 0)
-        .WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
-        .WithComponent<RectRenderer>(255, 255, 255)
-        .AddToScene();
+	// Background (commented out, but refactored for completeness)
+	/*scene->CreateGameObjectBuilder("background", 0)
+		.WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
+		.WithComponent<RectRenderer>(0, 0, 0)
+		.Build();*/
 
-    // Maze Generator
-    scene->CreateGameObjectBuilder("maze_generator", 0)
-        .WithComponent<MazeGenerator>()
-        .AddToScene();
+		// Border (as child of root)
+	root->CreateGameObjectBuilder("border", 0)
+		.WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
+		.WithComponent<RectRenderer>(255, 255, 255)
+		.AddToScene();
 
-    // Apple
-    scene->CreateGameObjectBuilder("apple", OBSTACLE_TAG)
-        .WithComponent<TileTransform>()
-        .WithComponent<SimpleCollider>()
-        .WithComponent<AppleLogic>()
-        .WithComponent<SpriteRenderer>(iconTexture)
-        .WithComponent<Animation>(0.25f, 2.25f, 2.25f, -1)
-        .AddToScene();
+	// Maze Generator
+	scene->CreateGameObjectBuilder("maze_generator", 0)
+		.WithComponent<MazeGenerator>()
+		.AddToScene();
 
-    // Snake Head
-    scene->CreateGameObjectBuilder("snake_head", OBSTACLE_TAG)
-        .WithComponent<TileTransform>()
-        .WithComponent<RectRenderer>(0, 255, 0)
-        .WithComponent<SimpleCollider>()
-        .WithComponent<SnakeLogic>()
-        .AddToScene();
+	// Apple
+	scene->CreateGameObjectBuilder("apple", OBSTACLE_TAG)
+		.WithComponent<TileTransform>()
+		.WithComponent<SimpleCollider>()
+		.WithComponent<AppleLogic>()
+		.WithComponent<SpriteRenderer>(iconTexture)
+		//.WithComponent<RectRenderer>(255, 0, 0, 100)  // Commented in original
+		//.WithComponent<Animation>(0.25f, 1.25f, 1.25f, -1)  // Commented in original
+		.WithComponent<Animation>(0.25f, 2.25f, 2.25f, -1)
+		.AddToScene();
 
-    // NPC Snake
-    scene->CreateGameObjectBuilder("npc_snake_head", OBSTACLE_TAG)
-        .WithComponent<TileTransform>()
-        .WithComponent<RectRenderer>(170, 100, 200)
-        .WithComponent<SnakeLogic>()
-        .WithComponent<NPCInputHandler>()
-        .WithComponent<SimpleCollider>()
-        .AddToScene();
+	// Snake Head
+	scene->CreateGameObjectBuilder("snake_head", OBSTACLE_TAG)
+		.WithComponent<TileTransform>()
+		.WithComponent<RectRenderer>(0, 255, 0)
+		.WithComponent<SimpleCollider>()
+		.WithComponent<InputHandler>()
+		.WithComponent<SnakeLogic>()
+		.AddToScene();
 
-    // End Screen Root
-    scene->CreateGameObjectBuilder("EndScreenRoot", 0)
-        .WithComponent<EndScreenLogic>(textureManager)
-        .AddToScene();
+	// NPC Snake
+	scene->CreateGameObjectBuilder("npc_snake_head", OBSTACLE_TAG)
+		.WithComponent<TileTransform>()
+		.WithComponent<RectRenderer>(170, 100, 200)
+		.WithComponent<SnakeLogic>()
+		.WithComponent<NPCInputHandler>()
+		.WithComponent<SimpleCollider>()
+		.AddToScene();
 
-    // State Machine Root
-    scene->CreateGameObjectBuilder("StateMachineRoot", 0)
-        .WithComponent<GameStateManager>()
-        .AddToScene();
+	// End Screen Root
+	scene->CreateGameObjectBuilder("EndScreenRoot", 0)
+		.WithComponent<EndScreenLogic>(textureManager)
+		.AddToScene();
+
+	// State Machine Root
+	scene->CreateGameObjectBuilder("StateMachineRoot", 0)
+		.WithComponent<GameStateManager>()
+		.AddToScene();
 }
 
 extern "C" void app_init(void)
@@ -114,7 +124,7 @@ extern "C" void app_init(void)
     gameInit(app_state->scene.get(), app_state->textureManager);
 }
 
-extern "C" bool app_frame(uint64_t deltaTime)
+extern "C" bool app_frame(float deltaTime)
 {
     return app_state->scene->Frame(deltaTime);
 }

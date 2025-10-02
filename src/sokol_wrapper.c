@@ -93,6 +93,9 @@ void create_test_rect(float pos[2], float size[2], float color[4])
     float x2 = ((pos[0] + size[0]) / app_state.screen_width) * 2.0f - 1.0f;
     float y2 = ((pos[1] + size[1]) / app_state.screen_height) * 2.0f - 1.0f;
 
+    y = -y;
+    y2 = -y2;
+
     float vertices[] = {
         x, y, 0.0f, color[0], color[1], color[2], color[3] ,
         x, y2, 0.0f, color[0], color[1], color[2], color[3] ,
