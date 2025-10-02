@@ -5,14 +5,15 @@
 
 InputHandler::InputHandler() : dir(Direction::STOP) {}
 
-void InputHandler::Update(float deltaTime) {
-   
-    auto& input = gameObject->GetScene()->GetInput();
+void InputHandler::Update(float deltaTime)
+{
+
+    auto &input = gameObject->GetScene()->GetInput();
 
     if (input.IsKeyPressed(Key::ESC))
     {
         dir = Direction::STOP;
-    } 
+    }
 
     if (input.IsKeyPressed(Key::A))
     {
@@ -32,6 +33,7 @@ void InputHandler::Update(float deltaTime) {
     }
 }
 
-Direction InputHandler::GetDirection() {
+Direction InputHandler::GetDirection()
+{
     return dir;
 }

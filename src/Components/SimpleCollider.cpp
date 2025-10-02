@@ -1,21 +1,25 @@
 #include "Components/SimpleCollider.h"
-#include "GameObject.h"  
-#include "Components/Transform.h"  
+#include "GameObject.h"
+#include "Components/Transform.h"
 
 #include "Scripts/GameConsts.h"
 
-SimpleCollider::SimpleCollider(bool active_) {
+SimpleCollider::SimpleCollider(bool active_)
+{
     SetActive(active_);
 }
 
-//TODO: Improve colliding
-bool SimpleCollider::IsColliding(const SimpleCollider& other) const {
-    if (!active || !other.active || !gameObject || !other.gameObject) return false;
-    
-    const TileTransform* t1 = gameObject->GetTransform();
-    const TileTransform* t2 = other.gameObject->GetTransform();
-    
-    if (!t1 || !t2) return false;
+// TODO: Improve colliding
+bool SimpleCollider::IsColliding(const SimpleCollider &other) const
+{
+    if (!active || !other.active || !gameObject || !other.gameObject)
+        return false;
+
+    const TileTransform *t1 = gameObject->GetTransform();
+    const TileTransform *t2 = other.gameObject->GetTransform();
+
+    if (!t1 || !t2)
+        return false;
 
     int left1 = t1->GetX();
     int right1 = t1->GetX() + t1->GetWidth() / TILE_SIZE;

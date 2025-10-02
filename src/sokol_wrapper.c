@@ -1,7 +1,9 @@
+
+#if !defined(SOKOL_GLES3)
 #define SOKOL_GLCORE
+#endif
+
 #define SOKOL_IMPL
-#define SOKOL_NO_DEPRECATED
-#define SOKOL_CPP_NO_SHORTCUTS
 
 #include "InputEvent.h"
 
@@ -16,7 +18,8 @@ extern bool app_frame(uint64_t deltaTime);
 extern void app_cleanup(void);
 extern void app_event(const InputEvent *event);
 
-static struct {
+static struct
+{
     sg_pass_action pass_action;
     sg_pipeline pip;
     sg_bindings bind;
@@ -24,7 +27,8 @@ static struct {
 
 static uint64_t last_time = 0;
 
-void init(void) {
+void init(void)
+{
     app_init();
 
     stm_setup();
@@ -32,57 +36,51 @@ void init(void) {
     srand(stm_sec(stm_now()));
 }
 
-sg_shader make_custom_shader() {
-    return sg_make_shader(&(sg_shader_desc) {
+sg_shader make_custom_shader()
+{
+    return sg_make_shader(&(sg_shader_desc){
         .attrs = {
             [0].glsl_name = "pos",
             [1].glsl_name = "color0",
         },
-        .vertex_func.source =
-        "#version 300 es\n"
-            "in vec4 pos;"
-            "in vec4 color0;"
-            "out vec4 color;"
-            "void main() {"
-            "  gl_Position = pos;\n"
-            "  color = color0;\n"
-            "}\n",
-            .fragment_func.source =
-            "#version 300 es\n"
-            "precision mediump float;\n"
-            "in vec4 color;\n"
-            "out vec4 frag_color;\n"
-            "void main() {\n"
-            "  frag_color = color;\n"
-            "}\n"
-    });
+        .vertex_func.source = "#version 300 es\n"
+                              "in vec4 pos;"
+                              "in vec4 color0;"
+                              "out vec4 color;"
+                              "void main() {"
+                              "  gl_Position = pos;\n"
+                              "  color = color0;\n"
+                              "}\n",
+        .fragment_func.source = "#version 300 es\n"
+                                "precision mediump float;\n"
+                                "in vec4 color;\n"
+                                "out vec4 frag_color;\n"
+                                "void main() {\n"
+                                "  frag_color = color;\n"
+                                "}\n"});
 }
 
-void sokol_setup() {
-    
-    sg_setup(&(sg_desc) {
+void sokol_setup()
+{
+
+    sg_setup(&(sg_desc){
         .environment = sglue_environment(),
-        .logger.func = slog_func
-    });
+        .logger.func = slog_func});
 
     state.pass_action = (sg_pass_action){
-        .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {0.2f, 0.3f, 0.3f, 1.0f} }
-    };
+        .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {0.2f, 0.3f, 0.3f, 1.0f}}};
 
-    //sg_shader shd = sg_make_shader(triangle_shader_desc(sg_query_backend()));
-    
+    // sg_shader shd = sg_make_shader(triangle_shader_desc(sg_query_backend()));
+
     // create a pipeline object (default render states are fine for triangle)
-    state.pip = sg_make_pipeline(&(sg_pipeline_desc) {
+    state.pip = sg_make_pipeline(&(sg_pipeline_desc){
         .shader = make_custom_shader(),
-            .layout = {
-                .attrs = {
-                    [0].format = SG_VERTEXFORMAT_FLOAT3,
-                    [1].format = SG_VERTEXFORMAT_FLOAT4
-                }
-        },
-            .index_type = SG_INDEXTYPE_UINT16,
-            .label = "triangle-pipeline"
-    });
+        .layout = {
+            .attrs = {
+                [0].format = SG_VERTEXFORMAT_FLOAT3,
+                [1].format = SG_VERTEXFORMAT_FLOAT4}},
+        .index_type = SG_INDEXTYPE_UINT16,
+        .label = "triangle-pipeline"});
 }
 
 void create_test_rect()
@@ -90,51 +88,53 @@ void create_test_rect()
     // a vertex buffer with 3 vertices and view for binding
     float vertices[] = {
         // positions            // colors
-         -1.0f,  1.0f, 0.0f,     1.0f, 0.0f, 0.0f, 1.0f,
-         -1.0f, -1.0f, 0.0f,     0.0f, 1.0f, 0.0f, 1.0f,
-          1.0f, -1.0f, 0.0f,     0.0f, 0.0f, 1.0f, 1.0f,
-          1.0f, 1.0f, 0.0f,      0.0f, 1.0f, 1.0f, 1.0f
-    };
-    state.bind.vertex_buffers[0] = sg_make_buffer(&(sg_buffer_desc) {
+        -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f};
+    state.bind.vertex_buffers[0] = sg_make_buffer(&(sg_buffer_desc){
         .data = SG_RANGE(vertices),
-            .label = "vertex-buffer"
-    });
+        .label = "vertex-buffer"});
 
     // create an index buffer for the cube
     const uint16_t indices[] = {
-        0, 1, 2,  0, 2, 3,
+        0,
+        1,
+        2,
+        0,
+        2,
+        3,
     };
 
-    state.bind.index_buffer = sg_make_buffer(&(sg_buffer_desc) {
+    state.bind.index_buffer = sg_make_buffer(&(sg_buffer_desc){
         .usage.index_buffer = true,
-            .data = SG_RANGE(indices),
-            .label = "cube-indices"
-    });
+        .data = SG_RANGE(indices),
+        .label = "cube-indices"});
 }
 
 void cleanup_test_rect()
 {
-	sg_destroy_buffer(state.bind.vertex_buffers[0]);
-	sg_destroy_buffer(state.bind.index_buffer);
+    sg_destroy_buffer(state.bind.vertex_buffers[0]);
+    sg_destroy_buffer(state.bind.index_buffer);
 }
 
-void frame(void) {
-
+void frame(void)
+{
     uint64_t now = stm_now();
     float deltaTime = stm_sec(stm_diff(now, last_time));
     last_time = now;
 
     if (!app_frame(deltaTime))
     {
-         sapp_request_quit();
+        sapp_request_quit();
     }
 }
 
-void sokol_begin_pass() {
-    sg_begin_pass(&(sg_pass) {
+void sokol_begin_pass()
+{
+    sg_begin_pass(&(sg_pass){
         .action = state.pass_action,
-            .swapchain = sglue_swapchain()
-    });
+        .swapchain = sglue_swapchain()});
 
     sg_apply_pipeline(state.pip);
 
@@ -150,54 +150,60 @@ void sokol_begin_pass() {
     }
 }
 
-void sokol_end_pass() {
+void sokol_end_pass()
+{
     sg_end_pass();
-	sg_commit();
+    sg_commit();
 }
 
-void cleanup(void) {
+void cleanup(void)
+{
     app_cleanup();
     sg_shutdown();
 }
 
-static void event(const sapp_event* e) {
+static void event(const sapp_event *e)
+{
     InputEvent custom;
-    
-    switch (e->type) {
-        case SAPP_EVENTTYPE_KEY_DOWN:
-            custom.type = EventType_KeyDown;  // Use enum values from CustomEvent.h (include it)
-            custom.key_code = (int)e->key_code;
-            break;
-        case SAPP_EVENTTYPE_KEY_UP:
-            custom.type = EventType_KeyUp;
-            custom.key_code = (int)e->key_code;
-            break;
-        case SAPP_EVENTTYPE_QUIT_REQUESTED:
-            custom.type = EventType_QuitRequested;
-            break;
-        default:
-            custom.type = EventType_Unknown;
-            break;
+
+    switch (e->type)
+    {
+    case SAPP_EVENTTYPE_KEY_DOWN:
+        custom.type = EventType_KeyDown; // Use enum values from CustomEvent.h (include it)
+        custom.key_code = (int)e->key_code;
+        break;
+    case SAPP_EVENTTYPE_KEY_UP:
+        custom.type = EventType_KeyUp;
+        custom.key_code = (int)e->key_code;
+        break;
+    case SAPP_EVENTTYPE_QUIT_REQUESTED:
+        custom.type = EventType_QuitRequested;
+        break;
+    default:
+        custom.type = EventType_Unknown;
+        break;
     }
 
     app_event(&custom);
 }
 
-sapp_desc sokol_main(int argc, char* argv[]) {
-    return (sapp_desc) {
-            .init_cb = init,
-            .frame_cb = frame,
-            .cleanup_cb = cleanup,
-            .event_cb = event,
-            .width = 800,
-            .height = 600,
-            .high_dpi = true,
-            .window_title = "Application",
+sapp_desc sokol_main(int argc, char *argv[])
+{
+    return (sapp_desc){
+        .init_cb = init,
+        .frame_cb = frame,
+        .cleanup_cb = cleanup,
+        .event_cb = event,
+        .width = 800,
+        .height = 600,
+        .high_dpi = true,
+        .window_title = "Application",
     };
 }
 
-//Texture wrappers for C interface
-uint32_t sokol_create_texture(int width, int height, const unsigned char* pixelData) {
+// Texture wrappers for C interface
+uint32_t sokol_create_texture(int width, int height, const unsigned char *pixelData)
+{
     /*std::vector<uint32_t> rgbaPixels(width * height);
     for (int i = 0; i < width * height; ++i) {
         uint8_t value = pixelData[i];
@@ -220,22 +226,25 @@ uint32_t sokol_create_texture(int width, int height, const unsigned char* pixelD
     }
     return img.id;*/
 
-	return 0; // Placeholder return value
+    return 0; // Placeholder return value
 }
 
 // Destroy texture by ID
-void sokol_destroy_texture(uint32_t id) {
-    sg_image img = { .id = id };
+void sokol_destroy_texture(uint32_t id)
+{
+    sg_image img = {.id = id};
     sg_destroy_image(img);
 }
 
 // Bind texture for drawing (call before draw quads)
-void sokol_bind_texture(uint32_t id) {
-    //sg_image img = { .id = id };
-    //sg_texture(img);
+void sokol_bind_texture(uint32_t id)
+{
+    // sg_image img = { .id = id };
+    // sg_texture(img);
 }
 
 // Unbind texture (call after draw)
-void sokol_unbind_texture(void) {
-    //sg_texture(sg_make_image(&(sg_image_desc) { 0 }));
+void sokol_unbind_texture(void)
+{
+    // sg_texture(sg_make_image(&(sg_image_desc) { 0 }));
 }

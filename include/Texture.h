@@ -4,7 +4,8 @@
 #include <cstdint>
 #include "ITexture.h"
 
-class Texture : public ITexture {
+class Texture final : public ITexture
+{
 private:
     uint32_t texture;
 
@@ -13,12 +14,12 @@ public:
     ~Texture() final;
 
     // Deleted copy constructor and assignment operator
-    Texture(const Texture&) = delete;
-    Texture& operator=(const Texture&) = delete;
+    Texture(const Texture &) = delete;
+    Texture &operator=(const Texture &) = delete;
 
     // Move constructor and assignment operator
-    Texture(Texture&& other) noexcept;
-    Texture& operator=(Texture&& other) noexcept;
+    Texture(Texture &&other) noexcept;
+    Texture &operator=(Texture &&other) noexcept;
 
     uint32_t GetHandle() const noexcept;
 };

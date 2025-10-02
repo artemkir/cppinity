@@ -27,21 +27,22 @@
 #include "Scripts/EndScreenLogic.h"
 #include "Scripts/GameConsts.h"
 #include "Scripts/GameStateManager.h"
-#include "Input.h"  // Updated input handler
+#include "Input.h" // Updated input handler
 
-struct AppState {
+struct AppState
+{
     SokolRenderer renderer;
     TexturesManager textureManager;
     std::unique_ptr<Scene> scene;
 
     AppState()
-        : textureManager(&renderer),  
-        scene(std::make_unique<Scene>(&renderer)) {} 
+        : textureManager(&renderer),
+          scene(std::make_unique<Scene>(&renderer)) {}
 };
 
-static AppState* state = nullptr;
+static AppState *state = nullptr;
 
-void gameInit(Scene* scene, TexturesManager& textureManager)
+void gameInit(Scene *scene, TexturesManager &textureManager)
 {
     auto iconTexture = state->textureManager.LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
@@ -52,7 +53,7 @@ void gameInit(Scene* scene, TexturesManager& textureManager)
 
     // Game Mode Root
     auto root = scene->CreateGameObjectBuilder("GameModeRoot", 0)
-        .AddToScene();
+                    .AddToScene();
 
     // Border (as child of root)
     root->CreateGameObjectBuilder("border", 0)
@@ -102,24 +103,28 @@ void gameInit(Scene* scene, TexturesManager& textureManager)
         .AddToScene();
 }
 
-extern "C" void app_init(void) {
+extern "C" void app_init(void)
+{
 
     state = new AppState();
-	state->renderer = SokolRenderer();
+    state->renderer = SokolRenderer();
     state->textureManager = TexturesManager(&state->renderer);
     state->scene = std::make_unique<Scene>(&state->renderer);
 
     gameInit(state->scene.get(), state->textureManager);
 }
 
-extern "C" bool app_frame(uint64_t deltaTime) {
+extern "C" bool app_frame(uint64_t deltaTime)
+{
     return state->scene->Frame(deltaTime);
 }
 
-extern "C" void app_cleanup(void) {
+extern "C" void app_cleanup(void)
+{
     delete state;
 }
 
-extern "C" void app_event(const InputEvent* event) {
+extern "C" void app_event(const InputEvent *event)
+{
     state->scene->HandleEvent(event);
 }

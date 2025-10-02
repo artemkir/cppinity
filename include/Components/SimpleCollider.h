@@ -2,8 +2,9 @@
 
 #include "BaseComponent.h"
 
-class SimpleCollider : public BaseComponent {
+class SimpleCollider : public BaseComponent
+{
 public:
 	SimpleCollider(bool active_ = true);
-	bool IsColliding(const SimpleCollider& other) const;
+	bool IsColliding(const SimpleCollider &other) const;
 };

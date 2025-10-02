@@ -7,7 +7,8 @@
 #include <memory>
 #include <stdexcept>
 
-class SokolRenderer : public IRenderer {
+class SokolRenderer : public IRenderer
+{
 public:
     SokolRenderer();
 
@@ -15,6 +16,6 @@ public:
     void DrawRect(float x, float y, float w, float h) const override;
     void SetDrawColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255) const override;
     void EndPass() const override;
-    std::shared_ptr<ITexture> CreateTexture(int width, int height, const unsigned char* pixelData) const override;
-    void DrawTexture(float x, float y, float w, float h, const ITexture& texture) const override;
+    std::shared_ptr<ITexture> CreateTexture(int width, int height, const unsigned char *pixelData) const override;
+    void DrawTexture(float x, float y, float w, float h, const ITexture &texture) const override;
 };

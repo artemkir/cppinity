@@ -2,9 +2,10 @@
 
 #include "IInputHandler.h"
 
-class InputHandler : public IInputHandler {
+class InputHandler : public IInputHandler
+{
 	Direction dir;
-	
+
 public:
 	InputHandler();
 	void Update(float deltaTime) override;

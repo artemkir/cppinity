@@ -10,19 +10,20 @@
 #include "Scene.h"
 #include "GameObjectBuilder.h"
 
-EndScreenLogic::EndScreenLogic(TexturesManager& textureManager_)
+EndScreenLogic::EndScreenLogic(TexturesManager &textureManager_)
     : textureManager(textureManager_) {}
 
-void EndScreenLogic::Start() {
+void EndScreenLogic::Start()
+{
     texture = textureManager.LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
     auto scene = gameObject->GetScene();
 
     // End Background
     bg = gameObject->CreateGameObjectBuilder("EndBackground", 0)
-        .WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
-        .WithComponent<RectRenderer>(0, 0, 255)
-        .AddToScene();
+             .WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
+             .WithComponent<RectRenderer>(0, 0, 255)
+             .AddToScene();
 
     // Game Over Text
     /*gameOverText = gameObject->CreateGameObjectBuilder("GameOverText", 0)
@@ -31,12 +32,13 @@ void EndScreenLogic::Start() {
         .AddToScene();*/
 
     stateManager = scene->FindGameObjectByName("StateMachineRoot")
-        ->GetComponent<GameStateManager>();
+                       ->GetComponent<GameStateManager>();
 }
 
-void EndScreenLogic::Update(float deltaTime) {
+void EndScreenLogic::Update(float deltaTime)
+{
     auto scene = gameObject->GetScene();
-    auto& input = scene->GetInput();
+    auto &input = scene->GetInput();
 
     if (input.IsKeyPressed(Key::Space))
     {
@@ -45,5 +47,4 @@ void EndScreenLogic::Update(float deltaTime) {
             stateManager->TransitionTo(GameState::MainMenu);
         }
     }
-       
 }

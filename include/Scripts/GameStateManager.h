@@ -4,15 +4,21 @@
 
 class GameObject;
 
-enum class GameState { MainMenu, GameMode, EndScreen };
+enum class GameState
+{
+    MainMenu,
+    GameMode,
+    EndScreen
+};
 
-class GameStateManager : public BaseComponent {
+class GameStateManager : public BaseComponent
+{
 private:
     GameState currentState = GameState::MainMenu;
-    GameObject* mainMenuRoot = nullptr;
-    GameObject* gameModeRoot = nullptr;
-    GameObject* endScreenRoot = nullptr;
-        
+    GameObject *mainMenuRoot = nullptr;
+    GameObject *gameModeRoot = nullptr;
+    GameObject *endScreenRoot = nullptr;
+
 public:
     void Start() override;
     void TransitionTo(GameState newState);

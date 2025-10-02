@@ -3,7 +3,8 @@
 #include <array>
 #include <unordered_map>
 
-enum class Key {
+enum class Key
+{
     A,
     D,
     W,
@@ -12,12 +13,13 @@ enum class Key {
     X,
     Space,
     ESC,
-    Count  // Sentinel for array size
+    Count // Sentinel for array size
 };
 
 struct InputEvent;
 
-class Input {
+class Input
+{
 private:
     std::array<bool, static_cast<size_t>(Key::Count)> down;
     std::array<bool, static_cast<size_t>(Key::Count)> pressed;
@@ -25,15 +27,15 @@ private:
     std::array<bool, static_cast<size_t>(Key::Count)> prevDown;
 
     std::unordered_map<int, Key> keyMap;
-    
+
     bool quitRequestedThisFrame = false;
 
 public:
     Input();
 
-    void BeginFrame(); 
+    void BeginFrame();
 
-    void HandleEvent(const InputEvent* event);  
+    void HandleEvent(const InputEvent *event);
 
     bool IsKeyDown(Key key) const;
     bool IsKeyPressed(Key key) const;
