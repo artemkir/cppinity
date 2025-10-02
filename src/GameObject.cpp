@@ -1,3 +1,4 @@
+// GameObject.cpp (unchanged, no SDL dependencies)
 #include <stdexcept>
 
 #include "GameObject.h"

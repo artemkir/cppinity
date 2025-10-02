@@ -1,3 +1,4 @@
+// TexturesManager.cpp (unchanged, no SDL dependencies)
 #include "TexturesManager.h"
 #include "IRenderer.h"
 

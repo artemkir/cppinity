@@ -1,13 +1,28 @@
-//#define __EMSCRIPTEN__
+// game.cpp (updated for sokol_app)
 
-#include <SDL2/SDL.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define SOKOL_GLCORE
+#define SOKOL_IMPL
+#define SOKOL_NO_DEPRECATED
+#define SOKOL_CPP_NO_SHORTCUTS
+
+#include "sokol_gfx.h"
+#include "sokol_app.h"
+#include "sokol_glue.h"
+#include "sokol_time.h"
+#include "sokol_log.h"
+
+#ifdef __cplusplus
+}
+#endif
+
 #include <ctime>
 #include <cstdlib>
 #include <memory>
-
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#endif
 
 #include "IRenderer.h"
 
@@ -15,15 +30,14 @@
 #include "Components/SimpleCollider.h"
 #include "Components/RectRenderer.h"
 #include "Components/SpriteRenderer.h"
-#include "Components/InputHandler.h"
 #include "Components/Animation.h"
 
 
-#include "SDLRenderer.h"
+#include "Renderer.h"
 #include "TexturesManager.h"
 #include "Scene.h"
 #include "GameObject.h"
-#include "GameObjectBuilder.h"  // Include the builder header
+#include "GameObjectBuilder.h"
 
 
 #include "Scripts/SnakeLogic.h"
@@ -35,139 +49,131 @@
 #include "Scripts/EndScreenLogic.h"
 #include "Scripts/GameConsts.h"
 #include "Scripts/GameStateManager.h"
+#include "Input.h"  // Updated input handler
 
-
-#ifdef __EMSCRIPTEN__
-struct LoopData { Scene* scene; };
-void emscriptenLoop(void* arg) {
-	LoopData* data = static_cast<LoopData*>(arg);
-	if (!data->scene->MainLoop()) emscripten_cancel_main_loop();
+static void slog_func(const char* tag, uint32_t log_level, uint32_t log_item_id, const char* message, uint32_t line_nr, const char* filename, void* user_data) {
+    if (message) {
+        printf("[%s] %s\n", tag, message);
+    }
 }
-#endif
 
-int main(int argc, char* argv[]) {
-	srand(time(NULL));
+struct AppState {
+    Renderer renderer;
+    TexturesManager textureManager;
+    std::unique_ptr<Scene> scene;
 
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		SDL_Log("SDL_Init failed: %s", SDL_GetError());
-		return 1;
-	}
+    AppState()
+        : textureManager(&renderer),  
+        scene(std::make_unique<Scene>(&renderer)) {} 
+};
 
-	SDL_Window* window = SDL_CreateWindow("Snake Game",
-		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		WIDTH * TILE_SIZE + 2, HEIGHT * TILE_SIZE + 2,
-		SDL_WINDOW_SHOWN);
-	if (!window) {
-		SDL_Log("Window creation failed: %s", SDL_GetError());
-		SDL_Quit();
-		return 1;
-	}
+static AppState* state = nullptr;
+static uint64_t last_time = 0;
 
-	SDL_Renderer* sdlRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	if (!sdlRenderer) {
-		SDL_Log("Renderer creation failed: %s", SDL_GetError());
-		SDL_DestroyWindow(window);
-		SDL_Quit();
-		return 1;
-	}
+static void init(void) {
+    
+    sg_desc desc = {};
+    desc.logger.func = slog_func;
 
-	SDLRenderer renderer(sdlRenderer);
-	TexturesManager textureManager(&renderer);
+    sg_setup(&desc);
+         
+    stm_setup();
+    last_time = stm_now();
 
-	auto scene = std::make_unique<Scene>(&renderer);
+    state = new AppState();
+    state->textureManager = TexturesManager(&state->renderer);
+    state->scene = std::make_unique<Scene>(&state->renderer);
 
-	auto iconTexture = textureManager.LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
+    srand(static_cast<unsigned>(stm_sec(stm_now())));
 
-#ifdef DEBUG
-	SDL_Texture* debugTexture = CreateDebugTexture2(sdlRenderer, icon, ICON_WIDTH, ICON_HEIGHT);
-#endif	
+    auto iconTexture = state->textureManager.LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
-	// Main Menu Root
-	scene->CreateGameObjectBuilder("MainMenuRoot", 0)
-		.WithComponent<MainMenuLogic>(textureManager)
-		.AddToScene();
+    // Main Menu Root
+    state->scene->CreateGameObjectBuilder("MainMenuRoot", 0)
+        .WithComponent<MainMenuLogic>(state->textureManager)
+        .AddToScene();
 
-	// Game Mode Root
-	auto root = scene->CreateGameObjectBuilder("GameModeRoot", 0)
-		.AddToScene();
+    // Game Mode Root
+    auto root = state->scene->CreateGameObjectBuilder("GameModeRoot", 0)
+        .AddToScene();
 
-	// Background (commented out, but refactored for completeness)
-	/*scene->CreateGameObjectBuilder("background", 0)
-		.WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
-		.WithComponent<RectRenderer>(0, 0, 0)
-		.Build();*/
+    // Border (as child of root)
+    root->CreateGameObjectBuilder("border", 0)
+        .WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
+        .WithComponent<RectRenderer>(255, 255, 255)
+        .AddToScene();
 
-		// Border (as child of root)
-	root->CreateGameObjectBuilder("border", 0)
-		.WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
-		.WithComponent<RectRenderer>(255, 255, 255)
-		.AddToScene();
+    // Maze Generator
+    state->scene->CreateGameObjectBuilder("maze_generator", 0)
+        .WithComponent<MazeGenerator>()
+        .AddToScene();
 
-	// Maze Generator
-	scene->CreateGameObjectBuilder("maze_generator", 0)
-		.WithComponent<MazeGenerator>()
-		.AddToScene();
+    // Apple
+    state->scene->CreateGameObjectBuilder("apple", OBSTACLE_TAG)
+        .WithComponent<TileTransform>()
+        .WithComponent<SimpleCollider>()
+        .WithComponent<AppleLogic>()
+        .WithComponent<SpriteRenderer>(iconTexture)
+        .WithComponent<Animation>(0.25f, 2.25f, 2.25f, -1)
+        .AddToScene();
 
-	// Apple
-	scene->CreateGameObjectBuilder("apple", OBSTACLE_TAG)
-		.WithComponent<TileTransform>()
-		.WithComponent<SimpleCollider>()
-		.WithComponent<AppleLogic>()
-		.WithComponent<SpriteRenderer>(iconTexture)
-		//.WithComponent<RectRenderer>(255, 0, 0, 100)  // Commented in original
-		//.WithComponent<Animation>(0.25f, 1.25f, 1.25f, -1)  // Commented in original
-		.WithComponent<Animation>(0.25f, 2.25f, 2.25f, -1)
-		.AddToScene();
+    // Snake Head
+    state->scene->CreateGameObjectBuilder("snake_head", OBSTACLE_TAG)
+        .WithComponent<TileTransform>()
+        .WithComponent<RectRenderer>(0, 255, 0)
+        .WithComponent<SimpleCollider>()
+        .WithComponent<SnakeLogic>()
+        .AddToScene();
 
-	// Snake Head
-	scene->CreateGameObjectBuilder("snake_head", OBSTACLE_TAG)
-		.WithComponent<TileTransform>()
-		.WithComponent<RectRenderer>(0, 255, 0)
-		.WithComponent<SimpleCollider>()
-		.WithComponent<InputHandler>()
-		.WithComponent<SnakeLogic>()
-		.AddToScene();
+    // NPC Snake
+    state->scene->CreateGameObjectBuilder("npc_snake_head", OBSTACLE_TAG)
+        .WithComponent<TileTransform>()
+        .WithComponent<RectRenderer>(170, 100, 200)
+        .WithComponent<SnakeLogic>()
+        .WithComponent<NPCInputHandler>()
+        .WithComponent<SimpleCollider>()
+        .AddToScene();
 
-	// NPC Snake
-	scene->CreateGameObjectBuilder("npc_snake_head", OBSTACLE_TAG)
-		.WithComponent<TileTransform>()
-		.WithComponent<RectRenderer>(170, 100, 200)
-		.WithComponent<SnakeLogic>()
-		.WithComponent<NPCInputHandler>()
-		.WithComponent<SimpleCollider>()
-		.AddToScene();
+    // End Screen Root
+    state->scene->CreateGameObjectBuilder("EndScreenRoot", 0)
+        .WithComponent<EndScreenLogic>(state->textureManager)
+        .AddToScene();
 
-	// End Screen Root
-	scene->CreateGameObjectBuilder("EndScreenRoot", 0)
-		.WithComponent<EndScreenLogic>(textureManager)
-		.AddToScene();
+    // State Machine Root
+    state->scene->CreateGameObjectBuilder("StateMachineRoot", 0)
+        .WithComponent<GameStateManager>()
+        .AddToScene();
+}
 
-	// State Machine Root
-	scene->CreateGameObjectBuilder("StateMachineRoot", 0)
-		.WithComponent<GameStateManager>()
-		.AddToScene();
+static void frame(void) {
+    uint64_t now = stm_now();
+    float deltaTime = stm_sec(stm_diff(now, last_time));
+    last_time = now;
 
-	//scene.Start();
+    state->scene->Frame(deltaTime);
+}
 
-#ifdef __EMSCRIPTEN__
-	emscripten_set_main_loop_arg(emscriptenLoop, &scene, 10, 1);
-#else
-	bool running = true;
-	while (scene->MainLoop()) {
-		SDL_Delay(16); // ~60fps rendering delay
+static void cleanup(void) {
+    sg_shutdown();
+    delete state;
+}
 
-		// DEBUG: Render the debug texture at top-left corner
-		//#ifdef DEBUG
-		//RenderDebugTexture(sdlRenderer, debugTexture, 5, 5, 64, 64);
-		//renderer.Present();
-		//#endif
+static void event(const sapp_event* e) {
+    state->scene->HandleEvent(e);
+}
 
-	}
-	//SDL_Log("Game Over! Final Score: %d", snakeLogicPtr->GetScore());
-	SDL_DestroyRenderer(sdlRenderer);
-	SDL_DestroyWindow(window);
-	SDL_Quit();
-#endif
-
-	return 0;
+sapp_desc sokol_main(int argc, char* argv[]) {
+    (void)argc;
+    (void)argv;
+    return (sapp_desc) {
+        .init_cb = init,
+        .frame_cb = frame,
+        .cleanup_cb = cleanup,
+        .event_cb = event,
+        .width = WIDTH * TILE_SIZE + 2,
+        .height = HEIGHT * TILE_SIZE + 2,
+        .sample_count = 4,
+        .window_title = "Snake Game",
+        .logger.func = slog_func,
+    };
 }

@@ -1,3 +1,4 @@
+// Scene.h
 #pragma once
 
 #include <map>
@@ -21,8 +22,6 @@ class Scene {
 	std::vector<SimpleCollider*> colliders;
 
 	IRenderer* renderer;
-	bool running = true;
-	unsigned lastTicks = 0;  // For calculating delta time
 
 	void CheckCollisions();
 
@@ -41,10 +40,11 @@ public:
 
 	void Clear();
 
-	bool IsRunning() const;
 	void Stop();
 
-	bool MainLoop();
+	void Frame(float deltaTime);  // Main frame logic for Sokol
+
+	void HandleEvent(const sapp_event* e);  // Handle Sokol events
 
 	const std::vector<std::unique_ptr<GameObject>>& GetGameObjects() const;
 	const IRenderer* GetRenderer() const;
@@ -54,4 +54,3 @@ public:
 	const Input& GetInput() const;
 	
 };
-

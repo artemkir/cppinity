@@ -1,14 +1,15 @@
+// Texture.h
 #pragma once
 
 #include "ITexture.h"
-#include <SDL.h>
+//#include "sokol_gfx.h"
 
 class Texture : public ITexture {
 private:
-    SDL_Texture* texture = nullptr;
+    sg_image texture;
 
 public:
-    explicit Texture(SDL_Texture* tex);
+    explicit Texture(sg_image tex);
     ~Texture() final;
 
     // Deleted copy constructor and assignment operator
@@ -19,5 +20,5 @@ public:
     Texture(Texture&& other) noexcept;
     Texture& operator=(Texture&& other) noexcept;
 
-    SDL_Texture* GetSDLTexture() const noexcept;
+    sg_image GetSGImage() const noexcept;
 };
