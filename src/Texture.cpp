@@ -1,28 +1,28 @@
-// Texture.cpp (updated for sg_image)
 #include "Texture.h"
-//#include "sokol_gfx.h"
 
-Texture::Texture(sg_image tex) : texture(tex) {}
+extern "C" void sokol_destroy_texture(uint32_t id);
+
+Texture::Texture(uint32_t tex) : texture(tex) {}
 
 Texture::~Texture() {
-    sg_destroy_image(texture);
+    sokol_destroy_texture(texture);
 }
 
 Texture::Texture(Texture&& other) noexcept : texture(other.texture) {
-    other.texture.id = SG_INVALID_ID;
+    other.texture = 0;
 }
 
 Texture& Texture::operator=(Texture&& other) noexcept {
     if (this != &other) {
-        if (texture.id != SG_INVALID_ID) {
-            sg_destroy_image(texture);
+        if (texture != 0) {
+            sokol_destroy_texture(texture);
         }
         texture = other.texture;
-        other.texture.id = SG_INVALID_ID;
+        other.texture = 0;
     }
     return *this;
 }
 
-sg_image Texture::GetSGImage() const noexcept {
+uint32_t Texture::GetHandle() const noexcept {
     return texture;
 }

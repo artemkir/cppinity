@@ -64,34 +64,41 @@ void Scene::Render() {
     }
 }
 
-void Scene::Clear() {
+void Scene::BeginPass() {
     gameObjects.clear();
     gameObjectLookup.clear();
     gameObjectsRenderers.clear();
     colliders.clear();
 }
 
-void Scene::Stop() {
-    // In Sokol, call sapp_quit() to stop the app
-    sapp_quit();
+bool Scene::IsRunning() const {
+    return running;
 }
 
-void Scene::Frame(float deltaTime) {
+void Scene::Stop() {
+    running = false;
+}
+
+bool Scene::Frame(float deltaTime) {
     inputHandler.BeginFrame();  // Prepare input for frame (compute pressed/released)
 
     if (inputHandler.WasQuitRequested()) {
         Stop();
     }
 
-    renderer->Clear();
+    renderer->BeginPass();
+
     Update(deltaTime);
     CheckCollisions();
     Render();
-    renderer->Present();
+    
+    renderer->EndPass();
+
+    return IsRunning();
 }
 
-void Scene::HandleEvent(const sapp_event* e) {
-    inputHandler.HandleEvent(e);
+void Scene::HandleEvent(const InputEvent* event) {
+    inputHandler.HandleEvent(event);  
 }
 
 const std::vector<std::unique_ptr<GameObject>>& Scene::GetGameObjects() const {

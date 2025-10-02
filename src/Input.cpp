@@ -1,6 +1,6 @@
 // Input.cpp (updated for Sokol)
 #include "Input.h"
-//#include "sokol_app.h"
+#include "InputEvent.h"
 
 Input::Input() {
     down.fill(false);
@@ -8,15 +8,15 @@ Input::Input() {
     released.fill(false);
     prevDown.fill(false);
 
-    // Initialize key mappings
-    keyMap[SAPP_KEYCODE_A] = Key::A;
-    keyMap[SAPP_KEYCODE_D] = Key::D;
-    keyMap[SAPP_KEYCODE_W] = Key::W;
-    keyMap[SAPP_KEYCODE_S] = Key::S;
-    keyMap[SAPP_KEYCODE_SPACE] = Key::Space;
-    keyMap[SAPP_KEYCODE_R] = Key::R;
-    keyMap[SAPP_KEYCODE_X] = Key::X;
-    keyMap[SAPP_KEYCODE_ESCAPE] = Key::ESC;
+	// Check SAPP_KEYCODE_A, etc. for correct values
+    keyMap[65] = Key::A;
+    keyMap[68] = Key::D;
+    keyMap[87] = Key::W;
+    keyMap[83] = Key::S;
+    keyMap[32] = Key::Space;
+    keyMap[82] = Key::R;
+    keyMap[88] = Key::X;
+    keyMap[256] = Key::ESC;
 }
 
 void Input::BeginFrame() {
@@ -33,13 +33,13 @@ void Input::BeginFrame() {
     quitRequestedThisFrame = false;
 }
 
-void Input::HandleEvent(const sapp_event* e) {
-    if (e->type == SAPP_EVENTTYPE_QUIT_REQUESTED) {
+void Input::HandleEvent(const InputEvent* event) {
+    if (event->type == EventType_QuitRequested) {
         quitRequestedThisFrame = true;
-    } else if (e->type == SAPP_EVENTTYPE_KEY_DOWN || e->type == SAPP_EVENTTYPE_KEY_UP) {
-        bool isDown = (e->type == SAPP_EVENTTYPE_KEY_DOWN);
+    } else if (event->type == EventType_KeyDown || event->type == EventType_KeyUp) {
+        bool isDown = (event->type == EventType_KeyDown);
         
-        auto it = keyMap.find(e->key_code);
+        auto it = keyMap.find(event->key_code);
         if (it != keyMap.end()) {
             Key key = it->second;
             down[static_cast<size_t>(key)] = isDown;

@@ -13,6 +13,7 @@ class RendererComponent;
 class IRenderer;
 class SimpleCollider;
 class GameObjectBuilder;
+struct InputEvent;
 
 // Scene Class
 class Scene {
@@ -22,6 +23,7 @@ class Scene {
 	std::vector<SimpleCollider*> colliders;
 
 	IRenderer* renderer;
+	bool running = true;
 
 	void CheckCollisions();
 
@@ -38,13 +40,15 @@ public:
 
 	void Render();
 
-	void Clear();
+	void BeginPass();
+
+	bool IsRunning() const;
 
 	void Stop();
 
-	void Frame(float deltaTime);  // Main frame logic for Sokol
+	bool Frame(float deltaTime); 
 
-	void HandleEvent(const sapp_event* e);  // Handle Sokol events
+	void HandleEvent(const InputEvent* event);  
 
 	const std::vector<std::unique_ptr<GameObject>>& GetGameObjects() const;
 	const IRenderer* GetRenderer() const;
