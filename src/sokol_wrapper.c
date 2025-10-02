@@ -11,8 +11,6 @@
 #include "sokol_time.h"
 #include "sokol_log.h"
 
-#include "Shaders\triangle-sapp.glsl.h"
-
 extern void app_init(void);
 extern bool app_frame(uint64_t deltaTime);
 extern void app_cleanup(void);
@@ -34,6 +32,32 @@ void init(void) {
     srand(stm_sec(stm_now()));
 }
 
+sg_shader make_custom_shader() {
+    return sg_make_shader(&(sg_shader_desc) {
+        .attrs = {
+            [0].glsl_name = "pos",
+            [1].glsl_name = "color0",
+        },
+        .vertex_func.source =
+        "#version 300 es\n"
+            "in vec4 pos;"
+            "in vec4 color0;"
+            "out vec4 color;"
+            "void main() {"
+            "  gl_Position = pos;\n"
+            "  color = color0;\n"
+            "}\n",
+            .fragment_func.source =
+            "#version 300 es\n"
+            "precision mediump float;\n"
+            "in vec4 color;\n"
+            "out vec4 frag_color;\n"
+            "void main() {\n"
+            "  frag_color = color;\n"
+            "}\n"
+    });
+}
+
 void sokol_setup() {
     
     sg_setup(&(sg_desc) {
@@ -45,17 +69,15 @@ void sokol_setup() {
         .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {0.2f, 0.3f, 0.3f, 1.0f} }
     };
 
-    // create shader from code-generated sg_shader_desc
-    sg_shader shd = sg_make_shader(triangle_shader_desc(sg_query_backend()));
-
+    //sg_shader shd = sg_make_shader(triangle_shader_desc(sg_query_backend()));
+    
     // create a pipeline object (default render states are fine for triangle)
     state.pip = sg_make_pipeline(&(sg_pipeline_desc) {
-        .shader = shd,
-            // if the vertex layout doesn't have gaps, don't need to provide strides and offsets
+        .shader = make_custom_shader(),
             .layout = {
                 .attrs = {
-                    [ATTR_triangle_position].format = SG_VERTEXFORMAT_FLOAT3,
-                    [ATTR_triangle_color0].format = SG_VERTEXFORMAT_FLOAT4
+                    [0].format = SG_VERTEXFORMAT_FLOAT3,
+                    [1].format = SG_VERTEXFORMAT_FLOAT4
                 }
         },
             .index_type = SG_INDEXTYPE_UINT16,
@@ -63,7 +85,7 @@ void sokol_setup() {
     });
 }
 
-void createRect()
+void create_test_rect()
 {
     // a vertex buffer with 3 vertices and view for binding
     float vertices[] = {
@@ -90,7 +112,7 @@ void createRect()
     });
 }
 
-void cleanupRect()
+void cleanup_test_rect()
 {
 	sg_destroy_buffer(state.bind.vertex_buffers[0]);
 	sg_destroy_buffer(state.bind.index_buffer);
@@ -118,13 +140,13 @@ void sokol_begin_pass() {
 
     for (int i = 0; i < 20; i++)
     {
-        createRect();
+        create_test_rect();
 
         sg_apply_bindings(&state.bind);
 
         sg_draw(0, 6, 1);
 
-        cleanupRect();
+        cleanup_test_rect();
     }
 }
 
