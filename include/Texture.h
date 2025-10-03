@@ -8,18 +8,14 @@ class Texture final : public ITexture
 {
 private:
     uint32_t texture;
+    uint32_t view;
 
 public:
-    explicit Texture(uint32_t tex);
+    explicit Texture(uint32_t tex, uint32_t view);
     ~Texture() final;
-
-    // Deleted copy constructor and assignment operator
     Texture(const Texture &) = delete;
     Texture &operator=(const Texture &) = delete;
-
-    // Move constructor and assignment operator
     Texture(Texture &&other) noexcept;
     Texture &operator=(Texture &&other) noexcept;
-
-    uint32_t GetHandle() const noexcept;
+    uint32_t GetViewHandle() const noexcept;
 };

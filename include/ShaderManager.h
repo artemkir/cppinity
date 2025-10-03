@@ -18,8 +18,13 @@ public:
 
     std::shared_ptr<Shader> GetShader(const std::string& id) const;
 
+    void CreateDefaultShaders();
+
 private:
     std::unordered_map<std::string, std::shared_ptr<Shader>> shaders_;
+
+    void CreateUnlitColorPixelRectShader();
+    void CreateUnlitTextureScreenShader();
 };
 
 #endif

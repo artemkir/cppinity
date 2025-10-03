@@ -22,7 +22,7 @@ public:
         unsigned char g_, 
         unsigned char b_, 
         int renderOrder_ = 0,
-        const std::string &materialName = "rect_material");
+        const std::string &materialName = "UI/Color");
 
     Color GetColor();
     void Render() override;

@@ -79,8 +79,8 @@ void CreateInitialScene(Scene* scene)
 		.WithComponent<TileTransform>()
 		.WithComponent<SimpleCollider>()
 		.WithComponent<AppleLogic>()
-		//.WithComponent<SpriteRenderer>(iconTexture)
-		.WithComponent<RectRenderer>(255, 0, 0, 100)  // Commented in original
+		.WithComponent<SpriteRenderer>(iconTexture)
+		//.WithComponent<RectRenderer>(255, 0, 0, 100)  // Commented in original
 		//.WithComponent<Animation>(0.25f, 1.25f, 1.25f, -1)  // Commented in original
 		.WithComponent<Animation>(0.25f, 2.25f, 2.25f, -1)
 		.AddToScene();
@@ -131,7 +131,8 @@ extern "C" void app_init(void)
         app_state->renderer.get(),
         app_state->materialManager.get(),
         app_state->textureManager.get());
-	 
+	
+	app_state->shaderManager->CreateDefaultShaders();
     app_state->materialManager->CreateDefaultMaterials();
     
     gameInit(app_state->scene.get());

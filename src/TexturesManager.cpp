@@ -4,7 +4,7 @@
 
 TexturesManager::TexturesManager(IRenderer* renderer_) : renderer(renderer_) {}
 
-std::shared_ptr<ITexture> TexturesManager::LoadTexture(const std::string& id, int width, int height, const unsigned char* data) {
+std::shared_ptr<ITexture> TexturesManager::LoadTexture(const std::string& id, int width, int height, const uint8_t* data) {
     auto it = textures.find(id);
     if (it != textures.end()) {
         return it->second;

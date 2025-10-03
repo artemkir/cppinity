@@ -57,14 +57,19 @@ Shader::Shader(const std::vector<AttributeDesc>& _attrs,
     }
 
     // Create via wrapper
-    id = sokol_create_shader(vsSource.c_str(), 
-                            fsSource.c_str(),
-                            attrs.size(), 
-                            attr_names_ptr.data(), 
-                            attr_formats.data(),
-                            vsUniformBlock.size, vsUniformBlock.uniforms.size(),
-                            uni_names_ptr.data(), uni_types.data(),
-                            fsImageNames.size(), image_names_ptr.data());
+    id = sokol_create_shader(
+        vsSource.c_str(), 
+        fsSource.c_str(),
+        attrs.size(), 
+        attr_names_ptr.data(), 
+        attr_formats.data(),
+        vsUniformBlock.size, 
+        vsUniformBlock.uniforms.size(),
+        uni_names_ptr.data(), 
+        uni_types.data(),
+        fsImageNames.size(), 
+        image_names_ptr.data()
+    );
 }
 
 Shader::~Shader() {
