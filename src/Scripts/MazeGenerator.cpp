@@ -1,5 +1,3 @@
-#include <format>
-
 #include "Scripts/MazeGenerator.h"
 
 #include "Components/RectRenderer.h"
@@ -22,7 +20,7 @@ void MazeGenerator::AddGridToScene()
             {
                 int c = color(g);
 
-                auto block = gameObject->GetScene()->CreateGameObjectBuilder(std::format("maze_block_{}_{}", x, y), OBSTACLE_TAG)
+                auto block = gameObject->GetScene()->CreateGameObjectBuilder("maze_block_" + std::to_string(x) + "_" + std::to_string(y), OBSTACLE_TAG)
                                  .WithComponent<TileTransform>(x, y, TILE_SIZE, TILE_SIZE)
                                  .WithComponent<RectRenderer>(c, c, c)
                                  .WithComponent<SimpleCollider>()

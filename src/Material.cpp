@@ -24,7 +24,7 @@ Material::Material(std::shared_ptr<Shader> shader)
 	}
 
 	// Create pipeline immediately
-	pipeline_id_ = sokol_create_pipeline(shader->GetID(), attrs.size(), attr_formats.data(), static_cast<int>(IndexType::UINT16));
+	pipeline_id_ = sokol_create_pipeline(shader->GetID(), attrs.size(), attr_formats.data(), static_cast<std::underlying_type_t<IndexType>>(IndexType::UINT16));
 
 	uniform_buffer_.resize(GetUniformSize(), 0);
 }
@@ -51,7 +51,7 @@ void Material::SetTexture(const std::string& name, std::shared_ptr<ITexture> tex
 	textures_[name] = texture;
 }
 
-const void* Material::GetUniformData() const 
+const unsigned char* Material::GetUniformData() const 
 {
 	if (!dirty_) 
 	{

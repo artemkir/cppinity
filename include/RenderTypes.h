@@ -38,18 +38,7 @@ public:
         default: return 0;
         }
     }
-
-    static int GetAlignment(UniformType type) {
-        // Std140 rules: float align 4, vec2 8, vec3/vec4 16
-        switch (type) {
-        case UniformType::FLOAT: return 4;
-        case UniformType::FLOAT2: return 8;
-        case UniformType::FLOAT3:
-        case UniformType::FLOAT4: return 16;
-        default: return 4;
-        }
-    }
-
+        
     static int GetComponentCount(UniformType type) {
         switch (type) {
         case UniformType::FLOAT: return 1;

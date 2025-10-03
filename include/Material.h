@@ -22,7 +22,7 @@ public:
 
     uint32_t GetPipelineID() const { return pipeline_id_; }
 
-    const void* GetUniformData() const;
+    const unsigned char* GetUniformData() const;
 
     int GetUniformSize() const { return shader_->GetVSUniformBlock().size; }
 
@@ -35,7 +35,7 @@ private:
     uint32_t pipeline_id_ = 0;
     std::unordered_map<std::string, std::vector<float>> uniform_values_;
     std::unordered_map<std::string, std::shared_ptr<ITexture>> textures_;
-    mutable std::vector<char> uniform_buffer_;
+    mutable std::vector<unsigned char> uniform_buffer_;
     mutable bool dirty_ = true;
 };
 
