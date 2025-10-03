@@ -11,16 +11,15 @@
 #include "TexturesManager.h"
 #include "GameObjectBuilder.h" // Include the builder header
 
-MainMenuLogic::MainMenuLogic(TexturesManager &textureManager_)
-    : textureManager(textureManager_)
+MainMenuLogic::MainMenuLogic()
 {
 }
 
 void MainMenuLogic::Start()
 {
-    buttonTexture = textureManager.LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
-
     auto scene = gameObject->GetScene();
+
+    auto buttonTexture = scene->GetTextureManager()->LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
     // Menu Background
     bg = gameObject->CreateGameObjectBuilder("MenuBackground", 0)

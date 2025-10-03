@@ -200,9 +200,9 @@ void sokol_begin_pass()
         .action = app_state.pass_action,
         .swapchain = sglue_swapchain()});
 
-    sg_apply_pipeline(app_state.pip);
+    //sg_apply_pipeline(app_state.pip);
 
-    sg_apply_bindings(&app_state.bind);
+    //sg_apply_bindings(&app_state.bind);
 }
 
 void sokol_end_pass()
@@ -307,4 +307,92 @@ void sokol_bind_texture(uint32_t id)
 void sokol_unbind_texture(void)
 {
     // sg_texture(sg_make_image(&(sg_image_desc) { 0 }));
+}
+
+uint32_t sokol_create_shader(const char* vs_source, const char* fs_source,
+                             int num_attrs, const char** attr_names, const int* attr_formats,
+                             int uniform_block_size, int num_uniforms,
+                             const char** uniform_names, const int* uniform_types,
+                             int num_images, const char** image_names) {
+    sg_shader_desc desc = {0};
+    desc.vertex_func.source = vs_source;
+    desc.fragment_func.source = fs_source;
+
+    for (int i = 0; i < num_attrs; ++i) {
+        desc.attrs[i].glsl_name = attr_names[i];
+        //desc.attrs[i].format = (sg_vertexformat)attr_formats[i];
+    }
+
+    desc.uniform_blocks[0].size = uniform_block_size;
+    
+    for (int i = 0; i < num_uniforms; ++i) {
+
+        desc.uniform_blocks[0].stage = SG_SHADERSTAGE_VERTEX;
+        desc.uniform_blocks[0].glsl_uniforms[i].glsl_name = uniform_names[i];
+        desc.uniform_blocks[0].glsl_uniforms[i].type = (sg_uniform_type)uniform_types[i];
+    }
+
+    //for (int i = 0; i < num_images; ++i) {
+    //    desc.fs.images[i].name = image_names[i];
+    //    desc.fs.images[i].image_type = SG_IMAGETYPE_2D;
+    //    desc.fs.images[i].sampler_type = SG_SAMPLERTYPE_FLOAT;
+    //}
+
+    sg_shader shd = sg_make_shader(&desc);
+    return shd.id;
+}
+
+void sokol_destroy_shader(uint32_t id) {
+    sg_destroy_shader((sg_shader){.id = id});
+}
+
+uint32_t sokol_create_pipeline(uint32_t shader_id, int num_attrs, const int* attr_formats, int index_type) {
+    sg_pipeline_desc desc = {0};
+
+    desc.shader.id = shader_id;
+    for (int i = 0; i < num_attrs; ++i) {
+        desc.layout.attrs[i].format = (sg_vertex_format)attr_formats[i];
+    }
+    desc.index_type = (sg_index_type)index_type;
+    
+    //TODO: add more
+    //desc.depth.compare = SG_COMPAREFUNC_ALWAYS;
+    //desc.depth.write_enabled = false;
+    //desc.cull_mode = SG_CULLMODE_NONE;
+
+    sg_pipeline pip = sg_make_pipeline(&desc);
+    return pip.id;
+}
+
+void sokol_destroy_pipeline(uint32_t id) {
+    sg_destroy_pipeline((sg_pipeline){.id = id});
+}
+
+void sokol_apply_pipeline(uint32_t id) {
+    sg_apply_pipeline((sg_pipeline){.id = id});
+}
+
+void sokol_apply_uniforms_vs(const void* data, int size) {
+    sg_range u = {.ptr = data, .size = (size_t)size};
+    sg_apply_uniforms(0, &u);
+}
+
+void sokol_apply_texture(uint32_t fs_image0_id) {
+    //sg_bindings bind = app_state.bind;
+    //bind.fs_images[0].id = fs_image0_id;
+    //sg_apply_bindings(&bind);
+}
+
+int sokol_get_screen_width() {
+    return app_state.screen_width;
+}
+
+int sokol_get_screen_height() {
+    return app_state.screen_height;
+}
+
+void sokol_draw(int num_elements) {
+    sg_apply_bindings(&app_state.bind);
+
+    sg_draw(0, num_elements, 1);
 }

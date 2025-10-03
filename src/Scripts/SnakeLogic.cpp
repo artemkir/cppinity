@@ -10,6 +10,7 @@
 #include "Scene.h"
 #include "Scripts/GameStateManager.h"
 #include "GameObject.h"
+#include "GameObjectBuilder.h"
 #include <memory>
 
 #include "Scripts/GameConsts.h"
@@ -97,28 +98,30 @@ void SnakeLogic::OnCollide(GameObject *other)
         apple->RegenerateApple();
 
         TileTransform *headTransform = gameObject->GetTransform();
+        
         int prevX = headTransform->GetX();
         int prevY = headTransform->GetY();
+        
         if (!tail.empty())
         {
             prevX = tail.back()->GetTransform()->GetX();
             prevY = tail.back()->GetTransform()->GetY();
         }
-        auto newTail = std::make_unique<GameObject>("tail_" + std::to_string(tail.size()), OBSTACLE_TAG);
-
+       
         auto color = rect->GetColor();
 
-        newTail->AddComponent(std::make_unique<RectRenderer>((int)(color.r * 0.75f), (int)(color.g * 0.75f), (int)(color.b * 0.75f)));
-        newTail->AddComponent(std::make_unique<TileTransform>(prevX, prevY, TILE_SIZE, TILE_SIZE));
-        newTail->AddComponent(std::make_unique<SimpleCollider>(false));
-        tail.push_back(newTail.get());
+        auto newTail = gameObject->GetScene()->CreateGameObjectBuilder("tail_" + std::to_string(tail.size()), OBSTACLE_TAG)
+			.WithComponent<RectRenderer>((int)(color.r * 0.75f), (int)(color.g * 0.75f), (int)(color.b * 0.75f))
+			.WithComponent<TileTransform>(prevX, prevY, TILE_SIZE, TILE_SIZE)
+			.WithComponent<SimpleCollider>(false)
+			.AddToScene();        
+
+        tail.push_back(newTail);
 
         if (tail.size() > 0 && update_interval > min_update_interval)
         {
             update_interval -= tail_change_interval;
         }
-
-        gameObject->GetScene()->AddGameObject(std::move(newTail));
     }
     else if (other->GetTag() & OBSTACLE_TAG)
     {

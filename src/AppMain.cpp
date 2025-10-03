@@ -5,6 +5,9 @@
 #include "InputEvent.h"
 
 #include "IRenderer.h"
+#include "ShaderManager.h"
+#include "MaterialManager.h"
+#include "RenderTypes.h"
 
 #include "Components/Transform.h"
 #include "Components/SimpleCollider.h"
@@ -32,24 +35,22 @@
 
 struct AppState
 {
-    SokolRenderer renderer;
-    TexturesManager textureManager;
+    std::unique_ptr<SokolRenderer> renderer;
+    std::unique_ptr<TexturesManager> textureManager;
+    std::unique_ptr<ShaderManager> shaderManager;
+    std::unique_ptr<MaterialManager> materialManager;
     std::unique_ptr<Scene> scene;
-
-    AppState()
-        : textureManager(&renderer),
-          scene(std::make_unique<Scene>(&renderer)) {}
 };
 
-static AppState *app_state = nullptr;
+static std::unique_ptr<AppState> app_state = nullptr;
 
-void gameInit(Scene *scene, TexturesManager &textureManager)
+void CreateInitialScene(Scene* scene)
 {
-    auto iconTexture = app_state->textureManager.LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
+	auto iconTexture = scene->GetTextureManager()->LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
 	// Main Menu Root
 	scene->CreateGameObjectBuilder("MainMenuRoot", 0)
-		.WithComponent<MainMenuLogic>(textureManager)
+		.WithComponent<MainMenuLogic>()
 		.AddToScene();
 
 	// Game Mode Root
@@ -78,8 +79,8 @@ void gameInit(Scene *scene, TexturesManager &textureManager)
 		.WithComponent<TileTransform>()
 		.WithComponent<SimpleCollider>()
 		.WithComponent<AppleLogic>()
-		.WithComponent<SpriteRenderer>(iconTexture)
-		//.WithComponent<RectRenderer>(255, 0, 0, 100)  // Commented in original
+		//.WithComponent<SpriteRenderer>(iconTexture)
+		.WithComponent<RectRenderer>(255, 0, 0, 100)  // Commented in original
 		//.WithComponent<Animation>(0.25f, 1.25f, 1.25f, -1)  // Commented in original
 		.WithComponent<Animation>(0.25f, 2.25f, 2.25f, -1)
 		.AddToScene();
@@ -104,7 +105,7 @@ void gameInit(Scene *scene, TexturesManager &textureManager)
 
 	// End Screen Root
 	scene->CreateGameObjectBuilder("EndScreenRoot", 0)
-		.WithComponent<EndScreenLogic>(textureManager)
+		.WithComponent<EndScreenLogic>()
 		.AddToScene();
 
 	// State Machine Root
@@ -113,15 +114,27 @@ void gameInit(Scene *scene, TexturesManager &textureManager)
 		.AddToScene();
 }
 
+void gameInit(Scene* scene)
+{
+	CreateInitialScene(scene);
+}
+
 extern "C" void app_init(void)
 {
+    app_state = std::make_unique<AppState>();
 
-    app_state = new AppState();
-    app_state->renderer = SokolRenderer();
-    app_state->textureManager = TexturesManager(&app_state->renderer);
-    app_state->scene = std::make_unique<Scene>(&app_state->renderer);
-
-    gameInit(app_state->scene.get(), app_state->textureManager);
+    app_state->renderer = std::make_unique<SokolRenderer>();
+    app_state->textureManager = std::make_unique<TexturesManager>(app_state->renderer.get());
+    app_state->shaderManager = std::make_unique<ShaderManager>();
+    app_state->materialManager = std::make_unique<MaterialManager>(app_state->shaderManager.get());
+    app_state->scene = std::make_unique<Scene>(
+        app_state->renderer.get(),
+        app_state->materialManager.get(),
+        app_state->textureManager.get());
+	 
+    app_state->materialManager->CreateDefaultMaterials();
+    
+    gameInit(app_state->scene.get());
 }
 
 extern "C" bool app_frame(float deltaTime)
@@ -131,7 +144,7 @@ extern "C" bool app_frame(float deltaTime)
 
 extern "C" void app_cleanup(void)
 {
-    delete app_state;
+    app_state = nullptr;
 }
 
 extern "C" void app_event(const InputEvent *event)

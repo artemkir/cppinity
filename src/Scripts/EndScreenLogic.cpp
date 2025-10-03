@@ -9,15 +9,15 @@
 #include "Scripts/IconImage.h"
 #include "Scene.h"
 #include "GameObjectBuilder.h"
+#include "TexturesManager.h"
 
-EndScreenLogic::EndScreenLogic(TexturesManager &textureManager_)
-    : textureManager(textureManager_) {}
+EndScreenLogic::EndScreenLogic() {}
 
 void EndScreenLogic::Start()
 {
-    texture = textureManager.LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
-
     auto scene = gameObject->GetScene();
+
+    auto texture = scene->GetTextureManager()->LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
     // End Background
     bg = gameObject->CreateGameObjectBuilder("EndBackground", 0)

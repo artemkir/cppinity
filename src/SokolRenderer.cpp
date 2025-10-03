@@ -1,10 +1,15 @@
 #include "SokolRenderer.h"
+#include "Material.h"
 
 extern "C" uint32_t sokol_create_texture(int width, int height, const unsigned char* pixelData);
 extern "C" void sokol_begin_pass();
 extern "C" void sokol_end_pass();
 extern "C" void sokol_setup();
 extern "C" void sokol_draw_screen_quad(const float pos[2], const float size[2], const float color[4]);
+extern "C" void sokol_apply_pipeline(uint32_t id);
+extern "C" void sokol_apply_uniforms_vs(const void* data, int size);
+extern "C" void sokol_apply_texture(uint32_t fs_image0_id);
+extern "C" void sokol_draw(int num_elements);
 
 SokolRenderer::SokolRenderer() {
     sokol_setup();
@@ -23,6 +28,29 @@ void SokolRenderer::DrawRect(float x, float y, float w, float h, float col[4]) c
 
 void SokolRenderer::EndPass() const {
     sokol_end_pass();
+}
+
+void SokolRenderer::ApplyMaterial(const Material* material) {
+    //if (material != current_material_) {
+        sokol_apply_pipeline(material->GetPipelineID());
+    //    current_material_ = material;
+    //    current_pipeline_ = material->GetPipelineID();
+    //}
+    // Always apply uniforms (may change per draw)
+    sokol_apply_uniforms_vs(material->GetUniformData(), material->GetUniformSize());
+}
+
+void SokolRenderer::ApplyTexture(const std::shared_ptr<ITexture>& texture) {
+    uint32_t tex_id = 0;
+    if (texture) {
+        const Texture& tex = dynamic_cast<const Texture&>(*texture);
+        tex_id = tex.GetHandle();
+    }
+    sokol_apply_texture(tex_id);
+}
+
+void SokolRenderer::Draw(int num_elements) {
+    sokol_draw(num_elements);
 }
 
 std::shared_ptr<ITexture> SokolRenderer::CreateTexture(int width, int height, const unsigned char* pixelData) const {
