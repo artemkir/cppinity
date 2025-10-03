@@ -15,7 +15,7 @@
 #include "sokol_log.h"
 
 extern void app_init(void);
-extern bool app_frame(uint64_t deltaTime);
+extern bool app_frame(float deltaTime);
 extern void app_cleanup(void);
 extern void app_event(const InputEvent *event);
 
@@ -63,48 +63,67 @@ sg_shader make_custom_shader()
                                 "}\n"});
 }
 
-void sokol_setup()
+typedef struct {
+    float bottom_left[2];
+    float size[2];
+    float color[4];
+    float screen_size[2];
+} vs_uniforms_t;
+
+sg_shader make_shader_for_2d_quads()
 {
-
-    sg_setup(&(sg_desc){
-        .environment = sglue_environment(),
-        .logger.func = slog_func});
-
-    app_state.pass_action = (sg_pass_action){
-        .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {0.2f, 0.3f, 0.3f, 1.0f}}};
-
-    // sg_shader shd = sg_make_shader(triangle_shader_desc(sg_query_backend()));
-
-    // create a pipeline object (default render states are fine for triangle)
-    app_state.pip = sg_make_pipeline(&(sg_pipeline_desc){
-        .shader = make_custom_shader(),
-        .layout = {
-            .attrs = {
-                [0].format = SG_VERTEXFORMAT_FLOAT3,
-                [1].format = SG_VERTEXFORMAT_FLOAT4}},
-        .index_type = SG_INDEXTYPE_UINT16,
-        .label = "triangle-pipeline"});
+    return sg_make_shader(&(sg_shader_desc) {
+        .attrs = {
+            [0].glsl_name = "pos"
+        },
+        .uniform_blocks[0] = {
+            .stage = SG_SHADERSTAGE_VERTEX,
+            .size = sizeof(vs_uniforms_t),
+            .glsl_uniforms = {
+                [0] = { .glsl_name = "u_bottom_left", .type = SG_UNIFORMTYPE_FLOAT2 },
+                [1] = { .glsl_name = "u_size", .type = SG_UNIFORMTYPE_FLOAT2 },
+                [2] = { .glsl_name = "u_color", .type = SG_UNIFORMTYPE_FLOAT4},
+                [3] = { .glsl_name = "u_screen_size", .type = SG_UNIFORMTYPE_FLOAT2},
+			},
+		},
+        .vertex_func.source = "#version 300 es\n"
+            "uniform vec2 u_bottom_left;\n"
+            "uniform vec2 u_size;\n"
+            "uniform vec4 u_color;\n"
+            "uniform vec2 u_screen_size;\n"
+            "in vec2 pos;\n"
+            "out vec4 color;\n"
+            "void main() {\n"
+            "  float pixel_x = u_bottom_left.x + pos.x * u_size.x;\n"
+            "  float pixel_y = u_bottom_left.y + (1.0 - pos.y) * u_size.y;\n"
+            "  float norm_x = (pixel_x / u_screen_size.x) * 2.0 - 1.0;\n"
+            "  float norm_y = 1.0 - (pixel_y / u_screen_size.y) * 2.0;\n"
+            "  gl_Position = vec4(norm_x, norm_y, 0.0, 1.0);\n"
+            "  color = u_color;\n"
+            "}\n",
+         .fragment_func.source = "#version 300 es\n"
+            "precision mediump float;\n"
+            "in vec4 color;\n"
+            "out vec4 frag_color;\n"
+            "void main() {\n"
+            "  frag_color = color;\n"
+            "}\n"
+    });
 }
 
-void create_test_rect(float pos[2], float size[2], float color[4])
+void create_default_quad_buffers()
 {
-    float x = (pos[0] / app_state.screen_width) * 2.0f - 1.0f;
-    float y = (pos[1] / app_state.screen_height) * 2.0f - 1.0f;
-    float x2 = ((pos[0] + size[0]) / app_state.screen_width) * 2.0f - 1.0f;
-    float y2 = ((pos[1] + size[1]) / app_state.screen_height) * 2.0f - 1.0f;
-
-    y = -y;
-    y2 = -y2;
-
     float vertices[] = {
-        x, y, 0.0f, color[0], color[1], color[2], color[3] ,
-        x, y2, 0.0f, color[0], color[1], color[2], color[3] ,
-        x2, y2, 0.0f, color[0], color[1], color[2], color[3] ,
-        x2, y, 0.0f, color[0], color[1], color[2], color[3] };
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f
+    };
 
-    app_state.bind.vertex_buffers[0] = sg_make_buffer(&(sg_buffer_desc){
+    app_state.bind.vertex_buffers[0] = sg_make_buffer(&(sg_buffer_desc) {
         .data = SG_RANGE(vertices),
-        .label = "vertex-buffer"});
+            .label = "vertex-buffer"
+    });
 
     // create an index buffer for the cube
     const uint16_t indices[] = {
@@ -116,13 +135,34 @@ void create_test_rect(float pos[2], float size[2], float color[4])
         3,
     };
 
-    app_state.bind.index_buffer = sg_make_buffer(&(sg_buffer_desc){
+    app_state.bind.index_buffer = sg_make_buffer(&(sg_buffer_desc) {
         .usage.index_buffer = true,
-        .data = SG_RANGE(indices),
-        .label = "cube-indices"});
+            .data = SG_RANGE(indices),
+            .label = "cube-indices"
+    });
 }
 
-void cleanup_test_rect()
+void sokol_setup()
+{
+    sg_setup(&(sg_desc){
+        .environment = sglue_environment(),
+        .logger.func = slog_func});
+
+    app_state.pass_action = (sg_pass_action){
+        .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {0.2f, 0.3f, 0.3f, 1.0f}}};
+
+    app_state.pip = sg_make_pipeline(&(sg_pipeline_desc){
+        .shader = make_shader_for_2d_quads(),
+        .layout = {
+            .attrs = {
+                [0].format = SG_VERTEXFORMAT_FLOAT2}},
+        .index_type = SG_INDEXTYPE_UINT16,
+        .label = "triangle-pipeline"});
+
+    create_default_quad_buffers();
+}
+
+void cleanup_default_quad_buffers()
 {
     sg_destroy_buffer(app_state.bind.vertex_buffers[0]);
     sg_destroy_buffer(app_state.bind.index_buffer);
@@ -140,15 +180,18 @@ void frame(void)
     }
 }
 
-void sokol_draw_rect(const float pos[2], const float size[2], const float color[4])
+void sokol_draw_screen_quad(const float pos[2], const float size[2], const float color[4])
 {
-    create_test_rect(pos,size,color);
-
-    sg_apply_bindings(&app_state.bind);
+    vs_uniforms_t vs_params = {
+		    .bottom_left = {pos[0], pos[1]},
+			.size = {size[0], size[1]},
+			.color = {color[0], color[1], color[2], color[3]},
+			.screen_size = {(float)app_state.screen_width, (float)app_state.screen_height}
+        };
+            
+    sg_apply_uniforms(0, &SG_RANGE(vs_params));
 
     sg_draw(0, 6, 1);
-
-    cleanup_test_rect();
 }
 
 void sokol_begin_pass()
@@ -159,16 +202,7 @@ void sokol_begin_pass()
 
     sg_apply_pipeline(app_state.pip);
 
-    /*for (int i = 0; i < 20; i++)
-    {
-        create_test_rect();
-
-        sg_apply_bindings(&app_state.bind);
-
-        sg_draw(0, 6, 1);
-
-        cleanup_test_rect();
-    }*/
+    sg_apply_bindings(&app_state.bind);
 }
 
 void sokol_end_pass()
@@ -179,6 +213,8 @@ void sokol_end_pass()
 
 void cleanup(void)
 {
+    cleanup_default_quad_buffers();
+
     app_cleanup();
     sg_shutdown();
 }
