@@ -151,14 +151,6 @@ void sokol_setup()
     app_state.pass_action = (sg_pass_action){
         .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {0.2f, 0.3f, 0.3f, 1.0f}}};
 
-    /*app_state.pip = sg_make_pipeline(&(sg_pipeline_desc) {
-        .shader = make_shader_for_2d_quads(),
-        .layout = {
-            .attrs = {
-                [0].format = SG_VERTEXFORMAT_FLOAT2}},
-        .index_type = SG_INDEXTYPE_UINT16,
-        .label = "triangle-pipeline"});*/
-
     app_state.bind.samplers[0] = sg_make_sampler(&(sg_sampler_desc) {
         .min_filter = SG_FILTER_NEAREST,
         .mag_filter = SG_FILTER_NEAREST,
