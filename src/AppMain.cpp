@@ -152,3 +152,13 @@ extern "C" void app_event(const InputEvent *event)
 {
     app_state->scene->HandleEvent(event);
 }
+
+extern "C" void app_fetch_completed(const uint8_t* data, size_t size, void* user)
+{
+
+}
+
+extern "C" void app_fetch_failed(void* user)
+{
+
+}

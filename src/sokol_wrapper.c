@@ -13,11 +13,14 @@
 #include "sokol_glue.h"
 #include "sokol_time.h"
 #include "sokol_log.h"
+#include "sokol_fetch.h"
 
 extern void app_init(void);
 extern bool app_frame(float deltaTime);
 extern void app_cleanup(void);
 extern void app_event(const InputEvent *event);
+extern void app_fetch_completed(const uint8_t* data, size_t size, void* user);
+extern void app_fetch_failed(void* user);
 
 static struct
 {
@@ -142,30 +145,6 @@ void create_default_quad_buffers()
     });
 }
 
-void sokol_setup()
-{
-    sg_setup(&(sg_desc){
-        .environment = sglue_environment(),
-        .logger.func = slog_func});
-
-    app_state.pass_action = (sg_pass_action){
-        .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {0.2f, 0.3f, 0.3f, 1.0f}}};
-
-    /*app_state.pip = sg_make_pipeline(&(sg_pipeline_desc) {
-        .shader = make_shader_for_2d_quads(),
-        .layout = {
-            .attrs = {
-                [0].format = SG_VERTEXFORMAT_FLOAT2}},
-        .index_type = SG_INDEXTYPE_UINT16,
-        .label = "triangle-pipeline"});*/
-
-    app_state.bind.samplers[0] = sg_make_sampler(&(sg_sampler_desc) {
-        .min_filter = SG_FILTER_NEAREST,
-        .mag_filter = SG_FILTER_NEAREST,
-    });
-
-    create_default_quad_buffers();
-}
 
 void cleanup_default_quad_buffers()
 {
@@ -247,23 +226,6 @@ static void event(const sapp_event *e)
     }
 
     app_event(&custom);
-}
-
-sapp_desc sokol_main(int argc, char *argv[])
-{
-    app_state.screen_width = WIDTH * TILE_SIZE + 2;
-    app_state.screen_height = HEIGHT * TILE_SIZE + 2;
-
-    return (sapp_desc){
-        .init_cb = init,
-        .frame_cb = frame,
-        .cleanup_cb = cleanup,
-        .event_cb = event,
-        .width = app_state.screen_width,
-        .height = app_state.screen_height,
-        .high_dpi = true,
-        .window_title = "Application",
-    };
 }
 
 uint32_t sokol_create_texture(int width, int height, const uint8_t* pixelData)
@@ -415,4 +377,88 @@ int sokol_get_screen_height() {
 void sokol_draw(int num_elements) {
     sg_apply_bindings(&app_state.bind);
     sg_draw(0, num_elements, 1);
+}
+
+void sokol_fetch_setup(int max_requests, int num_channels, int num_lanes) {
+    sfetch_desc_t desc = {
+        .max_requests = max_requests,
+        .num_channels = num_channels,
+        .num_lanes = num_lanes,
+        .logger.func = slog_func
+    };
+    sfetch_setup(&desc);
+}
+
+void sokol_fetch_shutdown(void) {
+    sfetch_shutdown();
+}
+
+void sokol_fetch_update(void) {
+    sfetch_update();
+}
+
+void fetch_loaded_callback(const uint8_t* data, size_t size, void* user) {
+    app_fetch_completed(data,size,user);
+}
+
+void fetch_failed_callback(void* user) {
+    app_fetch_failed(user);
+}
+
+void sokol_fetch_request(const char* path, 
+                         void (*loaded_cb)(const uint8_t*, size_t, void*),
+                         void (*failed_cb)(void*),
+                         void* user_data) {
+    sfetch_request_t req = {
+        .path = path,
+        .callback = fetch_callback,  // Your internal callback that dispatches to loaded/failed
+        .user_data = user_data,
+        .channel = 0  // Default channel
+    };
+    sfetch_send(&req);
+}
+
+// Internal callback to dispatch
+static void fetch_callback(const sfetch_response_t* response) {
+    if (response->fetched) {
+        fetch_loaded_callback(response->data.ptr, response->data.size, response->user_data);
+    } else if (response->failed) {
+        fetch_failed_callback(response->user_data);
+    }
+}
+
+void sokol_setup()
+{
+    sg_setup(&(sg_desc){
+        .environment = sglue_environment(),
+        .logger.func = slog_func});
+
+    sokol_fetch_setup(128,1,1);
+    
+    app_state.pass_action = (sg_pass_action){
+        .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {0.2f, 0.3f, 0.3f, 1.0f}}};
+
+    app_state.bind.samplers[0] = sg_make_sampler(&(sg_sampler_desc) {
+        .min_filter = SG_FILTER_NEAREST,
+        .mag_filter = SG_FILTER_NEAREST,
+    });
+
+    create_default_quad_buffers();
+}
+
+sapp_desc sokol_main(int argc, char *argv[])
+{
+    app_state.screen_width = WIDTH * TILE_SIZE + 2;
+    app_state.screen_height = HEIGHT * TILE_SIZE + 2;
+
+    return (sapp_desc){
+        .init_cb = init,
+        .frame_cb = frame,
+        .cleanup_cb = cleanup,
+        .event_cb = event,
+        .width = app_state.screen_width,
+        .height = app_state.screen_height,
+        .high_dpi = true,
+        .window_title = "Application",
+    };
 }
