@@ -14,6 +14,7 @@
 #include "sokol_time.h"
 #include "sokol_log.h"
 #include "sokol_fetch.h"
+#include "stb/stb_image.h"
 
 extern void app_init(void);
 extern bool app_frame(float deltaTime);
@@ -29,6 +30,7 @@ static struct
     sg_bindings bind;
     int screen_width;
     int screen_height;
+    uint8_t file_buffer[256 * 1024];
 } app_state;
 
 static uint64_t last_time = 0;
@@ -228,7 +230,44 @@ static void event(const sapp_event *e)
     app_event(&custom);
 }
 
-uint32_t sokol_create_texture(int width, int height, const uint8_t* grayscaleData)
+uint32_t sokol_create_texture_from_memory_file(const void* data, size_t size)
+{
+    int png_width, png_height, num_channels;
+    const int desired_channels = 4;
+
+    stbi_uc* pixels = stbi_load_from_memory(
+        data,
+        (int)size,
+        &png_width, &png_height,
+        &num_channels, desired_channels);
+
+    if (pixels) {
+        // create an image object from the loaded texture date
+        sg_image img = sg_make_image(&(sg_image_desc) {
+            .width = png_width,
+                .height = png_height,
+                .pixel_format = SG_PIXELFORMAT_RGBA8,
+                .data.mip_levels[0] = {
+                    .ptr = pixels,
+                    .size = (size_t)(png_width * png_height * 4),
+            },
+            .label = "png-image",
+        });
+        stbi_image_free(pixels);
+
+        // ...and initialize the pre-allocated texture view handle with that image
+        //sg_init_view(state.bind.views[VIEW_tex], &(sg_view_desc){
+        //    .texture = { .image = img },
+        //        .label = "png-texture-view",
+        //});
+
+        return img.id;
+    }
+
+    return 0;
+}
+
+uint32_t sokol_create_texture_from_grayscale(int width, int height, const uint8_t* grayscaleData)
 {
     size_t pixel_count = (size_t)(width * height);
     size_t buffer_size = sizeof(uint32_t) * pixel_count;
@@ -266,9 +305,24 @@ void sokol_destroy_texture(uint32_t id)
     sg_destroy_image(img);
 }
 
-uint32_t sokol_create_view(uint32_t texture_id)
+uint32_t sokol_alloc_empty_view()
 {
-    return sg_make_view(&(sg_view_desc) { .texture.image = texture_id }).id;
+    return sg_alloc_view().id;
+}
+
+uint32_t sokol_create_view(uint32_t view, uint32_t texture_id)
+{
+    //no view before
+    if (view == 0)
+    {
+        return sg_make_view(&(sg_view_desc) { .texture.image = texture_id }).id;
+    }
+    //view preallocated before
+    else
+    {
+        sg_init_view((sg_view) { .id = view }, & (sg_view_desc) { .texture.image = texture_id });
+        return view;
+    }
 }
 
 void sokol_destroy_view(uint32_t view_id)
@@ -394,7 +448,7 @@ void sokol_fetch_shutdown(void) {
 }
 
 void sokol_fetch_update(void) {
-    sfetch_update();
+    sfetch_dowork();
 }
 
 void fetch_loaded_callback(const uint8_t* data, size_t size, void* user) {
@@ -412,19 +466,27 @@ void fetch_callback(const sfetch_response_t* response) {
     else if (response->failed) {
         fetch_failed_callback(response->user_data);
     }
+
+	char buffer[256];
+	sprintf(buffer, "Fetch completed: %s (fetched: %d, failed: %d, size: %zu)\n", response->path, response->fetched, response->failed, response->data.size);
+
+	OutputDebugStringA(buffer);
 }
 
 void sokol_fetch_request(const char* path, 
-                         void (*loaded_cb)(const uint8_t*, size_t, void*),
-                         void (*failed_cb)(void*),
-                         void* user_data) {
+                         void* user_data,
+                         size_t buffer_size)
+{
     sfetch_request_t req = {
         .path = path,
-        .callback = fetch_callback,  // Your internal callback that dispatches to loaded/failed
-        .user_data = user_data,
-        .channel = 0  // Default channel
+        .callback = fetch_callback,  
+        .user_data = (sfetch_range_t){.ptr = user_data, .size = buffer_size},
+		.buffer = SFETCH_RANGE(app_state.file_buffer),
     };
-    sfetch_send(&req);
+
+    sfetch_handle_t f = sfetch_send(&req);
+
+	printf("Fetch request sent: %s (handle: %d)\n", path, f.id);
 }
 
 void sokol_setup()
@@ -432,9 +494,7 @@ void sokol_setup()
     sg_setup(&(sg_desc){
         .environment = sglue_environment(),
         .logger.func = slog_func});
-
-    sokol_fetch_setup(128,1,1);
-    
+       
     app_state.pass_action = (sg_pass_action){
         .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {0.2f, 0.3f, 0.3f, 1.0f}}};
 

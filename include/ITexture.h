@@ -1,7 +1,9 @@
-#pragma once
+/*#pragma once
 
-class ITexture
+class Texture
 {
 public:
-	virtual ~ITexture() = default;
-};
+	virtual ~Texture() = default;
+	virtual uint32_t GetViewHandle() const = 0;
+	virtual void UpdateContent(int width, int height, const unsigned char* pixelData) = 0;
+};*/

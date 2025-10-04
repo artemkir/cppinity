@@ -7,6 +7,7 @@
 #include "IRenderer.h"
 #include "ShaderManager.h"
 #include "MaterialManager.h"
+#include "ResourceManager.h"
 #include "RenderTypes.h"
 
 #include "Components/Transform.h"
@@ -39,6 +40,7 @@ struct AppState
     std::unique_ptr<TexturesManager> textureManager;
     std::unique_ptr<ShaderManager> shaderManager;
     std::unique_ptr<MaterialManager> materialManager;
+	std::unique_ptr<ResourceManager> resourceManager;
     std::unique_ptr<Scene> scene;
 };
 
@@ -46,9 +48,12 @@ static std::unique_ptr<AppState> app_state = nullptr;
 
 void CreateInitialScene(Scene* scene)
 {
-	auto iconTexture = scene->GetTextureManager()->LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
+	scene->GetTextureManager()->CreateTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
-	// Main Menu Root
+	scene->GetTextureManager()->LoadFromFile("wall", "broommaster.png");
+		
+
+	// Main Menu Root 
 	scene->CreateGameObjectBuilder("MainMenuRoot", 0)
 		.WithComponent<MainMenuLogic>()
 		.AddToScene();
@@ -79,7 +84,7 @@ void CreateInitialScene(Scene* scene)
 		.WithComponent<TileTransform>()
 		.WithComponent<SimpleCollider>()
 		.WithComponent<AppleLogic>()
-		.WithComponent<SpriteRenderer>(iconTexture)
+		.WithComponent<SpriteRenderer>("icon")
 		//.WithComponent<RectRenderer>(255, 0, 0, 100)  // Commented in original
 		//.WithComponent<Animation>(0.25f, 1.25f, 1.25f, -1)  // Commented in original
 		.WithComponent<Animation>(0.25f, 2.25f, 2.25f, -1)
@@ -122,9 +127,10 @@ void gameInit(Scene* scene)
 extern "C" void app_init(void)
 {
     app_state = std::make_unique<AppState>();
-
+		
     app_state->renderer = std::make_unique<SokolRenderer>();
-    app_state->textureManager = std::make_unique<TexturesManager>(app_state->renderer.get());
+	app_state->resourceManager = std::make_unique<ResourceManager>(app_state->renderer.get());
+    app_state->textureManager = std::make_unique<TexturesManager>(app_state->renderer.get(), app_state->resourceManager.get());
     app_state->shaderManager = std::make_unique<ShaderManager>();
     app_state->materialManager = std::make_unique<MaterialManager>(app_state->shaderManager.get());
     app_state->scene = std::make_unique<Scene>(
@@ -140,6 +146,8 @@ extern "C" void app_init(void)
 
 extern "C" bool app_frame(float deltaTime)
 {
+	app_state->resourceManager->Update();
+
     return app_state->scene->Frame(deltaTime);
 }
 
@@ -155,10 +163,10 @@ extern "C" void app_event(const InputEvent *event)
 
 extern "C" void app_fetch_completed(const uint8_t* data, size_t size, void* user)
 {
-
+	app_state->resourceManager->OnFetchComplete(data, size, false, nullptr, user);
 }
 
 extern "C" void app_fetch_failed(void* user)
 {
-
+	app_state->resourceManager->OnFetchComplete(nullptr, 0, true, "Failed to fetch resource", user);
 }

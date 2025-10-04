@@ -4,19 +4,21 @@
 #include "IRenderer.h"
 #include "Scene.h"
 #include "MaterialManager.h"
+#include "TexturesManager.h"
 
 extern "C" int sokol_get_screen_width();
 extern "C" int sokol_get_screen_height();
 
 SpriteRenderer::SpriteRenderer(
-    std::shared_ptr<ITexture> texture_, 
+    const std::string& texture_,
     int renderOrder_,
     const std::string& materialName)
-    : RendererComponent(renderOrder_), texture(std::move(texture_)), materialName(materialName) {}
+    : RendererComponent(renderOrder_), textureName(texture_), materialName(materialName) {}
 
 void SpriteRenderer::Awake()
 {
     material = gameObject->GetScene()->GetMaterialManager()->GetMaterial(materialName);
+    texture = gameObject->GetScene()->GetTextureManager()->GetTexture(textureName);
 }
 
 void SpriteRenderer::Render()

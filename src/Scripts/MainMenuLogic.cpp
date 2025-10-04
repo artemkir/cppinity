@@ -19,7 +19,7 @@ void MainMenuLogic::Start()
 {
     auto scene = gameObject->GetScene();
 
-    auto buttonTexture = scene->GetTextureManager()->LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
+    auto buttonTexture = scene->GetTextureManager()->CreateTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
     // Menu Background
     bg = gameObject->CreateGameObjectBuilder("MenuBackground", 0)

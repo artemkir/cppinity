@@ -29,6 +29,10 @@ Texture& Texture::operator=(Texture&& other) noexcept {
     return *this;
 }
 
-uint32_t Texture::GetViewHandle() const noexcept {
-    return view;
+void Texture::UpdateContent(int width, int height, const unsigned char* pixelData) {
+    if (texture != 0) {
+        sokol_destroy_texture(texture);
+    }
+    //texture = sokol_create_texture(width, height, pixelData);
+    // Assume sokol_create_texture handles failure by returning 0; you can add check/throw if needed
 }

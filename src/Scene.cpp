@@ -97,7 +97,7 @@ void Scene::Stop()
 }
 
 bool Scene::Frame(float deltaTime)
-{
+{    
     inputHandler.BeginFrame(); // Prepare input for frame (compute pressed/released)
 
     if (inputHandler.WasQuitRequested())
