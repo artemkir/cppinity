@@ -228,7 +228,7 @@ static void event(const sapp_event *e)
     app_event(&custom);
 }
 
-uint32_t sokol_create_texture(int width, int height, const uint8_t* pixelData)
+uint32_t sokol_create_texture(int width, int height, const uint8_t* grayscaleData)
 {
     size_t pixel_count = (size_t)(width * height);
     size_t buffer_size = sizeof(uint32_t) * pixel_count;
@@ -239,7 +239,7 @@ uint32_t sokol_create_texture(int width, int height, const uint8_t* pixelData)
 
     int offset = 0;
     for (int i = 0; i < pixel_count; i++) {
-        uint8_t value = pixelData[i];
+        uint8_t value = grayscaleData[i];
         uint32_t rgba = (uint32_t)value |
             ((uint32_t)value << 8) |
             ((uint32_t)value << 16) |
@@ -405,6 +405,15 @@ void fetch_failed_callback(void* user) {
     app_fetch_failed(user);
 }
 
+void fetch_callback(const sfetch_response_t* response) {
+    if (response->fetched) {
+        fetch_loaded_callback(response->data.ptr, response->data.size, response->user_data);
+    }
+    else if (response->failed) {
+        fetch_failed_callback(response->user_data);
+    }
+}
+
 void sokol_fetch_request(const char* path, 
                          void (*loaded_cb)(const uint8_t*, size_t, void*),
                          void (*failed_cb)(void*),
@@ -416,15 +425,6 @@ void sokol_fetch_request(const char* path,
         .channel = 0  // Default channel
     };
     sfetch_send(&req);
-}
-
-// Internal callback to dispatch
-static void fetch_callback(const sfetch_response_t* response) {
-    if (response->fetched) {
-        fetch_loaded_callback(response->data.ptr, response->data.size, response->user_data);
-    } else if (response->failed) {
-        fetch_failed_callback(response->user_data);
-    }
 }
 
 void sokol_setup()
