@@ -5,9 +5,11 @@
 #include "Components/SimpleCollider.h"
 #include "IRenderer.h"
 #include "GameObjectBuilder.h"
-#include "Input.h" // Assuming Input.h is the updated Sokol input handler
+#include "TexturesManager.h"
+#include "MaterialManager.h"
+#include "Input.h"
 
-Scene::Scene(IRenderer *r) : renderer(r) {}
+Scene::Scene(IRenderer *r, MaterialManager *m, TexturesManager *tm) : renderer(r), mm(m), tm(tm) {}
 
 void Scene::AddGameObject(std::unique_ptr<GameObject> go)
 {
@@ -127,6 +129,16 @@ const std::vector<std::unique_ptr<GameObject>> &Scene::GetGameObjects() const
 const IRenderer *Scene::GetRenderer() const
 {
     return renderer;
+}
+
+const MaterialManager *Scene::GetMaterialManager() const
+{
+    return mm;
+}
+
+TexturesManager *Scene::GetTextureManager() const
+{
+    return tm;
 }
 
 GameObjectBuilder Scene::CreateGameObjectBuilder(const std::string &name, unsigned tag)

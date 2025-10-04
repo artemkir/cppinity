@@ -151,13 +151,10 @@ void sokol_setup()
     app_state.pass_action = (sg_pass_action){
         .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {0.2f, 0.3f, 0.3f, 1.0f}}};
 
-    app_state.pip = sg_make_pipeline(&(sg_pipeline_desc){
-        .shader = make_shader_for_2d_quads(),
-        .layout = {
-            .attrs = {
-                [0].format = SG_VERTEXFORMAT_FLOAT2}},
-        .index_type = SG_INDEXTYPE_UINT16,
-        .label = "triangle-pipeline"});
+    app_state.bind.samplers[0] = sg_make_sampler(&(sg_sampler_desc) {
+        .min_filter = SG_FILTER_NEAREST,
+        .mag_filter = SG_FILTER_NEAREST,
+    });
 
     create_default_quad_buffers();
 }
@@ -200,9 +197,9 @@ void sokol_begin_pass()
         .action = app_state.pass_action,
         .swapchain = sglue_swapchain()});
 
-    sg_apply_pipeline(app_state.pip);
+    //sg_apply_pipeline(app_state.pip);
 
-    sg_apply_bindings(&app_state.bind);
+    //sg_apply_bindings(&app_state.bind);
 }
 
 void sokol_end_pass()
@@ -261,32 +258,35 @@ sapp_desc sokol_main(int argc, char *argv[])
     };
 }
 
-// Texture wrappers for C interface
-uint32_t sokol_create_texture(int width, int height, const unsigned char *pixelData)
+uint32_t sokol_create_texture(int width, int height, const uint8_t* pixelData)
 {
-    /*std::vector<uint32_t> rgbaPixels(width * height);
-    for (int i = 0; i < width * height; ++i) {
-        uint8_t value = pixelData[i];
-        rgbaPixels[i] = value | (value << 8) | (value << 16) | (value == 0 ? 0 : 255 << 24);  // RGBA
-    }
+    size_t pixel_count = (size_t)(width * height);
+    size_t buffer_size = sizeof(uint32_t) * pixel_count;
+    uint32_t *rgbaPixels = (uint32_t*)malloc(buffer_size);
 
-    sg_image_desc desc = (sg_image_desc){ 0 };
-    desc.width = width;
-    desc.height = height;
-    desc.pixel_format = SG_PIXELFORMAT_RGBA8;
-    desc.min_filter = SG_FILTER_NEAREST;
-    desc.mag_filter = SG_FILTER_NEAREST;
-    desc.content.subimage[0][0].ptr = rgbaPixels.data();
-    desc.content.subimage[0][0].size = width * height * 4;
-
-    sg_image img = sg_make_image(&desc);
-    if (sg_query_image_state(img) != SG_RESOURCESTATE_VALID) {
-        // Handle error, e.g., return 0
+    if (!rgbaPixels)
         return 0;
-    }
-    return img.id;*/
 
-    return 0; // Placeholder return value
+    int offset = 0;
+    for (int i = 0; i < pixel_count; i++) {
+        uint8_t value = pixelData[i];
+        uint32_t rgba = (uint32_t)value |
+            ((uint32_t)value << 8) |
+            ((uint32_t)value << 16) |
+            ((value == 0 ? 0u : 255u) << 24);
+        rgbaPixels[i] = rgba;
+    }
+
+    sg_image im = sg_make_image(&(sg_image_desc) {
+        .width = width,
+        .height = height,
+        .pixel_format = SG_PIXELFORMAT_RGBA8,
+        .data.mip_levels[0] = (sg_range){.ptr = rgbaPixels, .size = buffer_size}
+    });
+
+    free(rgbaPixels);
+
+    return im.id;
 }
 
 // Destroy texture by ID
@@ -296,15 +296,115 @@ void sokol_destroy_texture(uint32_t id)
     sg_destroy_image(img);
 }
 
-// Bind texture for drawing (call before draw quads)
-void sokol_bind_texture(uint32_t id)
+uint32_t sokol_create_view(uint32_t texture_id)
 {
-    // sg_image img = { .id = id };
-    // sg_texture(img);
+    return sg_make_view(&(sg_view_desc) { .texture.image = texture_id }).id;
 }
 
-// Unbind texture (call after draw)
+void sokol_destroy_view(uint32_t view_id)
+{
+    sg_destroy_view((sg_view){ .id = view_id });
+}
+
+void sokol_apply_view(uint32_t view_id)
+{
+    app_state.bind.views[0] = (sg_view){ .id = view_id };
+}
+
 void sokol_unbind_texture(void)
 {
     // sg_texture(sg_make_image(&(sg_image_desc) { 0 }));
+}
+
+uint32_t sokol_create_shader(
+    const char* vs_source, 
+    const char* fs_source,
+    int num_attrs, 
+    const char** attr_names, 
+    const int* attr_formats,
+    int uniform_block_size,
+    int num_uniforms,
+    const char** uniform_names, 
+    const int* uniform_types,
+    int num_images, 
+    const char** image_names) 
+{
+    sg_shader_desc desc = {0};
+    desc.vertex_func.source = vs_source;
+    desc.fragment_func.source = fs_source;
+
+    for (int i = 0; i < num_attrs; ++i) {
+        desc.attrs[i].glsl_name = attr_names[i];
+    }
+
+    desc.uniform_blocks[0].size = uniform_block_size;
+    
+    for (int i = 0; i < num_uniforms; ++i) {
+
+        desc.uniform_blocks[0].stage = SG_SHADERSTAGE_VERTEX;
+        desc.uniform_blocks[0].glsl_uniforms[i].glsl_name = uniform_names[i];
+        desc.uniform_blocks[0].glsl_uniforms[i].type = (sg_uniform_type)uniform_types[i];
+    }
+
+    for (int i = 0; i < num_images; ++i) {
+        desc.views[i].texture.stage = SG_SHADERSTAGE_FRAGMENT;
+        desc.samplers[i].stage = SG_SHADERSTAGE_FRAGMENT;
+        desc.texture_sampler_pairs[i] = (sg_shader_texture_sampler_pair){
+                .stage = SG_SHADERSTAGE_FRAGMENT,
+                .view_slot = 0,
+                .sampler_slot = 0,
+                .glsl_name = image_names[i]
+            };
+        }
+
+    sg_shader shd = sg_make_shader(&desc);
+    return shd.id;
+}
+
+void sokol_destroy_shader(uint32_t id) {
+    sg_destroy_shader((sg_shader){.id = id});
+}
+
+uint32_t sokol_create_pipeline(uint32_t shader_id, int num_attrs, const int* attr_formats, int index_type) {
+    sg_pipeline_desc desc = {0};
+
+    desc.shader.id = shader_id;
+    for (int i = 0; i < num_attrs; ++i) {
+        desc.layout.attrs[i].format = (sg_vertex_format)attr_formats[i];
+    }
+    desc.index_type = (sg_index_type)index_type;
+    
+    //TODO: add more
+    //desc.depth.compare = SG_COMPAREFUNC_ALWAYS;
+    //desc.depth.write_enabled = false;
+    //desc.cull_mode = SG_CULLMODE_NONE;
+
+    sg_pipeline pip = sg_make_pipeline(&desc);
+    return pip.id;
+}
+
+void sokol_destroy_pipeline(uint32_t id) {
+    sg_destroy_pipeline((sg_pipeline){.id = id});
+}
+
+void sokol_apply_pipeline(uint32_t id) {
+    sg_apply_pipeline((sg_pipeline){.id = id});
+}
+
+void sokol_apply_uniforms(const void* data, int size) {
+    sg_range u = {.ptr = data, .size = (size_t)size};
+    sg_apply_uniforms(0, &u);
+}
+
+int sokol_get_screen_width() {
+    return app_state.screen_width;
+}
+
+int sokol_get_screen_height() {
+    return app_state.screen_height;
+}
+
+void sokol_draw(int num_elements) {
+    sg_apply_bindings(&app_state.bind);
+    sg_draw(0, num_elements, 1);
 }

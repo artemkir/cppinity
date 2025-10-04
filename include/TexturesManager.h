@@ -16,6 +16,6 @@ class TexturesManager
 public:
     explicit TexturesManager(IRenderer *renderer_);
 
-    std::shared_ptr<ITexture> LoadTexture(const std::string &id, int width, int height, const unsigned char *data);
+    std::shared_ptr<ITexture> LoadTexture(const std::string &id, int width, int height, const uint8_t* data);
     std::shared_ptr<ITexture> GetTexture(const std::string &id) const;
 };
