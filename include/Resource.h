@@ -21,7 +21,8 @@ public:
 protected:
     Resource() = default;
 
-    virtual void ProcessData(const void* data, size_t size) = 0;
+    virtual void CreateFromFileData(const void* data, size_t size) = 0;
+    virtual void CreateFromMemory(const void* data, size_t size) = 0;
     virtual void HandleFailure(const std::string& err) {
         state_ = ResourceState::Failed;
         error_ = err;

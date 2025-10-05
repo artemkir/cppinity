@@ -9,7 +9,6 @@
 #include "Scripts/IconImage.h"
 #include "Scene.h"
 #include "GameObjectBuilder.h"
-#include "TexturesManager.h"
 
 EndScreenLogic::EndScreenLogic() {}
 
@@ -17,7 +16,7 @@ void EndScreenLogic::Start()
 {
     auto scene = gameObject->GetScene();
 
-    auto texture = scene->GetTextureManager()->CreateTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
+    //auto texture = scene->GetTextureManager()->CreateTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
     // End Background
     bg = gameObject->CreateGameObjectBuilder("EndBackground", 0)

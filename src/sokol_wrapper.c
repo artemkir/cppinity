@@ -30,7 +30,7 @@ static struct
     sg_bindings bind;
     int screen_width;
     int screen_height;
-    uint8_t file_buffer[256 * 1024];
+    uint8_t file_buffer[1024*1024*4];
 } app_state;
 
 static uint64_t last_time = 0;
@@ -294,6 +294,24 @@ uint32_t sokol_create_texture_from_grayscale(int width, int height, const uint8_
     });
 
     free(rgbaPixels);
+
+    return im.id;
+}
+
+uint32_t sokol_create_rgba_texture(int width, int height, const uint8_t* rgbaPixels)
+{
+    if (!rgbaPixels)
+        return 0;
+
+    size_t pixel_count = (size_t)(width * height);
+    size_t buffer_size = sizeof(uint32_t) * pixel_count;
+    
+    sg_image im = sg_make_image(&(sg_image_desc) {
+            .width = width,
+            .height = height,
+            .pixel_format = SG_PIXELFORMAT_RGBA8,
+            .data.mip_levels[0] = (sg_range){ .ptr = rgbaPixels, .size = buffer_size }
+    });
 
     return im.id;
 }

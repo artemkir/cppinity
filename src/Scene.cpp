@@ -5,11 +5,11 @@
 #include "Components/SimpleCollider.h"
 #include "IRenderer.h"
 #include "GameObjectBuilder.h"
-#include "TexturesManager.h"
 #include "MaterialManager.h"
+#include "ResourceManager.h"
 #include "Input.h"
 
-Scene::Scene(IRenderer *r, MaterialManager *m, TexturesManager *tm) : renderer(r), mm(m), tm(tm) {}
+Scene::Scene(IRenderer *r, MaterialManager *m, ResourceManager *rm) : renderer(r), mm(m), rm(rm) {}
 
 void Scene::AddGameObject(std::unique_ptr<GameObject> go)
 {
@@ -134,11 +134,6 @@ const IRenderer *Scene::GetRenderer() const
 const MaterialManager *Scene::GetMaterialManager() const
 {
     return mm;
-}
-
-TexturesManager *Scene::GetTextureManager() const
-{
-    return tm;
 }
 
 GameObjectBuilder Scene::CreateGameObjectBuilder(const std::string &name, unsigned tag)

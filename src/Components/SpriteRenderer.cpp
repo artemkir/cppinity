@@ -4,7 +4,7 @@
 #include "IRenderer.h"
 #include "Scene.h"
 #include "MaterialManager.h"
-#include "TexturesManager.h"
+#include "ResourceManager.h"
 
 extern "C" int sokol_get_screen_width();
 extern "C" int sokol_get_screen_height();
@@ -18,7 +18,11 @@ SpriteRenderer::SpriteRenderer(
 void SpriteRenderer::Awake()
 {
     material = gameObject->GetScene()->GetMaterialManager()->GetMaterial(materialName);
-    texture = gameObject->GetScene()->GetTextureManager()->GetTexture(textureName);
+    texture = gameObject->GetScene()->GetResourceManager()->Get<Texture>(textureName);
+
+    if (texture == nullptr) {
+		texture = gameObject->GetScene()->GetResourceManager()->Get<Texture>("default_texture");
+    }
 }
 
 void SpriteRenderer::Render()

@@ -18,7 +18,6 @@
 #include "Components/Animation.h"
 
 #include "SokolRenderer.h"
-#include "TexturesManager.h"
 #include "Scene.h"
 #include "GameObject.h"
 #include "GameObjectBuilder.h"
@@ -37,7 +36,6 @@
 struct AppState
 {
     std::unique_ptr<SokolRenderer> renderer;
-    std::unique_ptr<TexturesManager> textureManager;
     std::unique_ptr<ShaderManager> shaderManager;
     std::unique_ptr<MaterialManager> materialManager;
 	std::unique_ptr<ResourceManager> resourceManager;
@@ -48,10 +46,24 @@ static std::unique_ptr<AppState> app_state = nullptr;
 
 void CreateInitialScene(Scene* scene)
 {
-	scene->GetTextureManager()->CreateTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
+	//scene->GetTextureManager()->CreateTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
-	scene->GetTextureManager()->LoadFromFile("wall", "broommaster.png");
-		
+	std::shared_ptr<Texture> defaultTexture =
+		scene->GetResourceManager()->CreateEmpty<Texture>("default_texture");
+
+	const unsigned char pink[] = { 255,0,255,255 };
+
+	defaultTexture->CreateRGBATextureFromPixelData(1, 1, &pink);
+
+
+	std::shared_ptr<Texture> existingTexture = 
+		scene->GetResourceManager()->CreateEmpty<Texture>("icon");
+
+	existingTexture->CreateTextureFromGrayscalePixelData(ICON_WIDTH, ICON_HEIGHT, icon);
+
+	
+	scene->GetResourceManager()->Load<Texture>("broommaster.png");
+	scene->GetResourceManager()->Load<Texture>("girl.png");
 
 	// Main Menu Root 
 	scene->CreateGameObjectBuilder("MainMenuRoot", 0)
@@ -84,7 +96,7 @@ void CreateInitialScene(Scene* scene)
 		.WithComponent<TileTransform>()
 		.WithComponent<SimpleCollider>()
 		.WithComponent<AppleLogic>()
-		.WithComponent<SpriteRenderer>("icon")
+		.WithComponent<SpriteRenderer>("broommaster.png")
 		//.WithComponent<RectRenderer>(255, 0, 0, 100)  // Commented in original
 		//.WithComponent<Animation>(0.25f, 1.25f, 1.25f, -1)  // Commented in original
 		.WithComponent<Animation>(0.25f, 2.25f, 2.25f, -1)
@@ -130,13 +142,12 @@ extern "C" void app_init(void)
 		
     app_state->renderer = std::make_unique<SokolRenderer>();
 	app_state->resourceManager = std::make_unique<ResourceManager>(app_state->renderer.get());
-    app_state->textureManager = std::make_unique<TexturesManager>(app_state->renderer.get(), app_state->resourceManager.get());
     app_state->shaderManager = std::make_unique<ShaderManager>();
     app_state->materialManager = std::make_unique<MaterialManager>(app_state->shaderManager.get());
     app_state->scene = std::make_unique<Scene>(
         app_state->renderer.get(),
         app_state->materialManager.get(),
-        app_state->textureManager.get());
+        app_state->resourceManager.get());
 	
 	app_state->shaderManager->CreateDefaultShaders();
     app_state->materialManager->CreateDefaultMaterials();

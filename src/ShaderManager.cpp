@@ -94,7 +94,7 @@ void ShaderManager::CreateUnlitTextureScreenShader()
         "  float norm_y = 1.0 - (pixel_y / u_screen_size.y) * 2.0;\n"
         "  gl_Position = vec4(norm_x, norm_y, 0.0, 1.0);\n"
         "  color = u_color;\n"
-        "  uv = pos;\n"
+        "  uv = vec2(pos.x, 1.0 - pos.y);\n"
         "}\n";
 
     std::string fs = 

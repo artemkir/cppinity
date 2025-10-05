@@ -15,7 +15,7 @@ class SimpleCollider;
 class GameObjectBuilder;
 struct InputEvent;
 class MaterialManager;
-class TexturesManager;
+class ResourceManager;
 
 // Scene Class
 class Scene
@@ -27,7 +27,7 @@ class Scene
 
 	IRenderer *renderer;
 	MaterialManager *mm;
-	TexturesManager *tm;
+	ResourceManager *rm;
 
 	bool running = true;
 
@@ -36,7 +36,7 @@ class Scene
 	Input inputHandler;
 
 public:
-	Scene(IRenderer *r, MaterialManager *m, TexturesManager *tm);
+	Scene(IRenderer *r, MaterialManager *m, ResourceManager *tm);
 
 	void AddGameObject(std::unique_ptr<GameObject> go);
 
@@ -61,7 +61,7 @@ public:
 
 	const MaterialManager *GetMaterialManager() const;
 
-	TexturesManager *GetTextureManager() const;
+	ResourceManager* GetResourceManager() const { return rm; };
 
 	GameObjectBuilder CreateGameObjectBuilder(const std::string &name, unsigned tag = 0);
 
