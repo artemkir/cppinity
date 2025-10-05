@@ -47,7 +47,17 @@ void ResourceManager::Update()
 
 void ResourceManager::OnFetchComplete(const void *data, size_t size, bool failed, const char *error, void *user)
 {
-    Resource *res = static_cast<Resource *>(user);
+    FetchUser u{};
+    memcpy(&u, user, sizeof(FetchUser));
+
+    auto it = pending_.find(u.id);
+
+    // Request was cancelled or resource already released.
+    if (it == pending_.end()) {
+        return;
+    }
+    auto res = it->second; // strong ref
+
     if (failed)
     {
         res->HandleFailure(error ? error : "Unknown error");
@@ -64,4 +74,6 @@ void ResourceManager::OnFetchComplete(const void *data, size_t size, bool failed
             res->HandleFailure(e.what());
         }
     }
+
+    pending_.erase(it); // drop the strong ref when done
 }

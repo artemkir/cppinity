@@ -22,17 +22,5 @@ std::shared_ptr<Texture> TextureResource::GetTexture() const
 
 void TextureResource::ProcessData(const void* data, size_t size)
 {
-    const unsigned char* bytes = static_cast<const unsigned char*>(data);
-    bool is_png = (size >= 8) && (memcmp(bytes, "\x89PNG\r\n\x1A\n", 8) == 0);
-      
-    if (!is_png)
-    {
-        throw std::runtime_error("Unsupported format; only PNG supported");
-    }
-
-    manager_->GetRenderer()->UpdateTextureFromMemoryFile(texture_, bytes, size);
-
-    if (!texture_) {
-        throw std::runtime_error("Failed to create texture");
-    }
+    manager_->GetRenderer()->UpdateTextureFromMemoryFile(texture_, data, size);
 }
