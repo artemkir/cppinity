@@ -6,7 +6,8 @@
 #include <iterator>
 #include <random>
 
-class MazeGenerator : public BaseComponent {
+class MazeGenerator : public BaseComponent
+{
     std::random_device rd;
     std::vector<std::vector<bool>> grid;
 
@@ -17,6 +18,6 @@ class MazeGenerator : public BaseComponent {
 public:
     MazeGenerator() = default;
     bool IsObstacle(int x, int y);
-    std::pair<int,int> GetRandomEmptyPosition();
+    std::pair<int, int> GetRandomEmptyPosition();
     void Awake() override;
 };

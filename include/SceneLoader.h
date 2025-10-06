@@ -2,14 +2,18 @@
 
 #include "ComponentFactory.h"
 
-class SceneLoader {
+class SceneLoader
+{
 public:
-    explicit SceneLoader(ComponentFactory& componentFactory_) : ComponentFactory(componentFactory_) {}
+    explicit SceneLoader(ComponentFactory &componentFactory_) : ComponentFactory(componentFactory_) {}
 
-    void LoadScene(Scene* scene, const std::vector<GameObjectData>& data) {
-        for (const auto& objData : data) {
+    void LoadScene(Scene *scene, const std::vector<GameObjectData> &data)
+    {
+        for (const auto &objData : data)
+        {
             auto gameObject = std::make_unique<GameObject>(objData.name, objData.tag);
-            for (const auto& compData : objData.components) {
+            for (const auto &compData : objData.components)
+            {
                 auto component = componentFactory.Create(compData);
                 gameObject->AddComponent(std::move(component));
             }
@@ -18,5 +22,5 @@ public:
     }
 
 private:
-    ComponentFactory& componentFactory;
+    ComponentFactory &componentFactory;
 };

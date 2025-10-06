@@ -4,8 +4,9 @@
 
 class MazeGenerator;
 
-class AppleLogic : public BaseComponent {
-    MazeGenerator* mazeGenerator = nullptr;
+class AppleLogic : public BaseComponent
+{
+    MazeGenerator *mazeGenerator = nullptr;
 
 public:
     void Awake() override;
