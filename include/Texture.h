@@ -2,24 +2,39 @@
 #pragma once
 
 #include <cstdint>
-#include "ITexture.h"
+#include "Texture.h"
+#include "Resource.h"
 
-class Texture final : public ITexture
+struct TextureData {
+    uint32_t texture;
+    uint32_t view;
+};
+
+class Texture : public Resource
 {
 private:
-    uint32_t texture;
+	TextureData _data{0,0};
 
 public:
-    explicit Texture(uint32_t tex);
-    ~Texture() final;
+    uint32_t GetTexture() const { return _data.texture; }
+    uint32_t GetView() const { return _data.view; }
+    void SetTexture(uint32_t t) { _data.texture = t; }
+    void SetView(uint32_t v) { _data.view = v; }
 
-    // Deleted copy constructor and assignment operator
+    explicit Texture(ResourceManager* mgr);
+    ~Texture() final;
     Texture(const Texture &) = delete;
     Texture &operator=(const Texture &) = delete;
-
-    // Move constructor and assignment operator
     Texture(Texture &&other) noexcept;
     Texture &operator=(Texture &&other) noexcept;
 
-    uint32_t GetHandle() const noexcept;
+    friend class ResourceManager;
+
+    void CreateTextureFromGrayscalePixelData(int width, int height, const uint8_t* data);
+    void CreateRGBATextureFromPixelData(int width, int height, const uint8_t* data);
+
+protected:
+    void CreateFromFileData(const uint8_t* data, size_t size) override;
+    void CreateFromMemory(const uint8_t* data, size_t size) override;
+    
 };

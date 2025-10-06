@@ -5,6 +5,10 @@
 #include "InputEvent.h"
 
 #include "IRenderer.h"
+#include "ShaderManager.h"
+#include "MaterialManager.h"
+#include "ResourceManager.h"
+#include "RenderTypes.h"
 
 #include "Components/Transform.h"
 #include "Components/SimpleCollider.h"
@@ -14,7 +18,6 @@
 #include "Components/Animation.h"
 
 #include "SokolRenderer.h"
-#include "TexturesManager.h"
 #include "Scene.h"
 #include "GameObject.h"
 #include "GameObjectBuilder.h"
@@ -32,24 +35,39 @@
 
 struct AppState
 {
-    SokolRenderer renderer;
-    TexturesManager textureManager;
+    std::unique_ptr<SokolRenderer> renderer;
+    std::unique_ptr<ShaderManager> shaderManager;
+    std::unique_ptr<MaterialManager> materialManager;
+	std::unique_ptr<ResourceManager> resourceManager;
     std::unique_ptr<Scene> scene;
-
-    AppState()
-        : textureManager(&renderer),
-          scene(std::make_unique<Scene>(&renderer)) {}
 };
 
-static AppState *app_state = nullptr;
+static std::unique_ptr<AppState> app_state = nullptr;
 
-void gameInit(Scene *scene, TexturesManager &textureManager)
+void CreateInitialScene(Scene* scene)
 {
-    auto iconTexture = app_state->textureManager.LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
+	//scene->GetTextureManager()->CreateTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
-	// Main Menu Root
+	std::shared_ptr<Texture> defaultTexture =
+		scene->GetResourceManager()->CreateEmpty<Texture>("default_texture");
+
+	const uint8_t pink[] = { 255,0,255,255 };
+
+	defaultTexture->CreateRGBATextureFromPixelData(1, 1, pink);
+
+
+	std::shared_ptr<Texture> existingTexture = 
+		scene->GetResourceManager()->CreateEmpty<Texture>("icon");
+
+	existingTexture->CreateTextureFromGrayscalePixelData(ICON_WIDTH, ICON_HEIGHT, icon);
+
+	
+	scene->GetResourceManager()->Load<Texture>("broommaster.png");
+	scene->GetResourceManager()->Load<Texture>("girl.png");
+
+	// Main Menu Root 
 	scene->CreateGameObjectBuilder("MainMenuRoot", 0)
-		.WithComponent<MainMenuLogic>(textureManager)
+		.WithComponent<MainMenuLogic>()
 		.AddToScene();
 
 	// Game Mode Root
@@ -78,7 +96,7 @@ void gameInit(Scene *scene, TexturesManager &textureManager)
 		.WithComponent<TileTransform>()
 		.WithComponent<SimpleCollider>()
 		.WithComponent<AppleLogic>()
-		.WithComponent<SpriteRenderer>(iconTexture)
+		.WithComponent<SpriteRenderer>("broommaster.png")
 		//.WithComponent<RectRenderer>(255, 0, 0, 100)  // Commented in original
 		//.WithComponent<Animation>(0.25f, 1.25f, 1.25f, -1)  // Commented in original
 		.WithComponent<Animation>(0.25f, 2.25f, 2.25f, -1)
@@ -104,7 +122,7 @@ void gameInit(Scene *scene, TexturesManager &textureManager)
 
 	// End Screen Root
 	scene->CreateGameObjectBuilder("EndScreenRoot", 0)
-		.WithComponent<EndScreenLogic>(textureManager)
+		.WithComponent<EndScreenLogic>()
 		.AddToScene();
 
 	// State Machine Root
@@ -113,28 +131,53 @@ void gameInit(Scene *scene, TexturesManager &textureManager)
 		.AddToScene();
 }
 
+void gameInit(Scene* scene)
+{
+	CreateInitialScene(scene);
+}
+
 extern "C" void app_init(void)
 {
-
-    app_state = new AppState();
-    app_state->renderer = SokolRenderer();
-    app_state->textureManager = TexturesManager(&app_state->renderer);
-    app_state->scene = std::make_unique<Scene>(&app_state->renderer);
-
-    gameInit(app_state->scene.get(), app_state->textureManager);
+    app_state = std::make_unique<AppState>();
+		
+    app_state->renderer = std::make_unique<SokolRenderer>();
+	app_state->resourceManager = std::make_unique<ResourceManager>(app_state->renderer.get());
+    app_state->shaderManager = std::make_unique<ShaderManager>();
+    app_state->materialManager = std::make_unique<MaterialManager>(app_state->shaderManager.get());
+    app_state->scene = std::make_unique<Scene>(
+        app_state->renderer.get(),
+        app_state->materialManager.get(),
+        app_state->resourceManager.get());
+	
+	app_state->shaderManager->CreateDefaultShaders();
+    app_state->materialManager->CreateDefaultMaterials();
+    
+    gameInit(app_state->scene.get());
 }
 
 extern "C" bool app_frame(float deltaTime)
 {
+	app_state->resourceManager->Update();
+
     return app_state->scene->Frame(deltaTime);
 }
 
 extern "C" void app_cleanup(void)
 {
-    delete app_state;
+    app_state = nullptr;
 }
 
 extern "C" void app_event(const InputEvent *event)
 {
     app_state->scene->HandleEvent(event);
+}
+
+extern "C" void app_fetch_completed(const uint8_t* data, size_t size, void* user)
+{
+	app_state->resourceManager->OnFetchComplete(data, size, false, nullptr, user);
+}
+
+extern "C" void app_fetch_failed(void* user)
+{
+	app_state->resourceManager->OnFetchComplete(nullptr, 0, true, "Failed to fetch resource", user);
 }

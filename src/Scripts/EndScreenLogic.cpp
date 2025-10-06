@@ -10,14 +10,11 @@
 #include "Scene.h"
 #include "GameObjectBuilder.h"
 
-EndScreenLogic::EndScreenLogic(TexturesManager &textureManager_)
-    : textureManager(textureManager_) {}
-
 void EndScreenLogic::Start()
 {
-    texture = textureManager.LoadTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
-
     auto scene = gameObject->GetScene();
+
+    //auto texture = scene->GetTextureManager()->CreateTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
     // End Background
     bg = gameObject->CreateGameObjectBuilder("EndBackground", 0)

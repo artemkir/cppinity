@@ -5,9 +5,11 @@
 #include "Components/SimpleCollider.h"
 #include "IRenderer.h"
 #include "GameObjectBuilder.h"
-#include "Input.h" // Assuming Input.h is the updated Sokol input handler
+#include "MaterialManager.h"
+#include "ResourceManager.h"
+#include "Input.h"
 
-Scene::Scene(IRenderer *r) : renderer(r) {}
+Scene::Scene(IRenderer *r, MaterialManager *m, ResourceManager *resourceManager) : renderer(r), materialManager(m), resourceManager(resourceManager) {}
 
 void Scene::AddGameObject(std::unique_ptr<GameObject> go)
 {
@@ -95,7 +97,7 @@ void Scene::Stop()
 }
 
 bool Scene::Frame(float deltaTime)
-{
+{    
     inputHandler.BeginFrame(); // Prepare input for frame (compute pressed/released)
 
     if (inputHandler.WasQuitRequested())
@@ -117,16 +119,6 @@ bool Scene::Frame(float deltaTime)
 void Scene::HandleEvent(const InputEvent *event)
 {
     inputHandler.HandleEvent(event);
-}
-
-const std::vector<std::unique_ptr<GameObject>> &Scene::GetGameObjects() const
-{
-    return gameObjects;
-}
-
-const IRenderer *Scene::GetRenderer() const
-{
-    return renderer;
 }
 
 GameObjectBuilder Scene::CreateGameObjectBuilder(const std::string &name, unsigned tag)

@@ -4,6 +4,7 @@
 #include "Components/SimpleCollider.h"
 #include "Scripts/GameConsts.h"
 #include "Components/Transform.h"
+#include "GameObjectBuilder.h"
 
 void MazeGenerator::AddGridToScene()
 {
@@ -19,11 +20,11 @@ void MazeGenerator::AddGridToScene()
             {
                 int c = color(g);
 
-                auto block = std::make_unique<GameObject>("maze_block_" + std::to_string(x) + "_" + std::to_string(y), OBSTACLE_TAG);
-                block->AddComponent(std::make_unique<TileTransform>(x, y, TILE_SIZE, TILE_SIZE));
-                block->AddComponent(std::make_unique<RectRenderer>(c, c, c));
-                block->AddComponent(std::make_unique<SimpleCollider>());
-                gameObject->GetScene()->AddGameObject(std::move(block));
+                gameObject->GetScene()->CreateGameObjectBuilder("maze_block_" + std::to_string(x) + "_" + std::to_string(y), OBSTACLE_TAG)
+                                 .WithComponent<TileTransform>(x, y, TILE_SIZE, TILE_SIZE)
+                                 .WithComponent<RectRenderer>(c, c, c)
+                                 .WithComponent<SimpleCollider>()
+					             .AddToScene();
             }
         }
     }

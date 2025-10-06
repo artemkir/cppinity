@@ -14,6 +14,8 @@ class IRenderer;
 class SimpleCollider;
 class GameObjectBuilder;
 struct InputEvent;
+class MaterialManager;
+class ResourceManager;
 
 // Scene Class
 class Scene
@@ -24,6 +26,9 @@ class Scene
 	std::vector<SimpleCollider *> colliders;
 
 	IRenderer *renderer;
+	MaterialManager *materialManager;
+	ResourceManager *resourceManager;
+
 	bool running = true;
 
 	void CheckCollisions();
@@ -31,7 +36,7 @@ class Scene
 	Input inputHandler;
 
 public:
-	Scene(IRenderer *r);
+	Scene(IRenderer *r, MaterialManager *m, ResourceManager *tm);
 
 	void AddGameObject(std::unique_ptr<GameObject> go);
 
@@ -51,8 +56,13 @@ public:
 
 	void HandleEvent(const InputEvent *event);
 
-	const std::vector<std::unique_ptr<GameObject>> &GetGameObjects() const;
-	const IRenderer *GetRenderer() const;
+	const std::vector<std::unique_ptr<GameObject>>& Scene::GetGameObjects() const { return gameObjects;	}
+	
+	const IRenderer* Scene::GetRenderer() const { return renderer;	}
+
+	const MaterialManager* Scene::GetMaterialManager() const {	return materialManager;	}
+
+	ResourceManager* GetResourceManager() const { return resourceManager; };
 
 	GameObjectBuilder CreateGameObjectBuilder(const std::string &name, unsigned tag = 0);
 
