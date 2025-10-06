@@ -43,7 +43,7 @@ void Material::SetUniform(const std::string& name, const std::vector<float>& val
 	dirty_ = true;
 }
 
-void Material::SetTexture(const std::string& name, std::shared_ptr<ITexture> texture)
+void Material::SetTexture(const std::string& name, std::shared_ptr<Texture> texture)
 {
 	if (shader_->GetImageSlots().find(name) == shader_->GetImageSlots().end()) {
 		throw std::runtime_error("Texture sampler not found: " + name);
@@ -51,7 +51,7 @@ void Material::SetTexture(const std::string& name, std::shared_ptr<ITexture> tex
 	textures_[name] = texture;
 }
 
-const unsigned char* Material::GetUniformData() const 
+const uint8_t* Material::GetUniformData() const 
 {
 	if (!dirty_) 
 	{
@@ -78,7 +78,7 @@ const unsigned char* Material::GetUniformData() const
 	return uniform_buffer_.data();
 }
 
-std::shared_ptr<ITexture> Material::GetTexture(const std::string& name) const 
+std::shared_ptr<Texture> Material::GetTexture(const std::string& name) const 
 {
 	auto it = textures_.find(name);
 	return (it != textures_.end()) ? it->second : nullptr;
