@@ -1,10 +1,6 @@
-#include "Scripts/MazeGenerator.h"
+#include "Engine.h"
 
-#include "Components/RectRenderer.h"
-#include "Components/SimpleCollider.h"
-#include "Scripts/GameConsts.h"
-#include "Components/Transform.h"
-#include "GameObjectBuilder.h"
+#include "Game.h"
 
 void MazeGenerator::AddGridToScene()
 {

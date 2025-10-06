@@ -4,7 +4,7 @@
 #include <cstring>  // For memcpy
 #include <stdexcept>
 
-extern "C" uint32_t sokol_create_pipeline(uint32_t shader_id, int num_attrs, const int* attr_formats, int index_type);
+extern "C" uint32_t sokol_create_pipeline(uint32_t shader_id, int num_attrs, const int* attr_formats, int index_type, bool alphaBlending);
 extern "C" void sokol_destroy_pipeline(uint32_t id);
 
 Material::Material(std::shared_ptr<Shader> shader)
@@ -24,7 +24,12 @@ Material::Material(std::shared_ptr<Shader> shader)
 	}
 
 	// Create pipeline immediately
-	pipeline_id_ = sokol_create_pipeline(shader->GetID(), attrs.size(), attr_formats.data(), static_cast<std::underlying_type_t<IndexType>>(IndexType::UINT16));
+	pipeline_id_ = sokol_create_pipeline(
+		shader->GetID(), 
+		attrs.size(), 
+		attr_formats.data(), 
+		static_cast<std::underlying_type_t<IndexType>>(IndexType::UINT16),
+		true); //Alpha blending on by default for now
 
 	uniform_buffer_.resize(GetUniformSize(), 0);
 }

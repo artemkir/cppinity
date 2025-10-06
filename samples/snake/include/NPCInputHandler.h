@@ -1,9 +1,6 @@
 #pragma once
 
-#include "Components/IInputHandler.h"
-#include <vector>
-#include <memory>
-#include <set>
+#include "Engine.h"
 
 class NPCInputHandler : public IInputHandler
 {

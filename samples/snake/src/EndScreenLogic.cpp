@@ -1,14 +1,6 @@
-#include "Scripts/EndScreenLogic.h"
+#include "Engine.h"
 
-#include "GameObject.h"
-#include "Components/Transform.h"
-#include "Components/RectRenderer.h"
-#include "Components/SpriteRenderer.h"
-#include "Scripts/GameConsts.h"
-#include "Scripts/GameStateManager.h"
-#include "Scripts/IconImage.h"
-#include "Scene.h"
-#include "GameObjectBuilder.h"
+#include "Game.h"
 
 void EndScreenLogic::Start()
 {

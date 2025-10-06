@@ -1,14 +1,6 @@
 #pragma once
 
-#include <vector>
-
-#include "Components/BaseComponent.h"
-
-class MazeGenerator;
-class AppleLogic;
-class RectRenderer;
-class GameObject;
-class IInputHandler;
+#include "Engine.h"
 
 // SnakeLogic Component
 class SnakeLogic : public BaseComponent

@@ -1,10 +1,6 @@
 #pragma once
 
-#include "Scene.h"
-#include <stack>
-#include <algorithm>
-#include <iterator>
-#include <random>
+#include "Engine.h"
 
 class MazeGenerator : public BaseComponent
 {

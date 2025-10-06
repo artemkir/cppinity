@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Components/BaseComponent.h"
+#include "Engine.h"
 
 class MazeGenerator;
 

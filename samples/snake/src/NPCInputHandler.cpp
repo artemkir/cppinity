@@ -1,12 +1,6 @@
-#include "Scripts/NPCInputHandler.h"
-#include <algorithm>
-#include <queue>
+#include "Engine.h"
 
-#include "GameObject.h"
-#include "Components/InputHandler.h"
-#include "Components/Transform.h"
-#include "Scene.h"
-#include "Scripts/GameConsts.h"
+#include "Game.h"
 
 NPCInputHandler::NPCInputHandler() : dir(Direction::STOP) {}
 

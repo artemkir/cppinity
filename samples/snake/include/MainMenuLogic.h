@@ -1,9 +1,6 @@
 #pragma once
 
-#include "Components/BaseComponent.h"
-
-class GameObject;
-class GameStateManager;
+#include "Engine.h"
 
 class MainMenuLogic : public BaseComponent
 {

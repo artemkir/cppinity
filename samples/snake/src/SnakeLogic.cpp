@@ -1,19 +1,6 @@
+#include "Engine.h"
 
-#include "Scripts/SnakeLogic.h"
-
-#include "Scripts/MazeGenerator.h"
-#include "Scripts/AppleLogic.h"
-#include "Components/RectRenderer.h"
-#include "Components/SimpleCollider.h"
-#include "Components/Transform.h"
-#include "Components/IInputHandler.h"
-#include "Scene.h"
-#include "Scripts/GameStateManager.h"
-#include "GameObject.h"
-#include "GameObjectBuilder.h"
-#include <memory>
-
-#include "Scripts/GameConsts.h"
+#include "Game.h"
 
 void SnakeLogic::Awake()
 {

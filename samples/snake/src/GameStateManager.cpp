@@ -1,9 +1,6 @@
-#include "Scripts/GameStateManager.h"
-#include "Scripts/EndScreenLogic.h" // Include if required for score logic
+#include "Engine.h"
 
-#include "GameObject.h"
-#include "Components/Transform.h"
-#include "Scene.h"
+#include "Game.h"
 
 void GameStateManager::Start()
 {

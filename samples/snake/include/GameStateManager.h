@@ -1,8 +1,6 @@
 #pragma once
 
-#include "Components/BaseComponent.h"
-
-class GameObject;
+#include "Engine.h"
 
 enum class GameState
 {

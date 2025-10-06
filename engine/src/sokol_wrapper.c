@@ -4,12 +4,13 @@
 #endif
 
 #define SOKOL_IMPL
+#define SOKOL_APP_IMPL
 
 #include "InputEvent.h"
-#include "Scripts/GameConsts.h"
+//#include "Scripts/GameConsts.h"
 
-#include "sokol_gfx.h"
 #include "sokol_app.h"
+#include "sokol_gfx.h"
 #include "sokol_glue.h"
 #include "sokol_time.h"
 #include "sokol_log.h"
@@ -33,6 +34,13 @@ static struct
     uint8_t file_buffer[1024*1024*4];
 } app_state;
 
+typedef struct {
+    float bottom_left[2];
+    float size[2];
+    float color[4];
+    float screen_size[2];
+} vs_uniforms_t;
+
 static uint64_t last_time = 0;
 
 void init(void)
@@ -42,78 +50,6 @@ void init(void)
     stm_setup();
     last_time = stm_now();
     srand(stm_sec(stm_now()));
-}
-
-sg_shader make_custom_shader()
-{
-    return sg_make_shader(&(sg_shader_desc){
-        .attrs = {
-            [0].glsl_name = "pos",
-            [1].glsl_name = "color0",
-        },
-        .vertex_func.source = "#version 300 es\n"
-                              "in vec4 pos;"
-                              "in vec4 color0;"
-                              "out vec4 color;"
-                              "void main() {"
-                              "  gl_Position = pos;\n"
-                              "  color = color0;\n"
-                              "}\n",
-        .fragment_func.source = "#version 300 es\n"
-                                "precision mediump float;\n"
-                                "in vec4 color;\n"
-                                "out vec4 frag_color;\n"
-                                "void main() {\n"
-                                "  frag_color = color;\n"
-                                "}\n"});
-}
-
-typedef struct {
-    float bottom_left[2];
-    float size[2];
-    float color[4];
-    float screen_size[2];
-} vs_uniforms_t;
-
-sg_shader make_shader_for_2d_quads()
-{
-    return sg_make_shader(&(sg_shader_desc) {
-        .attrs = {
-            [0].glsl_name = "pos"
-        },
-        .uniform_blocks[0] = {
-            .stage = SG_SHADERSTAGE_VERTEX,
-            .size = sizeof(vs_uniforms_t),
-            .glsl_uniforms = {
-                [0] = { .glsl_name = "u_bottom_left", .type = SG_UNIFORMTYPE_FLOAT2 },
-                [1] = { .glsl_name = "u_size", .type = SG_UNIFORMTYPE_FLOAT2 },
-                [2] = { .glsl_name = "u_color", .type = SG_UNIFORMTYPE_FLOAT4},
-                [3] = { .glsl_name = "u_screen_size", .type = SG_UNIFORMTYPE_FLOAT2},
-			},
-		},
-        .vertex_func.source = "#version 300 es\n"
-            "uniform vec2 u_bottom_left;\n"
-            "uniform vec2 u_size;\n"
-            "uniform vec4 u_color;\n"
-            "uniform vec2 u_screen_size;\n"
-            "in vec2 pos;\n"
-            "out vec4 color;\n"
-            "void main() {\n"
-            "  float pixel_x = u_bottom_left.x + pos.x * u_size.x;\n"
-            "  float pixel_y = u_bottom_left.y + (1.0 - pos.y) * u_size.y;\n"
-            "  float norm_x = (pixel_x / u_screen_size.x) * 2.0 - 1.0;\n"
-            "  float norm_y = 1.0 - (pixel_y / u_screen_size.y) * 2.0;\n"
-            "  gl_Position = vec4(norm_x, norm_y, 0.0, 1.0);\n"
-            "  color = u_color;\n"
-            "}\n",
-         .fragment_func.source = "#version 300 es\n"
-            "precision mediump float;\n"
-            "in vec4 color;\n"
-            "out vec4 frag_color;\n"
-            "void main() {\n"
-            "  frag_color = color;\n"
-            "}\n"
-    });
 }
 
 void create_default_quad_buffers()
@@ -143,7 +79,7 @@ void create_default_quad_buffers()
     app_state.bind.index_buffer = sg_make_buffer(&(sg_buffer_desc) {
         .usage.index_buffer = true,
             .data = SG_RANGE(indices),
-            .label = "cube-indices"
+            .label = "quad-indices"
     });
 }
 
@@ -408,7 +344,7 @@ void sokol_destroy_shader(uint32_t id) {
     sg_destroy_shader((sg_shader){.id = id});
 }
 
-uint32_t sokol_create_pipeline(uint32_t shader_id, int num_attrs, const int* attr_formats, int index_type) {
+uint32_t sokol_create_pipeline(uint32_t shader_id, int num_attrs, const int* attr_formats, int index_type, bool alphaBlending) {
     sg_pipeline_desc desc = {0};
 
     desc.shader.id = shader_id;
@@ -417,10 +353,14 @@ uint32_t sokol_create_pipeline(uint32_t shader_id, int num_attrs, const int* att
     }
     desc.index_type = (sg_index_type)index_type;
     
-    //TODO: add more
-    //desc.depth.compare = SG_COMPAREFUNC_ALWAYS;
-    //desc.depth.write_enabled = false;
-    //desc.cull_mode = SG_CULLMODE_NONE;
+    if (alphaBlending)
+    {
+        desc.colors[0].blend.enabled = true;
+        desc.colors[0].blend.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA;
+        desc.colors[0].blend.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+        desc.colors[0].blend.src_factor_alpha = SG_BLENDFACTOR_ONE;  // SRC_ALPHA?
+        desc.colors[0].blend.dst_factor_alpha = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+    }
 
     sg_pipeline pip = sg_make_pipeline(&desc);
     return pip.id;
@@ -486,10 +426,12 @@ void fetch_callback(const sfetch_response_t* response) {
         fetch_failed_callback(response->user_data);
     }
 
+#if defined(WIN32) && defined(_DEBUG)
 	char buffer[256];
 	sprintf(buffer, "Fetch completed: %s (fetched: %d, failed: %d, size: %zu)\n", response->path, response->fetched, response->failed, response->data.size);
 
 	OutputDebugStringA(buffer);
+#endif
 }
 
 void sokol_fetch_request(const char* path, 
@@ -527,8 +469,8 @@ void sokol_setup()
 
 sapp_desc sokol_main(int argc, char *argv[])
 {
-    app_state.screen_width = WIDTH * TILE_SIZE + 2;
-    app_state.screen_height = HEIGHT * TILE_SIZE + 2;
+    app_state.screen_width = 800;
+    app_state.screen_height = 800;
 
     return (sapp_desc){
         .init_cb = init,
