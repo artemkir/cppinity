@@ -8,7 +8,7 @@
 
 // Forward declaration
 class Scene;
-class TileTransform;
+class BaseTransform;
 class GameObjectBuilder;
 
 // GameObject Class
@@ -18,7 +18,7 @@ class GameObject
     unsigned tag;
     std::string name;
     std::vector<std::unique_ptr<BaseComponent>> components;
-    TileTransform *transform = nullptr;
+    BaseTransform *transform = nullptr;
     std::vector<GameObject *> children;
     GameObject *parent = nullptr;
     bool isStarted = false;
@@ -55,7 +55,7 @@ public:
 
     const std::string &GetName() const;
     int GetTag() const;
-    TileTransform *GetTransform() const;
+    BaseTransform *GetTransform() const;
     std::vector<std::unique_ptr<BaseComponent>> &GetComponents();
 
     template <typename T, typename... Args>

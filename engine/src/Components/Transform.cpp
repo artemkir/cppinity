@@ -1,39 +1,39 @@
 #include "Components/Transform.h"
 
-TileTransform::TileTransform(float x_, float y_, float w, float h)
-    : x(x_), y(y_), width(w), height(h) {}
-
-float TileTransform::GetX() const { return x; }
-float TileTransform::GetY() const { return y; }
-float TileTransform::GetScaleX() const { return scaleX; }
-float TileTransform::GetScaleY() const { return scaleY; }
-
-void TileTransform::SetSize(float width_, float height_)
+GridTransform::GridTransform(float x_, float y_, float w, float h) :
+    t{ { x_, y_ } , { w, h } , { 1.0f, 1.0f } }
 {
-    width = width_;
-    height = height_;
 }
 
-void TileTransform::SetPosition(float x_, float y_)
+float GridTransform::GetX() const { return t.pos.x; }
+float GridTransform::GetY() const { return t.pos.y; }
+float GridTransform::GetScaleX() const { return t.scale.x; }
+float GridTransform::GetScaleY() const { return t.scale.y; }
+
+void GridTransform::SetSize(float width_, float height_)
 {
-    x = x_;
-    y = y_;
+    t.size = { width_, height_ };
 }
 
-void TileTransform::SetScale(float x_, float y_)
+void GridTransform::SetPosition(float x_, float y_)
 {
-    scaleX = x_;
-    scaleY = y_;
+    t.pos = { x_,y_ };
 }
 
-float TileTransform::GetWidth() const { return width; }
-float TileTransform::GetHeight() const { return height; }
-
-BaseTransform::Transform TileTransform::GetScreenTransform()
+void GridTransform::SetScale(float x_, float y_)
 {
-    return {
-        x * width - (scaleX - 1.0f) * width / 2.0f,
-        y * height - (scaleY - 1.0f) * height / 2.0f,
-        width * scaleX,
-        height * scaleY};
+	t.scale = { x_,y_ };
+}
+
+float GridTransform::GetWidth() const { return t.size.x; }
+float GridTransform::GetHeight() const { return t.size.y; }
+
+BaseTransform::Transform GridTransform::GetScreenTransform() const
+{
+    Vector2 one{ 1.0f, 1.0f };
+    Vector2 scaledSize = t.size * t.scale;
+    Vector2 shift = (t.scale - one) * t.size * 0.5f;
+	Vector2 screenPos = t.pos * t.size;   
+
+	return { { screenPos - shift}, { scaledSize }, {0,0} };
 }

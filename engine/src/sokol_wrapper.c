@@ -17,7 +17,7 @@
 #include "sokol_fetch.h"
 #include "stb/stb_image.h"
 
-extern void app_init(void);
+extern void app_init(int w, int h);
 extern bool app_frame(float deltaTime);
 extern void app_cleanup(void);
 extern void app_event(const InputEvent *event);
@@ -45,7 +45,7 @@ static uint64_t last_time = 0;
 
 void init(void)
 {
-    app_init();
+    app_init(app_state.screen_width, app_state.screen_height);
 
     stm_setup();
     last_time = stm_now();

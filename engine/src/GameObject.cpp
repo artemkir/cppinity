@@ -43,7 +43,7 @@ void GameObject::AddComponent(std::unique_ptr<BaseComponent> component)
 {
     component->SetGameObject(this);
 
-    if (const auto t = dynamic_cast<TileTransform *>(component.get()))
+    if (const auto t = dynamic_cast<BaseTransform *>(component.get()))
     {
         transform = t;
     }
@@ -98,7 +98,7 @@ int GameObject::GetTag() const
     return tag;
 }
 
-TileTransform *GameObject::GetTransform() const
+BaseTransform *GameObject::GetTransform() const
 {
     return transform;
 }

@@ -37,11 +37,11 @@ static std::unique_ptr<AppState> app_state = nullptr;
 
 extern void gameInit(Scene *);
 
-extern "C" void app_init(void)
+extern "C" void app_init(int screen_width, int screen_height)
 {
     app_state = std::make_unique<AppState>();
 		
-    app_state->renderer = std::make_unique<SokolRenderer>();
+    app_state->renderer = std::make_unique<SokolRenderer>(screen_width, screen_height);
 	app_state->resourceManager = std::make_unique<ResourceManager>(app_state->renderer.get());
     app_state->shaderManager = std::make_unique<ShaderManager>();
     app_state->materialManager = std::make_unique<MaterialManager>(app_state->shaderManager.get());

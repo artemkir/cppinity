@@ -15,21 +15,24 @@ bool SimpleCollider::IsColliding(const SimpleCollider &other) const
     if (!active || !other.active || !gameObject || !other.gameObject)
         return false;
 
-    const TileTransform *t1 = gameObject->GetTransform();
-    const TileTransform *t2 = other.gameObject->GetTransform();
+    auto *t1 = gameObject->GetTransform();
+    auto *t2 = other.gameObject->GetTransform();
 
     if (!t1 || !t2)
         return false;
 
-    int left1 = t1->GetX();
-    int right1 = t1->GetX() + t1->GetWidth() / 40;
-    int top1 = t1->GetY();
-    int bottom1 = t1->GetY() + t1->GetHeight() / 40;
+    auto s1 = t1->GetScreenTransform();
+    auto s2 = t2->GetScreenTransform();
 
-    int left2 = t2->GetX();
-    int right2 = t2->GetX() + t2->GetWidth() / 40;
-    int top2 = t2->GetY();
-    int bottom2 = t2->GetY() + t2->GetHeight() / 40;
+    int left1 = s1.pos.x;
+    int right1 = s1.pos.x + s1.size.x;
+    int top1 = s1.pos.y;
+    int bottom1 = s1.pos.y + s1.size.y;
+
+    int left2 = s2.pos.x;
+    int right2 = s2.pos.x + s2.size.x;
+    int top2 = s2.pos.y;
+    int bottom2 = s2.pos.y + s2.size.y;
 
     return left1 < right2 && right1 > left2 && top1 < bottom2 && bottom1 > top2;
 }

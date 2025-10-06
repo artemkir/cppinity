@@ -15,6 +15,8 @@ class SnakeLogic : public BaseComponent
 	float update_interval = 0.2f;
 	float min_update_interval = 0.05f;
 	float tail_change_interval = 0.005f;
+	float blockSizeW = 0.0f;
+	float blockSizeH = 0.0f;
 
 	IInputHandler *inputHandler = nullptr;
 

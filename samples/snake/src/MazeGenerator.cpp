@@ -7,17 +7,20 @@ void MazeGenerator::AddGridToScene()
     std::mt19937 g(rd());
     std::uniform_int_distribution<> color(100, 140);
 
+    float blockSizeW = (float)gameObject->GetScene()->GetRenderer()->GetW() / MAZE_WIDTH;
+    float blockSizeH = (float)gameObject->GetScene()->GetRenderer()->GetH() / MAZE_HEIGHT;
+
     // Add walls to Scene
-    for (int y = 0; y < HEIGHT; ++y)
+    for (int y = 0; y < MAZE_HEIGHT; ++y)
     {
-        for (int x = 0; x < WIDTH; ++x)
+        for (int x = 0; x < MAZE_WIDTH; ++x)
         {
             if (!grid[y][x])
             {
                 int c = color(g);
 
                 gameObject->GetScene()->CreateGameObjectBuilder("maze_block_" + std::to_string(x) + "_" + std::to_string(y), OBSTACLE_TAG)
-                                 .WithComponent<TileTransform>(x, y, TILE_SIZE, TILE_SIZE)
+                                 .WithComponent<GridTransform>(x, y, blockSizeW, blockSizeH)
                                  .WithComponent<RectRenderer>(c, c, c)
                                  .WithComponent<SimpleCollider>()
 					             .AddToScene();
@@ -30,7 +33,7 @@ void MazeGenerator::GenerateMaze(int startX, int startY)
 {
     std::mt19937 g(rd());
 
-    grid.resize(HEIGHT, std::vector<bool>(WIDTH, true)); // All walls initially
+    grid.resize(MAZE_HEIGHT, std::vector<bool>(MAZE_WIDTH, true)); // All walls initially
     std::stack<std::pair<int, int>> stack;
     stack.push({startX, startY});
     grid[startY][startX] = false; // Starting point is empty
@@ -51,7 +54,7 @@ void MazeGenerator::GenerateMaze(int startX, int startY)
             int nx = x + dx;
             int ny = y + dy;
 
-            if (nx >= 0 && nx < WIDTH && ny >= 0 && ny < HEIGHT && grid[ny][nx])
+            if (nx >= 0 && nx < MAZE_WIDTH && ny >= 0 && ny < MAZE_HEIGHT && grid[ny][nx])
             {
                 int stepX = dx / _steps;
                 int stepY = dy / _steps;
@@ -71,8 +74,8 @@ void MazeGenerator::GenerateMaze(int startX, int startY)
 
     // Random holes
     int numHoles = 20;
-    std::uniform_int_distribution<> disX(0, WIDTH - 1);
-    std::uniform_int_distribution<> disY(0, HEIGHT - 1);
+    std::uniform_int_distribution<> disX(0, MAZE_WIDTH - 1);
+    std::uniform_int_distribution<> disY(0, MAZE_HEIGHT - 1);
 
     for (int i = 0; i < numHoles; ++i)
     {
@@ -112,8 +115,8 @@ bool MazeGenerator::IsObstacle(int x, int y)
 std::pair<int, int> MazeGenerator::GetRandomEmptyPosition()
 {
     std::mt19937 g(rd());
-    std::uniform_int_distribution<> disX(0, WIDTH - 1);
-    std::uniform_int_distribution<> disY(0, HEIGHT - 1);
+    std::uniform_int_distribution<> disX(0, MAZE_WIDTH - 1);
+    std::uniform_int_distribution<> disY(0, MAZE_HEIGHT - 1);
 
     int x = 0;
     int y = 0;
@@ -138,5 +141,5 @@ std::pair<int, int> MazeGenerator::GetRandomEmptyPosition()
 
 void MazeGenerator::Awake()
 {
-    GenerateMaze(WIDTH / 2, HEIGHT / 2);
+    GenerateMaze(MAZE_WIDTH / 2, MAZE_HEIGHT / 2);
 }

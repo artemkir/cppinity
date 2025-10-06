@@ -23,7 +23,7 @@ float Animation::EaseInOutQuad(float t) const
 
 void Animation::Awake()
 {
-    const TileTransform *transform = gameObject->GetTransform();
+    auto transform = gameObject->GetTransform();
     startX = transform->GetScaleX();
     startY = transform->GetScaleY();
 }
@@ -33,7 +33,7 @@ void Animation::Update(float deltaTime)
     if (!active)
         return;
 
-    TileTransform *transform = gameObject->GetTransform();
+    auto transform = gameObject->GetTransform();
     elapsedTime += deltaTime;
 
     float t = elapsedTime / duration;

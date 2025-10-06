@@ -17,7 +17,7 @@ extern "C" uint32_t sokol_alloc_empty_view();
 extern "C" void sokol_destroy_texture(uint32_t id);
 extern "C" void sokol_destroy_view(uint32_t id);
 
-SokolRenderer::SokolRenderer() {
+SokolRenderer::SokolRenderer(int screen_width, int screen_height) : screen_width_(screen_width), screen_height_(screen_height) {
     sokol_setup();
 }
 

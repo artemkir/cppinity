@@ -34,13 +34,13 @@ void CreateInitialScene(Scene* scene)
 
 	// Background (commented out, but refactored for completeness)
 	/*scene->CreateGameObjectBuilder("background", 0)
-		.WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
+		.WithComponent<GridTransform>(0, 0, MAZE_WIDTH * TILE_SIZE, MAZE_HEIGHT * TILE_SIZE)
 		.WithComponent<RectRenderer>(0, 0, 0)
 		.Build();*/
 
 		// Border (as child of root)
 	root->CreateGameObjectBuilder("border", 0)
-		.WithComponent<TileTransform>(0, 0, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
+		.WithComponent<GridTransform>(0, 0, MAZE_WIDTH * TILE_SIZE, MAZE_HEIGHT * TILE_SIZE)
 		.WithComponent<RectRenderer>(255, 255, 255)
 		.AddToScene();
 
@@ -51,7 +51,7 @@ void CreateInitialScene(Scene* scene)
 
 	// Apple
 	scene->CreateGameObjectBuilder("apple", OBSTACLE_TAG)
-		.WithComponent<TileTransform>()
+		.WithComponent<GridTransform>()
 		.WithComponent<SimpleCollider>()
 		.WithComponent<AppleLogic>()
 		.WithComponent<SpriteRenderer>("icon")
@@ -62,7 +62,7 @@ void CreateInitialScene(Scene* scene)
 
 	// Snake Head
 	scene->CreateGameObjectBuilder("snake_head", OBSTACLE_TAG)
-		.WithComponent<TileTransform>()
+		.WithComponent<GridTransform>()
 		.WithComponent<RectRenderer>(0, 255, 0)
 		.WithComponent<SimpleCollider>()
 		.WithComponent<InputHandler>()
@@ -71,7 +71,7 @@ void CreateInitialScene(Scene* scene)
 
 	// NPC Snake
 	scene->CreateGameObjectBuilder("npc_snake_head", OBSTACLE_TAG)
-		.WithComponent<TileTransform>()
+		.WithComponent<GridTransform>()
 		.WithComponent<RectRenderer>(170, 100, 200)
 		.WithComponent<SnakeLogic>()
 		.WithComponent<NPCInputHandler>()

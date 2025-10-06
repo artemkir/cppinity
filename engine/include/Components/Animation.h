@@ -2,7 +2,7 @@
 
 #include "BaseComponent.h"
 
-class TileTransform;
+class GridTransform;
 
 class Animation : public BaseComponent
 {

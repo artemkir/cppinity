@@ -4,6 +4,9 @@
 
 void SnakeLogic::Awake()
 {
+    blockSizeW = (float)gameObject->GetScene()->GetRenderer()->GetW() / MAZE_WIDTH;
+    blockSizeH = (float)gameObject->GetScene()->GetRenderer()->GetH() / MAZE_HEIGHT;
+
     inputHandler = gameObject->GetComponent<IInputHandler>();
     mazeGenerator = gameObject->GetScene()->FindGameObjectByName("maze_generator")->GetComponent<MazeGenerator>();
     apple = gameObject->GetScene()->FindGameObjectByName("apple")->GetComponent<AppleLogic>();
@@ -11,7 +14,7 @@ void SnakeLogic::Awake()
 
     auto [x, y] = mazeGenerator->GetRandomEmptyPosition();
     gameObject->GetTransform()->SetPosition(x, y);
-    gameObject->GetTransform()->SetSize(TILE_SIZE, TILE_SIZE);
+    gameObject->GetTransform()->SetSize(blockSizeW, blockSizeH);
 }
 
 void SnakeLogic::Update(float deltaTime)
@@ -24,7 +27,7 @@ void SnakeLogic::Update(float deltaTime)
     updateTimer -= update_interval;
 
     auto dir = inputHandler->GetDirection();
-    TileTransform *headTransform = gameObject->GetTransform();
+    auto headTransform = gameObject->GetTransform();
 
     if (dir == Direction::STOP)
         return;
@@ -52,17 +55,17 @@ void SnakeLogic::Update(float deltaTime)
 
     // Wrap around logic
     if (headTransform->GetX() < 0)
-        headTransform->SetPosition(WIDTH - 1, headTransform->GetY());
-    if (headTransform->GetX() >= WIDTH)
+        headTransform->SetPosition(MAZE_WIDTH - 1, headTransform->GetY());
+    if (headTransform->GetX() >= MAZE_WIDTH)
         headTransform->SetPosition(0, headTransform->GetY());
     if (headTransform->GetY() < 0)
-        headTransform->SetPosition(headTransform->GetX(), HEIGHT - 1);
-    if (headTransform->GetY() >= HEIGHT)
+        headTransform->SetPosition(headTransform->GetX(), MAZE_HEIGHT - 1);
+    if (headTransform->GetY() >= MAZE_HEIGHT)
         headTransform->SetPosition(headTransform->GetX(), 0);
 
     for (size_t i = 0; i < tail.size(); i++)
     {
-        TileTransform *tailTransform = tail[i]->GetTransform();
+        auto tailTransform = tail[i]->GetTransform();
         int tempX = tailTransform->GetX();
         int tempY = tailTransform->GetY();
         tailTransform->SetPosition(prevX, prevY);
@@ -84,7 +87,7 @@ void SnakeLogic::OnCollide(GameObject *other)
 
         apple->RegenerateApple();
 
-        TileTransform *headTransform = gameObject->GetTransform();
+        auto headTransform = gameObject->GetTransform();
         
         int prevX = headTransform->GetX();
         int prevY = headTransform->GetY();
@@ -99,7 +102,7 @@ void SnakeLogic::OnCollide(GameObject *other)
 
         auto newTail = gameObject->GetScene()->CreateGameObjectBuilder("tail_" + std::to_string(tail.size()), OBSTACLE_TAG)
 			.WithComponent<RectRenderer>((int)(color.r * 0.75f), (int)(color.g * 0.75f), (int)(color.b * 0.75f))
-			.WithComponent<TileTransform>(prevX, prevY, TILE_SIZE, TILE_SIZE)
+			.WithComponent<GridTransform>(prevX, prevY, blockSizeW, blockSizeH)
 			.WithComponent<SimpleCollider>(false)
 			.AddToScene();        
 

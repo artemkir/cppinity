@@ -31,8 +31,8 @@ void SpriteRenderer::Render()
     const auto& renderer = GetRenderer();
 
     material->SetUniform("u_color", { 1.0f, 1.0f, 1.0f, 1.0f });
-    material->SetUniform("u_pixel_top_left", { transform.x, transform.y });
-    material->SetUniform("u_pixel_size", { transform.width, transform.height });
+    material->SetUniform("u_pixel_top_left", transform.pos.to_vector());
+    material->SetUniform("u_pixel_size", transform.size.to_vector());
     auto sw = static_cast<float>(sokol_get_screen_width());
     auto sh = static_cast<float>(sokol_get_screen_height());
     material->SetUniform("u_screen_size", { sw, sh });

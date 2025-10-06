@@ -9,7 +9,7 @@ void NPCInputHandler::Update(float deltaTime)
     if (!gameObject || !gameObject->GetTransform())
         return;
 
-    TileTransform *head = gameObject->GetTransform();
+    auto head = gameObject->GetTransform();
     GameObject *apple = nullptr;
     for (const auto &go : gameObject->GetScene()->GetGameObjects())
     {
@@ -87,7 +87,7 @@ std::vector<std::pair<int, int>> NPCInputHandler::FindPath(int startX, int start
             int nx = current->x + dx;
             int ny = current->y + dy;
 
-            if (nx < 0 || nx >= WIDTH || ny < 0 || ny >= HEIGHT)
+            if (nx < 0 || nx >= MAZE_WIDTH || ny < 0 || ny >= MAZE_HEIGHT)
                 continue;
 
             bool isObstacle = false;
