@@ -10,8 +10,6 @@
 #include "Scene.h"
 #include "GameObjectBuilder.h"
 
-EndScreenLogic::EndScreenLogic() {}
-
 void EndScreenLogic::Start()
 {
     auto scene = gameObject->GetScene();

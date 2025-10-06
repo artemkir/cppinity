@@ -14,7 +14,7 @@
 
 class Material {
 public:
-    Material(std::shared_ptr<Shader> shader);
+    explicit Material(std::shared_ptr<Shader> shader);
 
     ~Material();
 

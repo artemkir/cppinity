@@ -39,8 +39,8 @@ void RectRenderer::Render()
     material->SetUniform("u_color", {color.r / 255.f, color.g / 255.f, color.b / 255.f, 1.0f});
     material->SetUniform("u_pixel_top_left", {transform.x, transform.y});
     material->SetUniform("u_pixel_size", {transform.width, transform.height});
-    float sw = static_cast<float>(sokol_get_screen_width());
-    float sh = static_cast<float>(sokol_get_screen_height());
+    auto sw = static_cast<float>(sokol_get_screen_width());
+    auto sh = static_cast<float>(sokol_get_screen_height());
     material->SetUniform("u_screen_size", {sw, sh});
 
     renderer->ApplyMaterial(material.get());

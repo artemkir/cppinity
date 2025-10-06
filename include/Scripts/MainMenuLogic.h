@@ -12,7 +12,7 @@ class MainMenuLogic : public BaseComponent
     GameStateManager *stateManager = nullptr;
 
 public:
-    MainMenuLogic();
+    MainMenuLogic() = default;
 
     void Start() override;
     void Update(float deltaTime) override;

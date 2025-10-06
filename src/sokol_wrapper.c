@@ -147,23 +147,6 @@ void create_default_quad_buffers()
     });
 }
 
-void sokol_setup()
-{
-    sg_setup(&(sg_desc){
-        .environment = sglue_environment(),
-        .logger.func = slog_func});
-
-    app_state.pass_action = (sg_pass_action){
-        .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {0.2f, 0.3f, 0.3f, 1.0f}}};
-
-    app_state.bind.samplers[0] = sg_make_sampler(&(sg_sampler_desc) {
-        .min_filter = SG_FILTER_NEAREST,
-        .mag_filter = SG_FILTER_NEAREST,
-    });
-
-    create_default_quad_buffers();
-}
-
 void cleanup_default_quad_buffers()
 {
     sg_destroy_buffer(app_state.bind.vertex_buffers[0]);

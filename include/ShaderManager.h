@@ -6,6 +6,7 @@
 #include <memory>
 #include <unordered_map>
 #include "Shader.h"
+#include "StringHash.h"
 
 class ShaderManager {
 public:
@@ -21,7 +22,7 @@ public:
     void CreateDefaultShaders();
 
 private:
-    std::unordered_map<std::string, std::shared_ptr<Shader>> shaders_;
+    std::unordered_map<std::string, std::shared_ptr<Shader>, StringHash, std::equal_to<>> shaders_;
 
     void CreateUnlitColorPixelRectShader();
     void CreateUnlitTextureScreenShader();

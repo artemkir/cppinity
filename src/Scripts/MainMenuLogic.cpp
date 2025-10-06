@@ -10,10 +10,6 @@
 #include "Scene.h"
 #include "GameObjectBuilder.h" // Include the builder header
 
-MainMenuLogic::MainMenuLogic()
-{
-}
-
 void MainMenuLogic::Start()
 {
     auto scene = gameObject->GetScene();

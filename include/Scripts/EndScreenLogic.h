@@ -13,7 +13,7 @@ private:
     GameObject *bg = nullptr;
 
 public:
-    EndScreenLogic();
+    EndScreenLogic() = default;
 
     void Start() override;
     void Update(float deltaTime) override;

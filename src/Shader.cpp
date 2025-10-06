@@ -22,10 +22,8 @@ Shader::Shader(const std::vector<AttributeDesc>& _attrs,
                const std::vector<std::string>& _fs_image_names,
                const std::string& _vs_source,
                const std::string& _fs_source)
-    : attrs(_attrs), fsImageNames(_fs_image_names), vsSource(_vs_source), fsSource(_fs_source) {
-
-    // Calculate offsets and size
-    vsUniformBlock = _vs_uniform_block;
+    : attrs(_attrs), fsImageNames(_fs_image_names), vsSource(_vs_source), fsSource(_fs_source), vsUniformBlock(_vs_uniform_block) {
+        
     int offset = 0;
     for (auto& u : vsUniformBlock.uniforms) {
         u.offset = offset;

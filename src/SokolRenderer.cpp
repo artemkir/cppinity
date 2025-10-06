@@ -43,7 +43,7 @@ void SokolRenderer::ApplyMaterial(const Material* material) {
 
 void SokolRenderer::ApplyTexture(const std::shared_ptr<Texture>& texture) {
     if (texture) {
-        const Texture& tex = dynamic_cast<const Texture&>(*texture);
+        auto& tex = dynamic_cast<const Texture&>(*texture);
         sokol_apply_view(tex.GetView());
     }
     else

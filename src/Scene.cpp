@@ -9,7 +9,7 @@
 #include "ResourceManager.h"
 #include "Input.h"
 
-Scene::Scene(IRenderer *r, MaterialManager *m, ResourceManager *rm) : renderer(r), mm(m), rm(rm) {}
+Scene::Scene(IRenderer *r, MaterialManager *m, ResourceManager *resourceManager) : renderer(r), materialManager(m), resourceManager(resourceManager) {}
 
 void Scene::AddGameObject(std::unique_ptr<GameObject> go)
 {
@@ -119,21 +119,6 @@ bool Scene::Frame(float deltaTime)
 void Scene::HandleEvent(const InputEvent *event)
 {
     inputHandler.HandleEvent(event);
-}
-
-const std::vector<std::unique_ptr<GameObject>> &Scene::GetGameObjects() const
-{
-    return gameObjects;
-}
-
-const IRenderer *Scene::GetRenderer() const
-{
-    return renderer;
-}
-
-const MaterialManager *Scene::GetMaterialManager() const
-{
-    return mm;
 }
 
 GameObjectBuilder Scene::CreateGameObjectBuilder(const std::string &name, unsigned tag)

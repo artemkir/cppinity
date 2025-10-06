@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include "Material.h"
 #include "RenderTypes.h"
+#include "StringHash.h"
 
 class ShaderManager;
 
@@ -18,13 +19,12 @@ public:
                                              std::shared_ptr<Shader> shader);
 
     std::shared_ptr<Material> GetMaterial(const std::string& id) const;
-
-    ShaderManager *shaderManager;
-
+        
     void CreateDefaultMaterials();
 
 private:
-    std::unordered_map<std::string, std::shared_ptr<Material>> materials_;
+    ShaderManager* shaderManager;
+    std::unordered_map<std::string, std::shared_ptr<Material>, StringHash, std::equal_to<>> materials_;
 };
 
 #endif

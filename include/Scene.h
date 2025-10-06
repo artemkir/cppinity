@@ -26,8 +26,8 @@ class Scene
 	std::vector<SimpleCollider *> colliders;
 
 	IRenderer *renderer;
-	MaterialManager *mm;
-	ResourceManager *rm;
+	MaterialManager *materialManager;
+	ResourceManager *resourceManager;
 
 	bool running = true;
 
@@ -56,12 +56,13 @@ public:
 
 	void HandleEvent(const InputEvent *event);
 
-	const std::vector<std::unique_ptr<GameObject>> &GetGameObjects() const;
-	const IRenderer *GetRenderer() const;
+	const std::vector<std::unique_ptr<GameObject>>& Scene::GetGameObjects() const { return gameObjects;	}
+	
+	const IRenderer* Scene::GetRenderer() const { return renderer;	}
 
-	const MaterialManager *GetMaterialManager() const;
+	const MaterialManager* Scene::GetMaterialManager() const {	return materialManager;	}
 
-	ResourceManager* GetResourceManager() const { return rm; };
+	ResourceManager* GetResourceManager() const { return resourceManager; };
 
 	GameObjectBuilder CreateGameObjectBuilder(const std::string &name, unsigned tag = 0);
 
