@@ -5,16 +5,22 @@
 
 struct Vector2
 {
-	float x;
-	float y;
+	float x = 0.0f;
+	float y = 0.0f;
 
-	Vector2(float x_ = 0.0f, float y_ = 0.0f) : x(x_), y(y_) {}
+	Vector2(std::initializer_list<float> elems)
+	{
+		auto it = elems.begin();
+		x = (it != elems.end()) ? *it++ : 0.0f;
+		y = (it != elems.end()) ? *it : 0.0f;
+	}
+	
+	friend Vector2 operator+(const Vector2& v1, const Vector2& v2) { return Vector2{ v1.x + v2.x, v1.y + v2.y }; }
+	friend Vector2 operator-(const Vector2& v1, const Vector2& v2) { return Vector2{ v1.x - v2.x, v1.y - v2.y }; }
+	friend Vector2 operator*(const Vector2& v1, const Vector2& v2) { return Vector2{ v1.x * v2.x, v1.y * v2.y }; }
 
-	Vector2 operator+(const Vector2& other) const { return { x + other.x, y + other.y }; }
-	Vector2 operator-(const Vector2& other) const { return { x - other.x, y - other.y }; }
-	Vector2 operator*(float scalar) const { return { x * scalar, y * scalar }; }
-	Vector2 operator*(const Vector2& other) const { return { x * other.x, y * other.y }; } // Element-wise multiplication
-	Vector2 operator/(float scalar) const { return { x / scalar, y / scalar }; }
+	friend Vector2 operator*(const Vector2& v, float scalar) { return Vector2{ v.x * scalar, v.y * scalar }; }
+	friend Vector2 operator/(const Vector2& v, float scalar) { return Vector2{ v.x / scalar, v.y / scalar }; }
 
 	std::vector<float> to_vector() const { return { x, y }; }
 };

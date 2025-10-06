@@ -26,7 +26,7 @@ class GameObject
 public:
     // GameObject() = delete;
 
-    GameObject(const std::string &name_, unsigned tag_ = 0);
+    explicit GameObject(const std::string &name_, unsigned tag_ = 0);
 
     void SetScene(Scene *s);
     Scene *GetScene();
@@ -42,7 +42,7 @@ public:
     {
         for (const auto &comp : components)
         {
-            if (T *casted = dynamic_cast<T *>(comp.get()))
+            if (auto casted = dynamic_cast<T *>(comp.get()))
                 return casted;
         }
         return nullptr;
