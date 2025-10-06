@@ -5,15 +5,7 @@
 void CreateInitialScene(Scene* scene)
 {
 	//scene->GetTextureManager()->CreateTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
-
-	std::shared_ptr<Texture> defaultTexture =
-		scene->GetResourceManager()->CreateEmpty<Texture>("default_texture");
-
-	const uint8_t pink[] = { 255,0,255,255 };
-
-	defaultTexture->CreateRGBATextureFromPixelData(1, 1,  pink);
-
-
+		
 	std::shared_ptr<Texture> existingTexture = 
 		scene->GetResourceManager()->CreateEmpty<Texture>("icon");
 

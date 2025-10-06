@@ -39,6 +39,14 @@ extern void gameInit(Scene *);
 
 extern "C" void app_init(int screen_width, int screen_height)
 {
+    if (app_state) {
+		throw std::runtime_error("AppState already initialized");
+    }
+
+    if (screen_width <= 0 || screen_height <= 0) {
+		throw std::runtime_error("Invalid screen dimensions");
+    }
+
     app_state = std::make_unique<AppState>();
 		
     app_state->renderer = std::make_unique<SokolRenderer>(screen_width, screen_height);
@@ -53,11 +61,20 @@ extern "C" void app_init(int screen_width, int screen_height)
 	app_state->shaderManager->CreateDefaultShaders();
     app_state->materialManager->CreateDefaultMaterials();
     
+    //-----
+
+    const uint8_t pink[] = { 255,0,255,255 };
+    app_state->resourceManager->CreateEmpty<Texture>("default_texture")->CreateRGBATextureFromPixelData(1, 1, pink);
+
     gameInit(app_state->scene.get());
 }
 
 extern "C" bool app_frame(float deltaTime)
 {
+    if (!app_state) {
+		throw std::runtime_error("AppState not initialized");
+    }
+
 	app_state->resourceManager->Update();
 
     return app_state->scene->Frame(deltaTime);

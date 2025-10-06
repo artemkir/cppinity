@@ -2,25 +2,25 @@
 
 #include <vector>
 #include "BaseComponent.h"
+#include <cassert>
 
 struct Vector2
 {
 	float x = 0.0f;
 	float y = 0.0f;
 
-	Vector2(std::initializer_list<float> elems)
-	{
-		auto it = elems.begin();
-		x = (it != elems.end()) ? *it++ : 0.0f;
-		y = (it != elems.end()) ? *it : 0.0f;
-	}
+	Vector2(float x_, float y_) : x(x_), y(y_) {}
 	
 	friend Vector2 operator+(const Vector2& v1, const Vector2& v2) { return Vector2{ v1.x + v2.x, v1.y + v2.y }; }
 	friend Vector2 operator-(const Vector2& v1, const Vector2& v2) { return Vector2{ v1.x - v2.x, v1.y - v2.y }; }
 	friend Vector2 operator*(const Vector2& v1, const Vector2& v2) { return Vector2{ v1.x * v2.x, v1.y * v2.y }; }
 
 	friend Vector2 operator*(const Vector2& v, float scalar) { return Vector2{ v.x * scalar, v.y * scalar }; }
-	friend Vector2 operator/(const Vector2& v, float scalar) { return Vector2{ v.x / scalar, v.y / scalar }; }
+	friend Vector2 operator/(const Vector2& v, float scalar) 
+	{ 
+		assert(scalar != 0.0f && "Division by zero");
+		return Vector2{ v.x / scalar, v.y / scalar }; 
+	}
 
 	std::vector<float> to_vector() const { return { x, y }; }
 };
@@ -35,6 +35,7 @@ public:
 		Vector2 scale;
 	};
 
+	virtual ~BaseTransform() = default;
 	virtual Transform GetScreenTransform() const = 0;
 	virtual float GetX() const = 0;
 	virtual float GetY() const = 0;
