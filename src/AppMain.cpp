@@ -51,9 +51,9 @@ void CreateInitialScene(Scene* scene)
 	std::shared_ptr<Texture> defaultTexture =
 		scene->GetResourceManager()->CreateEmpty<Texture>("default_texture");
 
-	const unsigned char pink[] = { 255,0,255,255 };
+	const uint8_t pink[] = { 255,0,255,255 };
 
-	defaultTexture->CreateRGBATextureFromPixelData(1, 1, &pink);
+	defaultTexture->CreateRGBATextureFromPixelData(1, 1, pink);
 
 
 	std::shared_ptr<Texture> existingTexture = 

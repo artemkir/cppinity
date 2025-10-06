@@ -51,7 +51,7 @@ void Material::SetTexture(const std::string& name, std::shared_ptr<Texture> text
 	textures_[name] = texture;
 }
 
-const unsigned char* Material::GetUniformData() const 
+const uint8_t* Material::GetUniformData() const 
 {
 	if (!dirty_) 
 	{

@@ -232,7 +232,9 @@ static void event(const sapp_event *e)
 
 uint32_t sokol_create_texture_from_memory_file(const void* data, size_t size)
 {
-    int png_width, png_height, num_channels;
+    int png_width = 0;
+    int png_height = 0;
+    int num_channels = 0;
     const int desired_channels = 4;
 
     stbi_uc* pixels = stbi_load_from_memory(

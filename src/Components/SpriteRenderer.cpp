@@ -13,7 +13,7 @@ SpriteRenderer::SpriteRenderer(
     const std::string& texture_,
     int renderOrder_,
     const std::string& materialName)
-    : RendererComponent(renderOrder_), textureName(texture_), materialName(materialName) {}
+    : RendererComponent(renderOrder_), materialName(materialName), textureName(texture_) {}
 
 void SpriteRenderer::Awake()
 {

@@ -6,6 +6,8 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
+
+#include "StringHash.h"
 #include "RenderTypes.h"
 #include "Texture.h"  // Assume existing
 #include "Shader.h"
@@ -22,7 +24,7 @@ public:
 
     uint32_t GetPipelineID() const { return pipeline_id_; }
 
-    const unsigned char* GetUniformData() const;
+    const uint8_t* GetUniformData() const;
 
     int GetUniformSize() const { return shader_->GetVSUniformBlock().size; }
 
@@ -33,8 +35,8 @@ public:
 private:
     std::shared_ptr<Shader> shader_;
     uint32_t pipeline_id_ = 0;
-    std::unordered_map<std::string, std::vector<float>> uniform_values_;
-    std::unordered_map<std::string, std::shared_ptr<Texture>> textures_;
+    std::unordered_map<std::string, std::vector<float>, StringHash, std::equal_to<>> uniform_values_;
+    std::unordered_map<std::string, std::shared_ptr<Texture>, StringHash, std::equal_to<>> textures_;
     mutable std::vector<unsigned char> uniform_buffer_;
     mutable bool dirty_ = true;
 };

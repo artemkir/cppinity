@@ -20,7 +20,7 @@ void ResourceManager::Update()
     sokol_fetch_update();
 }
 
-void ResourceManager::OnFetchComplete(const void *data, size_t size, bool failed, const char *error, void *user)
+void ResourceManager::OnFetchComplete(const uint8_t*data, size_t size, bool failed, const char *error, void *user)
 {
     FetchUser u{};
     memcpy(&u, user, sizeof(FetchUser));

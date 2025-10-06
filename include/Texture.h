@@ -22,7 +22,7 @@ public:
     void SetView(uint32_t v) { _data.view = v; }
 
     explicit Texture(ResourceManager* mgr);
-    ~Texture();
+    ~Texture() final;
     Texture(const Texture &) = delete;
     Texture &operator=(const Texture &) = delete;
     Texture(Texture &&other) noexcept;
@@ -30,11 +30,11 @@ public:
 
     friend class ResourceManager;
 
-    void CreateTextureFromGrayscalePixelData(int width, int height, const void* data);
-    void CreateRGBATextureFromPixelData(int width, int height, const void* data);
+    void CreateTextureFromGrayscalePixelData(int width, int height, const uint8_t* data);
+    void CreateRGBATextureFromPixelData(int width, int height, const uint8_t* data);
 
 protected:
-    void CreateFromFileData(const void* data, size_t size) override;
-    void CreateFromMemory(const void* data, size_t size) override;
+    void CreateFromFileData(const uint8_t* data, size_t size) override;
+    void CreateFromMemory(const uint8_t* data, size_t size) override;
     
 };

@@ -29,22 +29,22 @@ Texture& Texture::operator=(Texture&& other) noexcept {
     return *this;
 }
 
-void Texture::CreateFromFileData(const void* data, size_t size) {
+void Texture::CreateFromFileData(const uint8_t* data, size_t size) {
     
     _data = manager_->GetRenderer()->CreateTextureFromMemoryFile(_data.view, data, size);
 }
 
-void Texture::CreateFromMemory(const void* data, size_t size) {
+void Texture::CreateFromMemory(const uint8_t* data, size_t size) {
 
     throw std::runtime_error("Function isn't implemented");
 }
 
-void Texture::CreateTextureFromGrayscalePixelData(int width, int height, const void* data) {
+void Texture::CreateTextureFromGrayscalePixelData(int width, int height, const uint8_t* data) {
 
     _data = manager_->GetRenderer()->CreateTextureFromGrayscalePixelData(_data.view, height, width, static_cast<const uint8_t*>(data));
 }
 
-void Texture::CreateRGBATextureFromPixelData(int width, int height, const void* data) {
+void Texture::CreateRGBATextureFromPixelData(int width, int height, const uint8_t* data) {
 
     _data = manager_->GetRenderer()->CreateRGBATextureFromPixelData(_data.view, width, height, static_cast<const uint8_t*>(data));
 }

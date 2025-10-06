@@ -13,9 +13,9 @@ public:
 	virtual void DrawRect(float x, float y, float w, float h, float col[4]) const = 0;
 	virtual void EndPass() const = 0;
 
-	virtual TextureData CreateRGBATextureFromPixelData(uint32_t view, int width, int height, const unsigned char* pixelData) const = 0;
-	virtual TextureData CreateTextureFromGrayscalePixelData(uint32_t view, int width, int height, const unsigned char* pixelData) const = 0;
-	virtual TextureData CreateTextureFromMemoryFile(uint32_t view, const void* data, size_t size) const = 0;
+	virtual TextureData CreateRGBATextureFromPixelData(uint32_t view, int width, int height, const uint8_t* pixelData) const = 0;
+	virtual TextureData CreateTextureFromGrayscalePixelData(uint32_t view, int width, int height, const uint8_t* pixelData) const = 0;
+	virtual TextureData CreateTextureFromMemoryFile(uint32_t view, const uint8_t* data, size_t size) const = 0;
 	virtual TextureData PreallocateEmptyTexture() const = 0;
 	virtual void DestroyTexture(const TextureData& texture) const = 0;
 

@@ -61,7 +61,7 @@ TextureData SokolRenderer::PreallocateEmptyTexture() const
 	return { 0, sokol_alloc_empty_view() };
 }
 
-TextureData SokolRenderer::CreateTextureFromGrayscalePixelData(uint32_t view, int width, int height, const unsigned char* pixelData) const {
+TextureData SokolRenderer::CreateTextureFromGrayscalePixelData(uint32_t view, int width, int height, const uint8_t* pixelData) const {
     uint32_t _id = sokol_create_texture_from_grayscale(width, height, pixelData);
     uint32_t _view = sokol_create_view(view,_id);
     
@@ -72,7 +72,7 @@ TextureData SokolRenderer::CreateTextureFromGrayscalePixelData(uint32_t view, in
     return { _id, _view };
 }
 
-TextureData SokolRenderer::CreateRGBATextureFromPixelData(uint32_t view, int width, int height, const unsigned char* pixelData) const {
+TextureData SokolRenderer::CreateRGBATextureFromPixelData(uint32_t view, int width, int height, const uint8_t* pixelData) const {
     uint32_t _id = sokol_create_rgba_texture(width, height, pixelData);
     uint32_t _view = sokol_create_view(view, _id);
 
@@ -83,7 +83,7 @@ TextureData SokolRenderer::CreateRGBATextureFromPixelData(uint32_t view, int wid
     return { _id, _view };
 }
 
-TextureData SokolRenderer::CreateTextureFromMemoryFile(uint32_t view, const void* data, size_t size) const
+TextureData SokolRenderer::CreateTextureFromMemoryFile(uint32_t view, const uint8_t* data, size_t size) const
 {
     uint32_t _id = sokol_create_texture_from_memory_file(data, size);
     uint32_t _view = sokol_create_view(view, _id);

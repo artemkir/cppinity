@@ -4,6 +4,7 @@
 #include "Resource.h"
 #include <unordered_map>
 #include <atomic>
+#include "StringHash.h"
 
 extern "C" void sokol_fetch_request(const char* path, void* user_data, size_t buffer_size);
 
@@ -11,7 +12,7 @@ class IRenderer;
 
 class ResourceManager {
 public:
-    ResourceManager(IRenderer* renderer_);
+    explicit ResourceManager(IRenderer* renderer_);
     ~ResourceManager();
 
     void Update();
@@ -23,7 +24,9 @@ public:
     template <typename T>
     std::shared_ptr<T> Load(const std::string& path)
     {
-        static_assert(std::is_base_of<Resource, T>::value, "T must derive from Resource");
+        static_assert(std::is_base_of_v<Resource, T>, "T must derive from Resource");
+
+        std::string computed_key = std::string(typeid(T).name()) + "::" + path;
 
         auto res = Get<T>(path);
         if (res) {
@@ -43,7 +46,7 @@ public:
 
         sokol_fetch_request(path.c_str(), &u, user_size);
 
-        cache_[path] = res;
+        cache_[computed_key] = res;
         return res;
     }
 
@@ -51,9 +54,11 @@ public:
     template <typename T>
     std::shared_ptr<T> Create(const std::string& id, const void* data, size_t size)
     {
-        static_assert(std::is_base_of<Resource, T>::value, "T must derive from Resource");
+        static_assert(std::is_base_of_v<Resource, T>, "T must derive from Resource");
 
-        auto res = Get<T>(path);
+        std::string computed_key = std::string(typeid(T).name()) + "::" + id;
+
+        auto res = Get<T>(id);
         if (res) {
             return res;
         }
@@ -72,14 +77,16 @@ public:
             res->HandleFailure(e.what());
         }
 
-        cache_[key] = res;
+        cache_[computed_key] = res;
         return res;
     }
     
     template <typename T>
     std::shared_ptr<T> CreateEmpty(const std::string& id)
     {
-        static_assert(std::is_base_of<Resource, T>::value, "T must derive from Resource");
+        static_assert(std::is_base_of_v<Resource, T>, "T must derive from Resource");
+
+        std::string computed_key = std::string(typeid(T).name()) + "::" + id;
 
         auto res = Get<T>(id);
         if (res) {
@@ -90,17 +97,18 @@ public:
         res->path_ = id;
         res->state_ = ResourceState::Loaded;
 
-        cache_[id] = res;
+        cache_[computed_key] = res;
         return res;
     }
 
     template <typename T>
     std::shared_ptr<T> Get(const std::string& key)
     {
-        static_assert(std::is_base_of<Resource, T>::value, "T must derive from Resource");
+        static_assert(std::is_base_of_v<Resource, T>, "T must derive from Resource");
+        
+        std::string computed_key = std::string(typeid(T).name()) + "::" + key;
 
-        auto it = cache_.find(key);
-        if (it != cache_.end())
+        if (auto it = cache_.find(computed_key); it != cache_.end())
         {
             return std::static_pointer_cast<T>(it->second);
         }
@@ -114,11 +122,11 @@ private:
     IRenderer* renderer_ = nullptr;
 
 	//Using strong refs here, all resources are cached forever!
-    std::unordered_map<std::string, std::shared_ptr<Resource>> cache_;
+    std::unordered_map<std::string, std::shared_ptr<Resource>, StringHash, std::equal_to<>> cache_;
 
 	//Refs to resources that are currently loading
     std::unordered_map<uint32_t, std::shared_ptr<Resource>> pending_;
 
 public:
-    void OnFetchComplete(const void* data, size_t size, bool failed, const char* error, void* user);
+    void OnFetchComplete(const uint8_t* data, size_t size, bool failed, const char* error, void* user);
 };
