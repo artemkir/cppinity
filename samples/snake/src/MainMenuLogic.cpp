@@ -12,7 +12,7 @@ void MainMenuLogic::Start()
     bg = gameObject->CreateGameObjectBuilder("MenuBackground", 0)
              .WithComponent<GridTransform>(0, 0, MAZE_WIDTH * TILE_SIZE / 2, MAZE_HEIGHT * TILE_SIZE / 2)
              //.WithComponent<RectRenderer>(255, 0, 0)
-             .WithComponent<SpriteRenderer>("girl.png")
+             .WithComponent<SpriteRenderer>("start.png")
              .AddToScene();
 
     // Start Button

@@ -12,8 +12,9 @@ void CreateInitialScene(Scene* scene)
 	existingTexture->CreateTextureFromGrayscalePixelData(ICON_WIDTH, ICON_HEIGHT, icon);
 
 	
-	scene->GetResourceManager()->Load<Texture>("broommaster.png");
-	scene->GetResourceManager()->Load<Texture>("girl.png");
+	scene->GetResourceManager()->Load<Texture>("win.png");
+	scene->GetResourceManager()->Load<Texture>("lose.png");
+	scene->GetResourceManager()->Load<Texture>("start.png");
 
 	// Main Menu Root 
 	scene->CreateGameObjectBuilder("MainMenuRoot", 0)
