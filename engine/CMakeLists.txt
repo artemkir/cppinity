@@ -37,6 +37,7 @@ target_include_directories(Engine
         "${ENGINE_INCLUDE_DIR}"          # your real headers
         "${GENERATED_INCLUDE_DIR}"       # exposes Engine.h
         "${sokol_SOURCE_DIR}"
+	    "oryol/Modules"
 )
 
 # Link platform/system deps once here
