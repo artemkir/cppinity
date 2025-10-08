@@ -15,7 +15,7 @@ RectRenderer::RectRenderer(
     unsigned char g_, 
     unsigned char b_, 
     int renderOrder_,
-    const std::string &materialName)
+    const String &materialName)
 	: RendererComponent(renderOrder_), color{ r_, g_, b_ }, materialName(materialName)
 {
     

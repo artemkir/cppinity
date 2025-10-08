@@ -41,7 +41,7 @@ void SokolRenderer::ApplyMaterial(const Material* material) {
     sokol_apply_uniforms(material->GetUniformData(), material->GetUniformSize());
 }
 
-void SokolRenderer::ApplyTexture(const std::shared_ptr<Texture>& texture) {
+void SokolRenderer::ApplyTexture(const SharedPtr<Texture>& texture) {
     if (texture) {
         auto& tex = dynamic_cast<const Texture&>(*texture);
         sokol_apply_view(tex.GetView());

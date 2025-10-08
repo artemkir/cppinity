@@ -6,7 +6,7 @@ void CreateInitialScene(Scene* scene)
 {
 	//scene->GetTextureManager()->CreateTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 		
-	std::shared_ptr<Texture> existingTexture = 
+	SharedPtr<Texture> existingTexture = 
 		scene->GetResourceManager()->CreateEmpty<Texture>("icon");
 
 	existingTexture->CreateTextureFromGrayscalePixelData(ICON_WIDTH, ICON_HEIGHT, icon);

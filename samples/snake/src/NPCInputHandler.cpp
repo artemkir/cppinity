@@ -52,9 +52,9 @@ Direction NPCInputHandler::GetDirection()
     return dir;
 }
 
-std::vector<std::pair<int, int>> NPCInputHandler::FindPath(int startX, int startY, int goalX, int goalY)
+Vector<std::pair<int, int>> NPCInputHandler::FindPath(int startX, int startY, int goalX, int goalY)
 {
-    std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, NodeComparator> openList;
+    std::priority_queue<SharedPtr<Node>, Vector<SharedPtr<Node>>, NodeComparator> openList;
     std::set<std::pair<int, int>> closedList;
 
     auto startNode = std::make_shared<Node>(startX, startY, 0, std::abs(goalX - startX) + std::abs(goalY - startY));
@@ -67,7 +67,7 @@ std::vector<std::pair<int, int>> NPCInputHandler::FindPath(int startX, int start
 
         if (current->x == goalX && current->y == goalY)
         {
-            std::vector<std::pair<int, int>> path;
+            Vector<std::pair<int, int>> path;
             for (auto node = current; node != nullptr; node = node->parent)
             {
                 path.push_back({node->x, node->y});
@@ -81,7 +81,7 @@ std::vector<std::pair<int, int>> NPCInputHandler::FindPath(int startX, int start
 
         closedList.insert({current->x, current->y});
 
-        std::vector<std::pair<int, int>> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+        Vector<std::pair<int, int>> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
         for (auto [dx, dy] : directions)
         {
             int nx = current->x + dx;

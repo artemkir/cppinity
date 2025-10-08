@@ -1,9 +1,7 @@
 // Renderer.h
 #pragma once
 
-#include <vector>
-#include <memory>
-#include <stdexcept>
+#include "Std.h"
 
 #include "IRenderer.h"
 #include "Texture.h"
@@ -32,6 +30,6 @@ public:
 	void DestroyTexture(const TextureData& data) const override;
         
     void ApplyMaterial(const Material* material) override;
-    void ApplyTexture(const std::shared_ptr<Texture>& texture) override;
+    void ApplyTexture(const SharedPtr<Texture>& texture) override;
     void Draw(int num_elements) override;
 };

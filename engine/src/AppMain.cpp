@@ -26,14 +26,14 @@
 
 struct AppState
 {
-    std::unique_ptr<SokolRenderer> renderer;
-    std::unique_ptr<ShaderManager> shaderManager;
-    std::unique_ptr<MaterialManager> materialManager;
-	std::unique_ptr<ResourceManager> resourceManager;
-    std::unique_ptr<Scene> scene;
+    UniquePtr<SokolRenderer> renderer;
+    UniquePtr<ShaderManager> shaderManager;
+    UniquePtr<MaterialManager> materialManager;
+	UniquePtr<ResourceManager> resourceManager;
+    UniquePtr<Scene> scene;
 };
 
-static std::unique_ptr<AppState> app_state = nullptr;
+static UniquePtr<AppState> app_state = nullptr;
 
 extern void gameInit(Scene *);
 

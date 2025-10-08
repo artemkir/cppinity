@@ -10,9 +10,9 @@ extern "C" int sokol_get_screen_width();
 extern "C" int sokol_get_screen_height();
 
 SpriteRenderer::SpriteRenderer(
-    const std::string& texture_,
+    const String& texture_,
     int renderOrder_,
-    const std::string& materialName)
+    const String& materialName)
     : RendererComponent(renderOrder_), materialName(materialName), textureName(texture_) {}
 
 void SpriteRenderer::Awake()

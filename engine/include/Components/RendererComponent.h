@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Std.h"
+
 #include "BaseComponent.h"
 
 class IRenderer;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Std.h"
+
 class GameObject;
 
 // Base Component Class

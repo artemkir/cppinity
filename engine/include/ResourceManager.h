@@ -1,10 +1,9 @@
 // ResourceManager.h
 #pragma once
 
+#include "Std.h"
+
 #include "Resource.h"
-#include <unordered_map>
-#include <atomic>
-#include "StringHash.h"
 
 extern "C" void sokol_fetch_request(const char* path, void* user_data, size_t buffer_size);
 
@@ -22,11 +21,11 @@ public:
     };
 
     template <typename T>
-    std::shared_ptr<T> Load(const std::string& path)
+    SharedPtr<T> Load(const String& path)
     {
         static_assert(std::is_base_of_v<Resource, T>, "T must derive from Resource");
 
-        std::string computed_key = std::string(typeid(T).name()) + "::" + path;
+        String computed_key = String(typeid(T).name()) + "::" + path;
 
         auto res = Get<T>(path);
         if (res) {
@@ -52,11 +51,11 @@ public:
 
     // Create resource from memory data
     template <typename T>
-    std::shared_ptr<T> Create(const std::string& id, const void* data, size_t size)
+    SharedPtr<T> Create(const String& id, const void* data, size_t size)
     {
         static_assert(std::is_base_of_v<Resource, T>, "T must derive from Resource");
 
-        std::string computed_key = std::string(typeid(T).name()) + "::" + id;
+        String computed_key = String(typeid(T).name()) + "::" + id;
 
         auto res = Get<T>(id);
         if (res) {
@@ -82,11 +81,11 @@ public:
     }
     
     template <typename T>
-    std::shared_ptr<T> CreateEmpty(const std::string& id)
+    SharedPtr<T> CreateEmpty(const String& id)
     {
         static_assert(std::is_base_of_v<Resource, T>, "T must derive from Resource");
 
-        std::string computed_key = std::string(typeid(T).name()) + "::" + id;
+        String computed_key = String(typeid(T).name()) + "::" + id;
 
         auto res = Get<T>(id);
         if (res) {
@@ -102,11 +101,11 @@ public:
     }
 
     template <typename T>
-    std::shared_ptr<T> Get(const std::string& key)
+    SharedPtr<T> Get(const String& key)
     {
         static_assert(std::is_base_of_v<Resource, T>, "T must derive from Resource");
         
-        std::string computed_key = std::string(typeid(T).name()) + "::" + key;
+        String computed_key = String(typeid(T).name()) + "::" + key;
 
         if (auto it = cache_.find(computed_key); it != cache_.end())
         {
@@ -122,10 +121,10 @@ private:
     IRenderer* renderer_ = nullptr;
 
 	//Using strong refs here, all resources are cached forever!
-    std::unordered_map<std::string, std::shared_ptr<Resource>, StringHash, std::equal_to<>> cache_;
+    std::unordered_map<String, SharedPtr<Resource>, StringHash, std::equal_to<>> cache_;
 
 	//Refs to resources that are currently loading
-    std::unordered_map<uint32_t, std::shared_ptr<Resource>> pending_;
+    std::unordered_map<uint32_t, SharedPtr<Resource>> pending_;
 
 public:
     void OnFetchComplete(const uint8_t* data, size_t size, bool failed, const char* error, void* user);

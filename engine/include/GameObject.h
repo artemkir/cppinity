@@ -1,9 +1,7 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <memory>
-// #include "GameObjectBuilder.h"
+#include "Std.h"
+
 #include "Components/BaseComponent.h"
 
 // Forward declaration
@@ -16,24 +14,24 @@ class GameObject
 {
     Scene *scene = nullptr;
     unsigned tag;
-    std::string name;
-    std::vector<std::unique_ptr<BaseComponent>> components;
+    String name;
+    Vector<UniquePtr<BaseComponent>> components;
     BaseTransform *transform = nullptr;
-    std::vector<GameObject *> children;
+    Vector<GameObject *> children;
     GameObject *parent = nullptr;
     bool isStarted = false;
 
 public:
     // GameObject() = delete;
 
-    explicit GameObject(const std::string &name_, unsigned tag_ = 0);
+    explicit GameObject(const String &name_, unsigned tag_ = 0);
 
     void SetScene(Scene *s);
     Scene *GetScene();
 
     void SetActive(bool active);
-    void AddGameObject(std::unique_ptr<GameObject> go);
-    void AddComponent(std::unique_ptr<BaseComponent> component);
+    void AddGameObject(UniquePtr<GameObject> go);
+    void AddComponent(UniquePtr<BaseComponent> component);
 
     bool HasStarted() const { return isStarted; }
 
@@ -53,10 +51,10 @@ public:
     void Update(float deltaTime) const;
     void OnCollide(GameObject *other) const;
 
-    const std::string &GetName() const;
+    const String &GetName() const;
     int GetTag() const;
     BaseTransform *GetTransform() const;
-    std::vector<std::unique_ptr<BaseComponent>> &GetComponents();
+    Vector<UniquePtr<BaseComponent>> &GetComponents();
 
     template <typename T, typename... Args>
     T *AddComponent(Args &&...args)
@@ -74,6 +72,6 @@ public:
     template <typename Func>
     void ForEachActiveComponent(Func f) const;
 
-    bool IsAncestorOf(const std::string &name, unsigned tag) const;
-    GameObjectBuilder CreateGameObjectBuilder(const std::string &name, unsigned tag);
+    bool IsAncestorOf(const String &name, unsigned tag) const;
+    GameObjectBuilder CreateGameObjectBuilder(const String &name, unsigned tag);
 };

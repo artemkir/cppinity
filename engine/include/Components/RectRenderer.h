@@ -1,7 +1,8 @@
 #pragma once
 
+#include "Std.h"
+
 #include "RendererComponent.h"
-#include <memory>           
 #include "Material.h"       
 
 // Renderer Component
@@ -13,8 +14,8 @@ class RectRenderer : public RendererComponent
     };
 
 	Color color;
-    std::string materialName;
-    std::shared_ptr<Material> material;
+    String materialName;
+    SharedPtr<Material> material;
 
 public:
     RectRenderer(
@@ -22,7 +23,7 @@ public:
         unsigned char g_, 
         unsigned char b_, 
         int renderOrder_ = 0,
-        const std::string &materialName = "UI/Color");
+        const String &materialName = "UI/Color");
 
     Color GetColor();
     void Render() override;

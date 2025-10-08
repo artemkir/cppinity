@@ -7,7 +7,7 @@
 extern "C" uint32_t sokol_create_pipeline(uint32_t shader_id, int num_attrs, const int* attr_formats, int index_type, bool alphaBlending);
 extern "C" void sokol_destroy_pipeline(uint32_t id);
 
-Material::Material(std::shared_ptr<Shader> shader)
+Material::Material(SharedPtr<Shader> shader)
 	: shader_(shader)
 {
 	//No material without shader
@@ -18,7 +18,7 @@ Material::Material(std::shared_ptr<Shader> shader)
 
 	// Prepare layout from shader attrs
 	const auto& attrs = shader->GetAttributes();
-	std::vector<int> attr_formats(attrs.size());
+	Vector<int> attr_formats(attrs.size());
 	for (size_t i = 0; i < attrs.size(); ++i) {
 		attr_formats[i] = static_cast<int>(attrs[i].format);
 	}
@@ -42,13 +42,13 @@ Material::~Material()
 	}
 }
 
-void Material::SetUniform(const std::string& name, const std::vector<float>& value) 
+void Material::SetUniform(const String& name, const Vector<float>& value) 
 {
 	uniform_values_[name] = value;
 	dirty_ = true;
 }
 
-void Material::SetTexture(const std::string& name, std::shared_ptr<Texture> texture)
+void Material::SetTexture(const String& name, SharedPtr<Texture> texture)
 {
 	if (shader_->GetImageSlots().find(name) == shader_->GetImageSlots().end()) {
 		throw std::runtime_error("Texture sampler not found: " + name);
@@ -83,7 +83,7 @@ const uint8_t* Material::GetUniformData() const
 	return uniform_buffer_.data();
 }
 
-std::shared_ptr<Texture> Material::GetTexture(const std::string& name) const 
+SharedPtr<Texture> Material::GetTexture(const String& name) const 
 {
 	auto it = textures_.find(name);
 	return (it != textures_.end()) ? it->second : nullptr;

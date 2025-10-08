@@ -5,7 +5,7 @@
 class MazeGenerator : public BaseComponent
 {
     std::random_device rd;
-    std::vector<std::vector<bool>> grid;
+    Vector<Vector<bool>> grid;
 
     void AddGridToScene();
     void GenerateMaze(int startX, int startY);
