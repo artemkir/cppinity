@@ -10,7 +10,7 @@ SharedPtr<Material> MaterialManager::CreateMaterial(const String& id,
     if (materials_.find(id) != materials_.end()) {
         throw std::runtime_error("Material already exists: " + id);
     }
-    auto material = std::make_shared<Material>(shader);
+    auto material = MakeShared<Material>(shader);
     materials_[id] = material;
     return material;
 }

@@ -32,14 +32,14 @@ public:
     uint32_t GetID() const { return id; }
     const Vector<AttributeDesc>& GetAttributes() const { return attrs; }
     const UniformBlockDesc& GetVSUniformBlock() const { return vsUniformBlock; }
-    const std::unordered_map<String, int>& GetImageSlots() const { return imageSlots; }
+    const UnorderedMapStringKey<int>& GetImageSlots() const { return imageSlots; }
 
 private:
     uint32_t id = 0;
     Vector<AttributeDesc> attrs;
     UniformBlockDesc vsUniformBlock;
     Vector<String> fsImageNames;
-    std::unordered_map<String, int> imageSlots;
+    UnorderedMapStringKey<int> imageSlots;
     String vsSource;
     String fsSource;
 };

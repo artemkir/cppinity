@@ -5,7 +5,7 @@
 class NPCInputHandler : public IInputHandler
 {
     Direction dir;
-    Vector<std::pair<int, int>> path;
+    Vector<Vector2i> path;
 
     struct Node
     {
@@ -13,8 +13,8 @@ class NPCInputHandler : public IInputHandler
         int g, h;
         SharedPtr<Node> parent;
 
-        Node(int x_, int y_, int g_, int h_, SharedPtr<Node> parent_ = nullptr) : x(x_), y(y_), g(g_), h(h_), parent(
-                                                                                                                        std::move(parent_)) {}
+        Node(int x_, int y_, int g_, int h_, SharedPtr<Node> parent_ = nullptr) : 
+            x(x_), y(y_), g(g_), h(h_), parent(std::move(parent_)) {}
         int f() const { return g + h; }
         bool operator>(const Node &other) const { return f() > other.f(); }
     };
@@ -27,7 +27,7 @@ class NPCInputHandler : public IInputHandler
         }
     };
 
-    Vector<std::pair<int, int>> FindPath(int startX, int startY, int goalX, int goalY);
+    Vector<Vector2i> FindPath(int startX, int startY, int goalX, int goalY);
 
 public:
     NPCInputHandler();

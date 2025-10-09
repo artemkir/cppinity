@@ -61,7 +61,7 @@ public:
     {
         static_assert(std::is_base_of_v<BaseComponent, T>, "T must derive from BaseComponent");
 
-        auto component = std::make_unique<T>(std::forward<Args>(args)...);
+        auto component = MakeUnique<T>(std::forward<Args>(args)...);
         T *ptr = component.get();
 
         AddComponent(std::move(component));

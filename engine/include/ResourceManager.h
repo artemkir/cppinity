@@ -32,7 +32,7 @@ public:
             return res;
         }
 
-        res = std::make_shared<T>(this);
+        res = MakeShared<T>(this);
         res->path_ = path;
         res->state_ = ResourceState::Loading;
 
@@ -62,7 +62,7 @@ public:
             return res;
         }
 
-        res = std::make_shared<T>(this);
+        res = MakeShared<T>(this);
         res->path_ = id; // Use ID as key for in-memory resources
         res->state_ = ResourceState::Loading;
 
@@ -92,7 +92,7 @@ public:
             throw std::runtime_error("Resource already exists: " + id);
         }
 
-        res = std::make_shared<T>(this);
+        res = MakeShared<T>(this);
         res->path_ = id;
         res->state_ = ResourceState::Loaded;
 
@@ -117,14 +117,16 @@ public:
     IRenderer* GetRenderer() const { return renderer_; }
 
 private:
-    std::atomic<uint32_t> next_id_{ 1 };
+	//Removed atomic for simplicity, assuming single-threaded fetch callbacks
+    //std::atomic<uint32_t> next_id_{ 1 };
+	uint32_t next_id_ = 1;
     IRenderer* renderer_ = nullptr;
 
 	//Using strong refs here, all resources are cached forever!
-    std::unordered_map<String, SharedPtr<Resource>, StringHash, std::equal_to<>> cache_;
+    UnorderedMapStringKey<SharedPtr<Resource>> cache_;
 
 	//Refs to resources that are currently loading
-    std::unordered_map<uint32_t, SharedPtr<Resource>> pending_;
+    UnorderedMap<uint32_t, SharedPtr<Resource>> pending_;
 
 public:
     void OnFetchComplete(const uint8_t* data, size_t size, bool failed, const char* error, void* user);

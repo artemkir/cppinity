@@ -11,7 +11,7 @@ SharedPtr<Shader> ShaderManager::CreateShader(const String& id,
     if (shaders_.find(id) != shaders_.end()) {
         throw std::runtime_error("Shader already exists: " + id);
     }
-    auto shader = std::make_shared<Shader>(attrs, vs_uniform_block, fs_image_names, vs_source, fs_source);
+    auto shader = MakeShared<Shader>(attrs, vs_uniform_block, fs_image_names, vs_source, fs_source);
     shaders_[id] = shader;
     return shader;
 }

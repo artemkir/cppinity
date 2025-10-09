@@ -12,10 +12,10 @@ class GameObjectBuilder
 {
 public:
     GameObjectBuilder(Scene *scene, const String &name, unsigned tag)
-        : scene(scene), go(std::make_unique<GameObject>(name, tag)) {}
+        : scene(scene), go(MakeUnique<GameObject>(name, tag)) {}
 
     GameObjectBuilder(GameObject *parent, const String &name, unsigned tag)
-        : parent(parent), go(std::make_unique<GameObject>(name, tag)) {}
+        : parent(parent), go(MakeUnique<GameObject>(name, tag)) {}
 
     template <typename T, typename... Args>
     GameObjectBuilder &WithComponent(Args &&...args)
@@ -34,8 +34,7 @@ public:
     // TODO:
     GameObjectBuilder &WithChild(const String &childName, unsigned childTag)
     {
-        // go_->AddChild(childName, childTag);
-        throw std::runtime_error("WithChild is not implemented.");
+		assert(false && "WithChild is not implemented.");
         return *this;
     }
 
@@ -47,7 +46,7 @@ public:
         }
         else
         {
-            throw std::runtime_error("No transform component attached.");
+			assert(false && "No transform component attached.");
         }
         return *this;
     }

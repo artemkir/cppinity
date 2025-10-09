@@ -22,7 +22,7 @@ public:
 
 private:
     ShaderManager* shaderManager;
-    std::unordered_map<String, SharedPtr<Material>, StringHash, std::equal_to<>> materials_;
+    UnorderedMapStringKey<SharedPtr<Material>> materials_;
 };
 
 #endif

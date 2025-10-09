@@ -112,7 +112,7 @@ bool MazeGenerator::IsObstacle(int x, int y)
     return false;
 }
 
-std::pair<int, int> MazeGenerator::GetRandomEmptyPosition()
+Vector2i MazeGenerator::GetRandomEmptyPosition()
 {
     std::mt19937 g(rd());
     std::uniform_int_distribution<> disX(0, MAZE_WIDTH - 1);
