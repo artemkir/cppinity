@@ -5,17 +5,17 @@
 
 MaterialManager::MaterialManager(ShaderManager* sm) : shaderManager(sm) {}
 
-std::shared_ptr<Material> MaterialManager::CreateMaterial(const std::string& id,
-                                                          std::shared_ptr<Shader> shader) {
+SharedPtr<Material> MaterialManager::CreateMaterial(const String& id,
+                                                          SharedPtr<Shader> shader) {
     if (materials_.find(id) != materials_.end()) {
         throw std::runtime_error("Material already exists: " + id);
     }
-    auto material = std::make_shared<Material>(shader);
+    auto material = MakeShared<Material>(shader);
     materials_[id] = material;
     return material;
 }
 
-std::shared_ptr<Material> MaterialManager::GetMaterial(const std::string& id) const {
+SharedPtr<Material> MaterialManager::GetMaterial(const String& id) const {
     auto it = materials_.find(id);
     if (it == materials_.end()) {
         throw std::runtime_error("Material not found: " + id);

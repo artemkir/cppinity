@@ -1,9 +1,7 @@
 // Resource.h
 #pragma once
 
-#include <string>
-#include <memory>
-#include <stdexcept>
+#include "Std.h"
 
 class ResourceManager;  // Forward declare
 
@@ -15,12 +13,12 @@ public:
     explicit Resource(ResourceManager* mgr) : manager_(mgr) {}
 
     ResourceState GetState() const { return state_; }
-    const std::string& GetError() const { return error_; }
-    const std::string& GetPath() const { return path_; }
+    const String& GetError() const { return error_; }
+    const String& GetPath() const { return path_; }
 
-    std::string path_;
+    String path_;
     ResourceState state_ = ResourceState::Unloaded;
-    std::string error_;
+    String error_;
     ResourceManager* manager_ = nullptr;
 
 protected:
@@ -28,7 +26,7 @@ protected:
         
     virtual void CreateFromFileData(const uint8_t* data, size_t size) = 0;
     virtual void CreateFromMemory(const uint8_t* data, size_t size) = 0;
-    virtual void HandleFailure(const std::string& err) {
+    virtual void HandleFailure(const String& err) {
         state_ = ResourceState::Failed;
         error_ = err;
     }

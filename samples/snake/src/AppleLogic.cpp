@@ -1,8 +1,6 @@
-#include "AppleLogic.h"
-#include "GameObject.h"
-#include "MazeGenerator.h"
-#include "GameConsts.h"
-#include "Components/Transform.h"
+#include "Engine.h"
+
+#include "Game.h"
 
 void AppleLogic::Awake()
 {

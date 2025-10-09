@@ -1,6 +1,7 @@
 #pragma once
 
-#include "memory"
+#include "Std.h"
+
 #include "Texture.h"
 
 class Material;
@@ -23,6 +24,6 @@ public:
 	virtual void DestroyTexture(const TextureData& texture) const = 0;
 
 	virtual void ApplyMaterial(const Material* material) = 0;
-    virtual void ApplyTexture(const std::shared_ptr<Texture>& texture) = 0;  // For simple single-texture case
+    virtual void ApplyTexture(const SharedPtr<Texture>& texture) = 0;  // For simple single-texture case
     virtual void Draw(int num_elements) = 0;
 };

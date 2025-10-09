@@ -1,10 +1,7 @@
 // Scene.h
 #pragma once
 
-#include <map>
-#include <unordered_map>
-#include <vector>
-#include <memory>
+#include "Std.h"
 
 #include "GameObject.h"
 #include "Input.h"
@@ -20,10 +17,10 @@ class ResourceManager;
 // Scene Class
 class Scene
 {
-	std::vector<std::unique_ptr<GameObject>> gameObjects;			// preserves order
-	std::unordered_map<std::string, GameObject *> gameObjectLookup; // fast lookup
-	std::multimap<int, RendererComponent *> gameObjectsRenderers;
-	std::vector<SimpleCollider *> colliders;
+	Vector<UniquePtr<GameObject>> gameObjects;			// preserves order
+	UnorderedMapStringKey<GameObject *> gameObjectLookup; // fast lookup
+	MultiMap<int, RendererComponent *> gameObjectsRenderers;
+	Vector<SimpleCollider *> colliders;
 
 	IRenderer *renderer;
 	MaterialManager *materialManager;
@@ -38,9 +35,9 @@ class Scene
 public:
 	Scene(IRenderer *r, MaterialManager *m, ResourceManager *tm);
 
-	void AddGameObject(std::unique_ptr<GameObject> go);
+	void AddGameObject(UniquePtr<GameObject> go);
 
-	GameObject *FindGameObjectByName(const std::string &name);
+	GameObject *FindGameObjectByName(const String &name);
 
 	void Update(float deltaTime);
 
@@ -56,7 +53,7 @@ public:
 
 	void HandleEvent(const InputEvent *event);
 
-	const std::vector<std::unique_ptr<GameObject>>& Scene::GetGameObjects() const { return gameObjects;	}
+	const Vector<UniquePtr<GameObject>>& Scene::GetGameObjects() const { return gameObjects;	}
 	
 	const IRenderer* Scene::GetRenderer() const { return renderer;	}
 
@@ -64,7 +61,7 @@ public:
 
 	ResourceManager* GetResourceManager() const { return resourceManager; };
 
-	GameObjectBuilder CreateGameObjectBuilder(const std::string &name, unsigned tag = 0);
+	GameObjectBuilder CreateGameObjectBuilder(const String &name, unsigned tag = 0);
 
 	const Input &GetInput() const;
 };

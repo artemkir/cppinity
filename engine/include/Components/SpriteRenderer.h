@@ -1,6 +1,7 @@
 #pragma once
 
-#include <memory>
+#include "Std.h"
+
 #include "RendererComponent.h"
 #include "Texture.h"
 #include "Material.h"
@@ -9,14 +10,14 @@
 class SpriteRenderer : public RendererComponent
 {
 private:
-    std::string materialName;
-    std::string textureName;
+    String materialName;
+    String textureName;
 
-    std::shared_ptr<Texture> texture;
-    std::shared_ptr<Material> material;
+    SharedPtr<Texture> texture;
+    SharedPtr<Material> material;
 
 public:
-    explicit SpriteRenderer(const std::string& texture_, int renderOrder_ = 0, const std::string& materialName = "UI/Texture");
+    explicit SpriteRenderer(const String& texture_, int renderOrder_ = 0, const String& materialName = "UI/Texture");
 
     // No explicit cleanup needed as shared_ptr handles texture destruction
     ~SpriteRenderer() override = default;

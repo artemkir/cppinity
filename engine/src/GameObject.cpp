@@ -6,7 +6,7 @@
 #include "Components/Transform.h"
 #include "GameObjectBuilder.h"
 
-GameObject::GameObject(const std::string &name_, unsigned tag_)
+GameObject::GameObject(const String &name_, unsigned tag_)
     : name(name_), tag(tag_) {}
 
 void GameObject::SetScene(Scene *s)
@@ -32,14 +32,14 @@ void GameObject::SetActive(bool active)
     }
 }
 
-void GameObject::AddGameObject(std::unique_ptr<GameObject> go)
+void GameObject::AddGameObject(UniquePtr<GameObject> go)
 {
     children.push_back(go.get());
     go->parent = this;
     scene->AddGameObject(std::move(go));
 }
 
-void GameObject::AddComponent(std::unique_ptr<BaseComponent> component)
+void GameObject::AddComponent(UniquePtr<BaseComponent> component)
 {
     component->SetGameObject(this);
 
@@ -88,7 +88,7 @@ void GameObject::OnCollide(GameObject *other) const
                            { comp->OnCollide(other); });
 }
 
-const std::string &GameObject::GetName() const
+const String &GameObject::GetName() const
 {
     return name;
 }
@@ -103,12 +103,12 @@ BaseTransform *GameObject::GetTransform() const
     return transform;
 }
 
-std::vector<std::unique_ptr<BaseComponent>> &GameObject::GetComponents()
+Vector<UniquePtr<BaseComponent>> &GameObject::GetComponents()
 {
     return components;
 }
 
-bool GameObject::IsAncestorOf(const std::string &name, unsigned tag) const
+bool GameObject::IsAncestorOf(const String &name, unsigned tag) const
 {
     const GameObject *current = this;
     while (current)
@@ -121,7 +121,7 @@ bool GameObject::IsAncestorOf(const std::string &name, unsigned tag) const
     return false;
 }
 
-GameObjectBuilder GameObject::CreateGameObjectBuilder(const std::string &name_, unsigned tag_)
+GameObjectBuilder GameObject::CreateGameObjectBuilder(const String &name_, unsigned tag_)
 {
     if (IsAncestorOf(name_, tag_))
     {

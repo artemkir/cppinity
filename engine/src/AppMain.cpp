@@ -26,34 +26,30 @@
 
 struct AppState
 {
-    std::unique_ptr<SokolRenderer> renderer;
-    std::unique_ptr<ShaderManager> shaderManager;
-    std::unique_ptr<MaterialManager> materialManager;
-	std::unique_ptr<ResourceManager> resourceManager;
-    std::unique_ptr<Scene> scene;
+    UniquePtr<SokolRenderer> renderer;
+    UniquePtr<ShaderManager> shaderManager;
+    UniquePtr<MaterialManager> materialManager;
+	UniquePtr<ResourceManager> resourceManager;
+    UniquePtr<Scene> scene;
 };
 
-static std::unique_ptr<AppState> app_state = nullptr;
+static UniquePtr<AppState> app_state = nullptr;
 
 extern void gameInit(Scene *);
 
 extern "C" void app_init(int screen_width, int screen_height)
 {
-    if (app_state) {
-		throw std::runtime_error("AppState already initialized");
-    }
+    assert(!app_state && "AppState already initialized");
+  
+	assert(screen_width > 0 && screen_height > 0 && "Invalid screen dimensions");
 
-    if (screen_width <= 0 || screen_height <= 0) {
-		throw std::runtime_error("Invalid screen dimensions");
-    }
-
-    app_state = std::make_unique<AppState>();
+    app_state = MakeUnique<AppState>();
 		
-    app_state->renderer = std::make_unique<SokolRenderer>(screen_width, screen_height);
-	app_state->resourceManager = std::make_unique<ResourceManager>(app_state->renderer.get());
-    app_state->shaderManager = std::make_unique<ShaderManager>();
-    app_state->materialManager = std::make_unique<MaterialManager>(app_state->shaderManager.get());
-    app_state->scene = std::make_unique<Scene>(
+    app_state->renderer = MakeUnique<SokolRenderer>(screen_width, screen_height);
+	app_state->resourceManager = MakeUnique<ResourceManager>(app_state->renderer.get());
+    app_state->shaderManager = MakeUnique<ShaderManager>();
+    app_state->materialManager = MakeUnique<MaterialManager>(app_state->shaderManager.get());
+    app_state->scene = MakeUnique<Scene>(
         app_state->renderer.get(),
         app_state->materialManager.get(),
         app_state->resourceManager.get());
@@ -71,10 +67,8 @@ extern "C" void app_init(int screen_width, int screen_height)
 
 extern "C" bool app_frame(float deltaTime)
 {
-    if (!app_state) {
-		throw std::runtime_error("AppState not initialized");
-    }
-
+    assert (app_state && "AppState not initialized");
+    
 	app_state->resourceManager->Update();
 
     return app_state->scene->Frame(deltaTime);

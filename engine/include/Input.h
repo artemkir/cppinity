@@ -1,7 +1,7 @@
 // Input.h
 #pragma once
-#include <array>
-#include <unordered_map>
+
+#include "Std.h"
 
 enum class Key
 {
@@ -21,12 +21,12 @@ struct InputEvent;
 class Input
 {
 private:
-    std::array<bool, static_cast<size_t>(Key::Count)> down;
-    std::array<bool, static_cast<size_t>(Key::Count)> pressed;
-    std::array<bool, static_cast<size_t>(Key::Count)> released;
-    std::array<bool, static_cast<size_t>(Key::Count)> prevDown;
+    Array<bool, static_cast<size_t>(Key::Count)> down;
+    Array<bool, static_cast<size_t>(Key::Count)> pressed;
+    Array<bool, static_cast<size_t>(Key::Count)> released;
+    Array<bool, static_cast<size_t>(Key::Count)> prevDown;
 
-    std::unordered_map<int, Key> keyMap;
+    UnorderedMap<int, Key> keyMap;
 
     bool quitRequestedThisFrame = false;
 

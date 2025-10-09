@@ -2,18 +2,32 @@
 
 #include "Engine.h"
 
+struct Vector2i
+{
+    int x;
+    int y;
+
+    bool operator<(const Vector2i& other) const {
+        if (x != other.x)
+        {
+            return x < other.x;
+        }
+
+        return y < other.y;
+    }
+};
+
 class MazeGenerator : public BaseComponent
 {
     std::random_device rd;
-    std::vector<std::vector<bool>> grid;
+    Vector<Vector<bool>> grid;
 
     void AddGridToScene();
     void GenerateMaze(int startX, int startY);
-    bool __IsReachable(int x, int y, int startX, int startY);
-
+    
 public:
     MazeGenerator() = default;
     bool IsObstacle(int x, int y);
-    std::pair<int, int> GetRandomEmptyPosition();
+    Vector2i GetRandomEmptyPosition();
     void Awake() override;
 };

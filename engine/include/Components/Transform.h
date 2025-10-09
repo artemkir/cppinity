@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
+#include "Std.h"
+
 #include "BaseComponent.h"
-#include <cassert>
 
 struct Vector2
 {
@@ -22,7 +22,7 @@ struct Vector2
 		return Vector2{ v.x / scalar, v.y / scalar }; 
 	}
 
-	std::vector<float> to_vector() const { return { x, y }; }
+	Vector<float> to_vector() const { return { x, y }; }
 };
 
 class BaseTransform

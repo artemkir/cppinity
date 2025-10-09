@@ -11,7 +11,7 @@
 
 Scene::Scene(IRenderer *r, MaterialManager *m, ResourceManager *resourceManager) : renderer(r), materialManager(m), resourceManager(resourceManager) {}
 
-void Scene::AddGameObject(std::unique_ptr<GameObject> go)
+void Scene::AddGameObject(UniquePtr<GameObject> go)
 {
     go->SetScene(this);
     gameObjectLookup[go->GetName()] = go.get();
@@ -33,7 +33,7 @@ void Scene::AddGameObject(std::unique_ptr<GameObject> go)
     gameObjects.push_back(std::move(go));
 }
 
-GameObject *Scene::FindGameObjectByName(const std::string &name)
+GameObject *Scene::FindGameObjectByName(const String &name)
 {
     auto it = gameObjectLookup.find(name);
     return it != gameObjectLookup.end() ? it->second : nullptr;
@@ -121,7 +121,7 @@ void Scene::HandleEvent(const InputEvent *event)
     inputHandler.HandleEvent(event);
 }
 
-GameObjectBuilder Scene::CreateGameObjectBuilder(const std::string &name, unsigned tag)
+GameObjectBuilder Scene::CreateGameObjectBuilder(const String &name, unsigned tag)
 {
     return GameObjectBuilder(this, name, tag);
 }

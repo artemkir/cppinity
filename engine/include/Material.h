@@ -2,25 +2,21 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <memory>
+#include "Std.h"
 
-#include "StringHash.h"
 #include "RenderTypes.h"
 #include "Texture.h"  // Assume existing
 #include "Shader.h"
 
 class Material {
 public:
-    explicit Material(std::shared_ptr<Shader> shader);
+    explicit Material(SharedPtr<Shader> shader);
 
     ~Material();
 
-    void SetUniform(const std::string& name, const std::vector<float>& value);
+    void SetUniform(const String& name, const Vector<float>& value);
 
-    void SetTexture(const std::string& name, std::shared_ptr<Texture> texture);
+    void SetTexture(const String& name, SharedPtr<Texture> texture);
 
     uint32_t GetPipelineID() const { return pipeline_id_; }
 
@@ -28,16 +24,16 @@ public:
 
     int GetUniformSize() const { return shader_->GetVSUniformBlock().size; }
 
-    std::shared_ptr<Texture> GetTexture(const std::string& name) const;
+    SharedPtr<Texture> GetTexture(const String& name) const;
 
     const Shader* GetShader() const { return shader_.get(); }
 
 private:
-    std::shared_ptr<Shader> shader_;
+    SharedPtr<Shader> shader_;
     uint32_t pipeline_id_ = 0;
-    std::unordered_map<std::string, std::vector<float>, StringHash, std::equal_to<>> uniform_values_;
-    std::unordered_map<std::string, std::shared_ptr<Texture>, StringHash, std::equal_to<>> textures_;
-    mutable std::vector<unsigned char> uniform_buffer_;
+    UnorderedMapStringKey<Vector<float>> uniform_values_;
+    UnorderedMapStringKey<SharedPtr<Texture>> textures_;
+    mutable Vector<unsigned char> uniform_buffer_;
     mutable bool dirty_ = true;
 };
 

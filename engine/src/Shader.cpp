@@ -17,11 +17,11 @@ extern "C" uint32_t sokol_create_shader(
 
 extern "C" void sokol_destroy_shader(uint32_t id);
 
-Shader::Shader(const std::vector<AttributeDesc>& _attrs,
+Shader::Shader(const Vector<AttributeDesc>& _attrs,
                const UniformBlockDesc& _vs_uniform_block,
-               const std::vector<std::string>& _fs_image_names,
-               const std::string& _vs_source,
-               const std::string& _fs_source)
+               const Vector<String>& _fs_image_names,
+               const String& _vs_source,
+               const String& _fs_source)
     : attrs(_attrs), fsImageNames(_fs_image_names), vsSource(_vs_source), fsSource(_fs_source), vsUniformBlock(_vs_uniform_block) {
         
     int offset = 0;
@@ -32,23 +32,23 @@ Shader::Shader(const std::vector<AttributeDesc>& _attrs,
     vsUniformBlock.size = offset; 
 
     // Prepare attr arrays
-    std::vector<const char*> attr_names_ptr(attrs.size());
-    std::vector<int> attr_formats(attrs.size());
+    Vector<const char*> attr_names_ptr(attrs.size());
+    Vector<int> attr_formats(attrs.size());
     for (size_t i = 0; i < attrs.size(); ++i) {
         attr_names_ptr[i] = attrs[i].name.c_str();
         attr_formats[i] = static_cast<int>(attrs[i].format);
     }
 
     // Prepare uniform arrays
-    std::vector<const char*> uni_names_ptr(vsUniformBlock.uniforms.size());
-    std::vector<int> uni_types(vsUniformBlock.uniforms.size());
+    Vector<const char*> uni_names_ptr(vsUniformBlock.uniforms.size());
+    Vector<int> uni_types(vsUniformBlock.uniforms.size());
     for (size_t i = 0; i < vsUniformBlock.uniforms.size(); ++i) {
         uni_names_ptr[i] = vsUniformBlock.uniforms[i].name.c_str();
         uni_types[i] = static_cast<int>(vsUniformBlock.uniforms[i].type);
     }
 
     // Prepare image names
-    std::vector<const char*> image_names_ptr(fsImageNames.size());
+    Vector<const char*> image_names_ptr(fsImageNames.size());
     for (size_t i = 0; i < fsImageNames.size(); ++i) {
         image_names_ptr[i] = fsImageNames[i].c_str();
         imageSlots[fsImageNames[i]] = i;

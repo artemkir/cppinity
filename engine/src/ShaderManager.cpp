@@ -2,21 +2,21 @@
 #include "ShaderManager.h"
 #include <stdexcept>
 
-std::shared_ptr<Shader> ShaderManager::CreateShader(const std::string& id,
-                                                    const std::vector<Shader::AttributeDesc>& attrs,
+SharedPtr<Shader> ShaderManager::CreateShader(const String& id,
+                                                    const Vector<Shader::AttributeDesc>& attrs,
                                                     const Shader::UniformBlockDesc& vs_uniform_block,
-                                                    const std::vector<std::string>& fs_image_names,
-                                                    const std::string& vs_source,
-                                                    const std::string& fs_source) {
+                                                    const Vector<String>& fs_image_names,
+                                                    const String& vs_source,
+                                                    const String& fs_source) {
     if (shaders_.find(id) != shaders_.end()) {
         throw std::runtime_error("Shader already exists: " + id);
     }
-    auto shader = std::make_shared<Shader>(attrs, vs_uniform_block, fs_image_names, vs_source, fs_source);
+    auto shader = MakeShared<Shader>(attrs, vs_uniform_block, fs_image_names, vs_source, fs_source);
     shaders_[id] = shader;
     return shader;
 }
 
-std::shared_ptr<Shader> ShaderManager::GetShader(const std::string& id) const {
+SharedPtr<Shader> ShaderManager::GetShader(const String& id) const {
     auto it = shaders_.find(id);
     if (it == shaders_.end()) {
         throw std::runtime_error("Shader not found: " + id);
@@ -32,7 +32,7 @@ void ShaderManager::CreateDefaultShaders()
 
 void ShaderManager::CreateUnlitColorPixelRectShader()
 {
-    std::string vs = 
+    String vs = 
         "#version 300 es\n"
         "uniform vec2 u_pixel_top_left;\n"
         "uniform vec2 u_pixel_size;\n"
@@ -49,7 +49,7 @@ void ShaderManager::CreateUnlitColorPixelRectShader()
         "  color = u_color;\n"
         "}\n";
 
-    std::string fs = 
+    String fs = 
         "#version 300 es\n"
         "precision mediump float;\n"
         "in vec4 color;\n"
@@ -58,11 +58,11 @@ void ShaderManager::CreateUnlitColorPixelRectShader()
         "  frag_color = color;\n"
         "}\n";
 
-    std::vector<Shader::AttributeDesc> attrs = {
+    Vector<Shader::AttributeDesc> attrs = {
         {"pos", VertexFormat::FLOAT2}
     };
 
-    std::vector<Shader::UniformDesc> unis = {
+    Vector<Shader::UniformDesc> unis = {
         {"u_pixel_top_left", UniformType::FLOAT2},
         {"u_pixel_size", UniformType::FLOAT2},
         {"u_screen_size", UniformType::FLOAT2},
@@ -70,14 +70,14 @@ void ShaderManager::CreateUnlitColorPixelRectShader()
     };
     Shader::UniformBlockDesc ub = { 0, unis };
 
-    std::vector<std::string> image_names;  // Empty for color rect
+    Vector<String> image_names;  // Empty for color rect
 
     CreateShader("unlit_color_pixel", attrs, ub, image_names, vs, fs);
 }
 
 void ShaderManager::CreateUnlitTextureScreenShader()
 {
-    std::string vs = 
+    String vs = 
         "#version 300 es\n"
         "uniform vec2 u_pixel_top_left;\n"
         "uniform vec2 u_pixel_size;\n"
@@ -97,7 +97,7 @@ void ShaderManager::CreateUnlitTextureScreenShader()
         "  uv = vec2(pos.x, 1.0 - pos.y);\n"
         "}\n";
 
-    std::string fs = 
+    String fs = 
         "#version 300 es\n"
         "precision mediump float;\n"
         "uniform sampler2D tex;\n"
@@ -108,12 +108,12 @@ void ShaderManager::CreateUnlitTextureScreenShader()
         "  frag_color = texture(tex, uv) * color;\n"
         "}\n";
 
-    std::vector<Shader::AttributeDesc> attrs = {
+    Vector<Shader::AttributeDesc> attrs = {
         {"pos", VertexFormat::FLOAT2},
         //{"texcoord0", VertexFormat::FLOAT2}
     };
 
-    std::vector<Shader::UniformDesc> unis = {
+    Vector<Shader::UniformDesc> unis = {
         {"u_pixel_top_left", UniformType::FLOAT2},
         {"u_pixel_size", UniformType::FLOAT2},
         {"u_screen_size", UniformType::FLOAT2},
@@ -121,7 +121,7 @@ void ShaderManager::CreateUnlitTextureScreenShader()
     };
     Shader::UniformBlockDesc ub = { 0, unis };
 
-    std::vector<std::string> image_names = {
+    Vector<String> image_names = {
         "tex"
     };  
 

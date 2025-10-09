@@ -9,7 +9,7 @@ class SnakeLogic : public BaseComponent
 	AppleLogic *apple = nullptr;
 	RectRenderer *rect = nullptr;
 
-	std::vector<GameObject *> tail;
+	Vector<GameObject *> tail;
 	int score = 0;
 	float updateTimer = 0.0f;
 	float update_interval = 0.2f;

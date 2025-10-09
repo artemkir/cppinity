@@ -1,4 +1,4 @@
-// Input.cpp (updated for Sokol)
+// Input.cpp
 #include "Input.h"
 #include "InputEvent.h"
 

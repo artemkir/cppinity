@@ -30,8 +30,8 @@ void NPCInputHandler::Update(float deltaTime)
     path = FindPath(startX, startY, goalX, goalY);
     if (path.size() > 1)
     {
-        int nextX = path[1].first;
-        int nextY = path[1].second;
+        int nextX = path[1].x;
+        int nextY = path[1].y;
         if (nextX < startX)
             dir = Direction::LEFT;
         else if (nextX > startX)
@@ -52,12 +52,12 @@ Direction NPCInputHandler::GetDirection()
     return dir;
 }
 
-std::vector<std::pair<int, int>> NPCInputHandler::FindPath(int startX, int startY, int goalX, int goalY)
+Vector<Vector2i> NPCInputHandler::FindPath(int startX, int startY, int goalX, int goalY)
 {
-    std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, NodeComparator> openList;
-    std::set<std::pair<int, int>> closedList;
+    std::priority_queue<SharedPtr<Node>, Vector<SharedPtr<Node>>, NodeComparator> openList;
+    Set<Vector2i> closedList;
 
-    auto startNode = std::make_shared<Node>(startX, startY, 0, std::abs(goalX - startX) + std::abs(goalY - startY));
+    auto startNode = MakeShared<Node>(startX, startY, 0, std::abs(goalX - startX) + std::abs(goalY - startY));
     openList.push(startNode);
 
     while (!openList.empty())
@@ -67,7 +67,7 @@ std::vector<std::pair<int, int>> NPCInputHandler::FindPath(int startX, int start
 
         if (current->x == goalX && current->y == goalY)
         {
-            std::vector<std::pair<int, int>> path;
+            Vector<Vector2i> path;
             for (auto node = current; node != nullptr; node = node->parent)
             {
                 path.push_back({node->x, node->y});
@@ -81,8 +81,8 @@ std::vector<std::pair<int, int>> NPCInputHandler::FindPath(int startX, int start
 
         closedList.insert({current->x, current->y});
 
-        std::vector<std::pair<int, int>> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
-        for (auto [dx, dy] : directions)
+        Vector<Vector2i> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+        for (auto& [dx, dy] : directions)
         {
             int nx = current->x + dx;
             int ny = current->y + dy;
@@ -105,7 +105,7 @@ std::vector<std::pair<int, int>> NPCInputHandler::FindPath(int startX, int start
 
             int g = current->g + 1;
             int h = std::abs(goalX - nx) + std::abs(goalY - ny);
-            auto neighbor = std::make_shared<Node>(nx, ny, g, h, current);
+            auto neighbor = MakeShared<Node>(nx, ny, g, h, current);
             openList.push(neighbor);
         }
     }
