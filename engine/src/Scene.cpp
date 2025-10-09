@@ -54,19 +54,20 @@ void Scene::DestroyImmediate(GameObject* go)
     {
         go->RemoveMeFromParent();
     }
-
+        
     // Recursively destroy all children first
-    // Copy the children vector to avoid issues during recursion
     Vector<GameObject*> childrenCopy = go->GetChildren();
     for (auto child : childrenCopy)
     {
-        Destroy(child);
+        if (!child)
+            continue;
+        
+        DestroyImmediate(child);
     }
     // At this point, go->children should be empty due to recursive calls
 
     // Remove renderer component from gameObjectsRenderers if present
-    auto renderComp = go->GetComponent<RendererComponent>();
-    if (renderComp)
+    if (auto renderComp = go->GetComponent<RendererComponent>(); renderComp)
     {
         for (auto it = gameObjectsRenderers.begin(); it != gameObjectsRenderers.end(); )
         {
@@ -82,8 +83,7 @@ void Scene::DestroyImmediate(GameObject* go)
     }
 
     // Remove collider from colliders if present
-    auto coll = go->GetComponent<SimpleCollider>();
-    if (coll)
+    if (auto coll = go->GetComponent<SimpleCollider>(); coll)
     {
         auto& cols = colliders;
         cols.erase(std::remove(cols.begin(), cols.end(), coll), cols.end());
@@ -104,13 +104,18 @@ void Scene::DestroyImmediate(GameObject* go)
     }
 }
 
-void Scene::ProcessPendingDestroys() {
-    for (auto goPtr : pendingDestroy) {
-        if (goPtr && goPtr->GetScene() == this) {  // Safety check
+void Scene::ProcessPendingDestroys() 
+{
+    while (!pendingDestroy.empty()) 
+    {
+        GameObject* goPtr = pendingDestroy.back();
+        pendingDestroy.pop_back();
+
+        if (goPtr && goPtr->GetScene() == this) 
+        {
             DestroyImmediate(goPtr);
         }
     }
-    pendingDestroy.clear();
 }
 
 GameObject *Scene::FindGameObjectByName(const String &name)

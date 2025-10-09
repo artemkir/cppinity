@@ -36,7 +36,7 @@ public:
 	};
 
 	virtual ~BaseTransform() = default;
-	virtual const Transform& GetScreenTransform() const = 0;
+	virtual Transform GetScreenTransform() const = 0;
 	virtual float GetX() const = 0;
 	virtual float GetY() const = 0;
 	virtual float GetScaleX() const = 0;
@@ -70,7 +70,7 @@ public:
 	void SetScale(float x_, float y_) override {	t.scale = { x_,y_ }; }
 	float GetWidth() const override { return GetSize().x; }
 	float GetHeight() const override { return GetSize().y; }
-	const Transform& GetScreenTransform() const override { return t; }
+	Transform GetScreenTransform() const override { return t; }
 };
 
 // Grid transform component for snake
@@ -79,7 +79,7 @@ class GridTransform : public ScreenTransform
 public:
 	using ScreenTransform::ScreenTransform;
 
-	const Transform& GetScreenTransform() const override
+	Transform GetScreenTransform() const override
 	{
 		Vector2 one{ 1.0f, 1.0f };
 		Vector2 scaledSize = GetSize() * GetScale();
