@@ -25,4 +25,5 @@ public:
 	void Update(float deltaTime) override;
 	void OnCollide(GameObject *other) override;
 	int GetScore();
+	void OnActive(bool active) override;
 };

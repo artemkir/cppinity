@@ -16,6 +16,8 @@ private:
     GameObject *mainMenuRoot = nullptr;
     GameObject *gameModeRoot = nullptr;
     GameObject *endScreenRoot = nullptr;
+    GameObject *snake = nullptr;
+    GameObject *player = nullptr;
 
 public:
     void Start() override;

@@ -49,25 +49,43 @@ public:
 	virtual void SetScale(float x_, float y_) = 0;
 };
 
-// Grid transform component for snake
-class GridTransform : public BaseComponent, public BaseTransform
+class ScreenTransform : public BaseComponent, public BaseTransform
 {
 	Transform t;
 
 public:
-	explicit GridTransform(float x_ = 0.0f, float y_ = 0.0f, float w = 0.0f, float h = 0.0f);
+	explicit ScreenTransform(float x_, float y_, float w, float h) :
+		t{ { x_, y_ } , { w, h } , { 1.0f, 1.0f } }
+	{}
 
-	float GetX() const override;
-	float GetY() const override;
-	float GetScaleX() const override;
-	float GetScaleY() const override;
+	const Vector2& GetPos() const { return t.pos; }
+	const Vector2& GetSize() const { return t.size; }
+	const Vector2& GetScale() const { return t.scale; }
+	float GetX() const override { return GetPos().x; }
+	float GetY() const override { return GetPos().y; }
+	float GetScaleX() const override { return GetScale().x; }
+	float GetScaleY() const override { return GetScale().y; }
+	void SetSize(float width_, float height_) override { t.size = { width_, height_ }; }
+	void SetPosition(float x_, float y_) override {	t.pos = { x_,y_ }; }
+	void SetScale(float x_, float y_) override {	t.scale = { x_,y_ }; }
+	float GetWidth() const override { return GetSize().x; }
+	float GetHeight() const override { return GetSize().y; }
+	Transform GetScreenTransform() const override { return t; }
+};
 
-	void SetSize(float width_, float height_) override;
-	void SetPosition(float x_, float y_) override;
-	void SetScale(float x_, float y_) override;
-	 
-	float GetWidth() const override;
-	float GetHeight() const override;
+// Grid transform component for snake
+class GridTransform : public ScreenTransform
+{
+public:
+	using ScreenTransform::ScreenTransform;
 
-	Transform GetScreenTransform() const override;
+	Transform GetScreenTransform() const override
+	{
+		Vector2 one{ 1.0f, 1.0f };
+		Vector2 scaledSize = GetSize() * GetScale();
+		Vector2 shift = (GetScale() - one) * GetSize() * 0.5f;
+		Vector2 screenPos = GetPos() * GetSize();
+
+		return { { screenPos - shift}, { scaledSize }, {0,0} };
+	}
 };

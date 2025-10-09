@@ -38,7 +38,6 @@ void Animation::Update(float deltaTime)
     float t = elapsedTime / duration;
     if (t >= 1.0f)
     {
-
         loops--;
 
         if (loops == 0)

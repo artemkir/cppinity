@@ -11,10 +11,31 @@ void SnakeLogic::Awake()
     mazeGenerator = gameObject->GetScene()->FindGameObjectByName("maze_generator")->GetComponent<MazeGenerator>();
     apple = gameObject->GetScene()->FindGameObjectByName("apple")->GetComponent<AppleLogic>();
     rect = gameObject->GetComponent<RectRenderer>();
+    
+	gameObject->SetActive(false);
+}
 
-    auto [x, y] = mazeGenerator->GetRandomEmptyPosition();
-    gameObject->GetTransform()->SetPosition(x, y);
-    gameObject->GetTransform()->SetSize(blockSizeW, blockSizeH);
+void SnakeLogic::OnActive(bool active)
+{
+    //start new level
+    if (active)
+    {
+        auto pos = mazeGenerator->GetRandomEmptyPosition();
+        gameObject->GetTransform()->SetPosition(pos.x, pos.y);
+        gameObject->GetTransform()->SetSize(blockSizeW, blockSizeH);
+		inputHandler->Stop();
+    }
+    else
+    {
+		auto scene = gameObject->GetScene();
+        
+        for (size_t i = 0; i < tail.size(); i++)
+        {
+            scene->Destroy(tail[i]);
+        }        
+
+        tail.clear();
+    }
 }
 
 void SnakeLogic::Update(float deltaTime)
@@ -108,10 +129,10 @@ void SnakeLogic::OnCollide(GameObject *other)
 
         tail.push_back(newTail);
 
-        if (tail.size() > 0 && update_interval > min_update_interval)
-        {
-            update_interval -= tail_change_interval;
-        }
+        //if (tail.size() > 0 && update_interval > min_update_interval)
+        //{
+        //    update_interval -= tail_change_interval;
+        //}
     }
     else if (other->GetTag() & OBSTACLE_TAG)
     {

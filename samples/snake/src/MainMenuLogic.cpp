@@ -6,13 +6,17 @@ void MainMenuLogic::Start()
 {
     auto scene = gameObject->GetScene();
 
+    float screenW = (float)gameObject->GetScene()->GetRenderer()->GetW();
+    float screenH = (float)gameObject->GetScene()->GetRenderer()->GetH();
+
     //auto buttonTexture = scene->GetTextureManager()->CreateTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
 
     // Menu Background
     bg = gameObject->CreateGameObjectBuilder("MenuBackground", 0)
-             .WithComponent<GridTransform>(0, 0, MAZE_WIDTH * TILE_SIZE / 2, MAZE_HEIGHT * TILE_SIZE / 2)
+             .WithComponent<ScreenTransform>(0.0f, 0.0f, screenW, screenH)
              //.WithComponent<RectRenderer>(255, 0, 0)
              .WithComponent<SpriteRenderer>("start.png")
+		     .WithComponent<Animation>(0.5f, 1.1f, 1.1f, -1)
              .AddToScene();
 
     // Start Button

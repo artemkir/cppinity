@@ -10,4 +10,5 @@ public:
 	InputHandler();
 	void Update(float deltaTime) override;
 	Direction GetDirection() override;
+	void Stop() override;
 };
