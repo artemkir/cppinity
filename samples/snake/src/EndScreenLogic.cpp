@@ -6,12 +6,14 @@ void EndScreenLogic::Start()
 {
     auto scene = gameObject->GetScene();
 
-    //auto texture = scene->GetTextureManager()->CreateTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
+    float screenW = (float)gameObject->GetScene()->GetRenderer()->GetW();
+    float screenH = (float)gameObject->GetScene()->GetRenderer()->GetH();
 
     // End Background
     bg = gameObject->CreateGameObjectBuilder("EndBackground", 0)
-             .WithComponent<GridTransform>(0, 0, MAZE_WIDTH * TILE_SIZE, MAZE_HEIGHT * TILE_SIZE)
-             .WithComponent<RectRenderer>(0, 0, 255)
+             .WithComponent<ScreenTransform>(0, 0, screenW, screenH)
+             .WithComponent<SpriteRenderer>("lose.png")
+             .WithComponent<Animation>(0.5f, 1.1f, 1.1f, -1)
              .AddToScene();
 
     // Game Over Text

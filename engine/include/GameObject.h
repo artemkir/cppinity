@@ -29,6 +29,19 @@ public:
     void SetScene(Scene *s);
     Scene *GetScene();
 
+	GameObject* GetParent() const { return parent; }
+	const Vector<GameObject*>& GetChildren() const { return children; }
+
+    void RemoveMeFromParent()
+    {
+        if (parent)
+        {
+            auto &siblings = parent->children;
+            siblings.erase(std::remove(siblings.begin(), siblings.end(), this), siblings.end());
+            parent = nullptr;
+		}
+    }
+
     void SetActive(bool active);
     void AddGameObject(UniquePtr<GameObject> go);
     void AddComponent(UniquePtr<BaseComponent> component);

@@ -21,6 +21,7 @@ class Scene
 	UnorderedMapStringKey<GameObject *> gameObjectLookup; // fast lookup
 	MultiMap<int, RendererComponent *> gameObjectsRenderers;
 	Vector<SimpleCollider *> colliders;
+	Vector<GameObject*> pendingDestroy;
 
 	IRenderer *renderer;
 	MaterialManager *materialManager;
@@ -32,11 +33,17 @@ class Scene
 
 	Input inputHandler;
 
+	void DestroyImmediate(GameObject* go);
+	void ProcessPendingDestroys();
+
 public:
 	Scene(IRenderer *r, MaterialManager *m, ResourceManager *tm);
 
 	void AddGameObject(UniquePtr<GameObject> go);
 
+	void Destroy(GameObject* go);
+	
+	
 	GameObject *FindGameObjectByName(const String &name);
 
 	void Update(float deltaTime);

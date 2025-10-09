@@ -33,6 +33,86 @@ void Scene::AddGameObject(UniquePtr<GameObject> go)
     gameObjects.push_back(std::move(go));
 }
 
+void Scene::Destroy(GameObject* go) {
+    if (go->GetScene() != this) {
+        return;
+    }
+
+    if (std::find(pendingDestroy.begin(), pendingDestroy.end(), go) != pendingDestroy.end()) {
+        return;
+    }
+
+    pendingDestroy.push_back(go);
+}
+
+void Scene::DestroyImmediate(GameObject* go)
+{
+    if (!go) return;
+
+    // Remove from parent's children list if it has a parent
+    if (auto parent = go->GetParent())
+    {
+        go->RemoveMeFromParent();
+    }
+
+    // Recursively destroy all children first
+    // Copy the children vector to avoid issues during recursion
+    Vector<GameObject*> childrenCopy = go->GetChildren();
+    for (auto child : childrenCopy)
+    {
+        Destroy(child);
+    }
+    // At this point, go->children should be empty due to recursive calls
+
+    // Remove renderer component from gameObjectsRenderers if present
+    auto renderComp = go->GetComponent<RendererComponent>();
+    if (renderComp)
+    {
+        for (auto it = gameObjectsRenderers.begin(); it != gameObjectsRenderers.end(); )
+        {
+            if (it->second == renderComp)
+            {
+                it = gameObjectsRenderers.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+
+    // Remove collider from colliders if present
+    auto coll = go->GetComponent<SimpleCollider>();
+    if (coll)
+    {
+        auto& cols = colliders;
+        cols.erase(std::remove(cols.begin(), cols.end(), coll), cols.end());
+    }
+
+    // Remove from gameObjectLookup
+    gameObjectLookup.erase(go->GetName());
+
+    // Remove from gameObjects (this will delete the GameObject via unique_ptr)
+    auto& gos = gameObjects;
+    for (auto it = gos.begin(); it != gos.end(); ++it)
+    {
+        if (it->get() == go)
+        {
+             gos.erase(it);
+            break;
+        }
+    }
+}
+
+void Scene::ProcessPendingDestroys() {
+    for (auto goPtr : pendingDestroy) {
+        if (goPtr && goPtr->GetScene() == this) {  // Safety check
+            DestroyImmediate(goPtr);
+        }
+    }
+    pendingDestroy.clear();
+}
+
 GameObject *Scene::FindGameObjectByName(const String &name)
 {
     auto it = gameObjectLookup.find(name);
@@ -110,6 +190,8 @@ bool Scene::Frame(float deltaTime)
     Update(deltaTime);
     CheckCollisions();
     Render();
+
+    ProcessPendingDestroys();
 
     renderer->EndPass();
 

@@ -15,4 +15,5 @@ class IInputHandler : public BaseComponent
 {
 public:
     virtual Direction GetDirection() = 0;
+    virtual void Stop() = 0;
 };

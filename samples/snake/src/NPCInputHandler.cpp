@@ -41,10 +41,15 @@ void NPCInputHandler::Update(float deltaTime)
         else if (nextY > startY)
             dir = Direction::DOWN;
     }
-    else
+    /*else
     {
         dir = Direction::STOP;
-    }
+    }*/
+}
+
+void NPCInputHandler::Stop()
+{
+    dir = Direction::STOP;
 }
 
 Direction NPCInputHandler::GetDirection()
