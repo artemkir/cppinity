@@ -32,6 +32,28 @@ elseif(APPLE)
         OpenGL::GL
         "-framework Cocoa" "-framework QuartzCore"
     )
+elseif(EMSCRIPTEN)
+	message(STATUS "Building for WebAssembly (Emscripten)")
+	# Produce .html per executable (otherwise you'll get .js)
+	set(CMAKE_EXECUTABLE_SUFFIX ".html")
+	# Tell Sokol to use WebGL2 (GLES3)
+	target_compile_definitions(platform_deps INTERFACE SOKOL_GLES3)
+	# Emscripten link options (tweak as needed)
+	target_link_options(platform_deps INTERFACE
+	"-sUSE_WEBGL2=1"
+	"-sFULL_ES3=1"
+	"-sWASM=1"
+	"-sALLOW_MEMORY_GROWTH=1"
+	"-sASSERTIONS=1"
+	)
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	target_link_options(platform_deps INTERFACE
+	"-gsource-map"
+	"-sASSERTIONS=2"
+	"-sGL_DEBUG=1"
+)
+endif()
+
 elseif(UNIX AND NOT APPLE)
     find_package(OpenGL REQUIRED)
     find_package(X11 REQUIRED)

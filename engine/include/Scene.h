@@ -60,11 +60,11 @@ public:
 
 	void HandleEvent(const InputEvent *event);
 
-	const Vector<UniquePtr<GameObject>>& Scene::GetGameObjects() const { return gameObjects;	}
+	const Vector<UniquePtr<GameObject>>& GetGameObjects() const { return gameObjects;	}
 	
-	const IRenderer* Scene::GetRenderer() const { return renderer;	}
+	const IRenderer* GetRenderer() const { return renderer;	}
 
-	const MaterialManager* Scene::GetMaterialManager() const {	return materialManager;	}
+	const MaterialManager* GetMaterialManager() const {	return materialManager;	}
 
 	ResourceManager* GetResourceManager() const { return resourceManager; };
 
