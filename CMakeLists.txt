@@ -45,6 +45,7 @@ elseif(EMSCRIPTEN)
 	"-sWASM=1"
 	"-sALLOW_MEMORY_GROWTH=1"
 	"-sASSERTIONS=1"
+	"-sSINGLE_FILE=1"          # Embed all JS and WASM into a single file
 	)
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	target_link_options(platform_deps INTERFACE

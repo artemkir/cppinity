@@ -43,7 +43,9 @@ public:
         FetchUser u{ id };
 		size_t user_size = sizeof(FetchUser);
 
-        sokol_fetch_request(path.c_str(), &u, user_size);
+		String fetch_path = "/assets/" + path;
+
+        sokol_fetch_request(fetch_path.c_str(), &u, user_size);
 
         cache_[computed_key] = res;
         return res;

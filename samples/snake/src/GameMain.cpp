@@ -4,14 +4,7 @@
 
 void CreateInitialScene(Scene* scene)
 {
-	//scene->GetTextureManager()->CreateTexture("icon", ICON_WIDTH, ICON_HEIGHT, icon);
-
-	//SharedPtr<Texture> existingTexture =
-	//	scene->GetResourceManager()->CreateEmpty<Texture>("icon");
-
-	//existingTexture->CreateTextureFromGrayscalePixelData(ICON_WIDTH, ICON_HEIGHT, icon);
-
-
+	//Load Resources
 	scene->GetResourceManager()->Load<Texture>("win.png");
 	scene->GetResourceManager()->Load<Texture>("lose.png");
 	scene->GetResourceManager()->Load<Texture>("start.png");
@@ -20,22 +13,6 @@ void CreateInitialScene(Scene* scene)
 	scene->CreateGameObjectBuilder("MainMenuRoot", 0)
 		.WithComponent<MainMenuLogic>()
 		.AddToScene();
-
-	// Game Mode Root
-	//auto root = scene->CreateGameObjectBuilder("GameModeRoot", 0)
-	//	.AddToScene();
-
-	// Background (commented out, but refactored for completeness)
-	/*scene->CreateGameObjectBuilder("background", 0)
-		.WithComponent<GridTransform>(0, 0, MAZE_WIDTH * TILE_SIZE, MAZE_HEIGHT * TILE_SIZE)
-		.WithComponent<RectRenderer>(0, 0, 0)
-		.Build();*/
-
-		// Border (as child of root)
-	//root->CreateGameObjectBuilder("border", 0)
-	//	.WithComponent<GridTransform>(0, 0, MAZE_WIDTH * TILE_SIZE, MAZE_HEIGHT * TILE_SIZE)
-	//	.WithComponent<RectRenderer>(255, 255, 255)
-	//	.AddToScene();
 
 	// Maze Generator
 	scene->CreateGameObjectBuilder("maze_generator", 0)
@@ -47,9 +24,7 @@ void CreateInitialScene(Scene* scene)
 		.WithComponent<GridTransform>(0,0,1,1)
 		.WithComponent<SimpleCollider>()
 		.WithComponent<AppleLogic>()
-		//.WithComponent<SpriteRenderer>("icon")
 		.WithComponent<RectRenderer>(255, 0, 0, 100)  
-		//.WithComponent<Animation>(0.25f, 1.25f, 1.25f, -1)  
 		.WithComponent<Animation>(0.25f, 1.25f, 1.25f, -1)
 		.AddToScene();
 
