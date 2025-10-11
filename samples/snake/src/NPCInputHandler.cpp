@@ -57,9 +57,9 @@ Direction NPCInputHandler::GetDirection()
     return dir;
 }
 
-Vector<Vector2i> NPCInputHandler::FindPath(int startX, int startY, int goalX, int goalY)
+List<Vector2i> NPCInputHandler::FindPath(int startX, int startY, int goalX, int goalY)
 {
-    std::priority_queue<SharedPtr<Node>, Vector<SharedPtr<Node>>, NodeComparator> openList;
+    std::priority_queue<SharedPtr<Node>, List<SharedPtr<Node>>, NodeComparator> openList;
     Set<Vector2i> closedList;
 
     auto startNode = MakeShared<Node>(startX, startY, 0, std::abs(goalX - startX) + std::abs(goalY - startY));
@@ -72,7 +72,7 @@ Vector<Vector2i> NPCInputHandler::FindPath(int startX, int startY, int goalX, in
 
         if (current->x == goalX && current->y == goalY)
         {
-            Vector<Vector2i> path;
+            List<Vector2i> path;
             for (auto node = current; node != nullptr; node = node->parent)
             {
                 path.push_back({node->x, node->y});
@@ -86,7 +86,7 @@ Vector<Vector2i> NPCInputHandler::FindPath(int startX, int startY, int goalX, in
 
         closedList.insert({current->x, current->y});
 
-        Vector<Vector2i> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+        List<Vector2i> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
         for (auto& [dx, dy] : directions)
         {
             int nx = current->x + dx;

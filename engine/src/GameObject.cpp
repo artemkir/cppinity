@@ -103,7 +103,7 @@ BaseTransform *GameObject::GetTransform() const
     return transform;
 }
 
-Vector<UniquePtr<BaseComponent>> &GameObject::GetComponents()
+List<UniquePtr<BaseComponent>> &GameObject::GetComponents()
 {
     return components;
 }

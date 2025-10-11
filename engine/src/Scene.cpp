@@ -56,7 +56,7 @@ void Scene::DestroyImmediate(GameObject* go)
     }
         
     // Recursively destroy all children first
-    Vector<GameObject*> childrenCopy = go->GetChildren();
+    List<GameObject*> childrenCopy = go->GetChildren();
     for (auto child : childrenCopy)
     {
         if (!child)

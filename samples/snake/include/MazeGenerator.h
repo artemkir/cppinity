@@ -20,7 +20,7 @@ struct Vector2i
 class MazeGenerator : public BaseComponent
 {
     std::random_device rd;
-    Vector<Vector<bool>> grid;
+    List<List<bool>> grid;
 
     void AddGridToScene();
     void GenerateMaze(int startX, int startY);

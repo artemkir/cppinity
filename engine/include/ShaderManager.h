@@ -9,9 +9,9 @@
 class ShaderManager {
 public:
     SharedPtr<Shader> CreateShader(const String& id,
-                                         const Vector<Shader::AttributeDesc>& attrs,
+                                         const List<Shader::AttributeDesc>& attrs,
                                          const Shader::UniformBlockDesc& vs_uniform_block,
-                                         const Vector<String>& fs_image_names,
+                                         const List<String>& fs_image_names,
                                          const String& vs_source,
                                          const String& fs_source);
 

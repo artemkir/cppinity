@@ -15,9 +15,9 @@ class GameObject
     Scene *scene = nullptr;
     unsigned tag;
     String name;
-    Vector<UniquePtr<BaseComponent>> components;
+    List<UniquePtr<BaseComponent>> components;
     BaseTransform *transform = nullptr;
-    Vector<GameObject *> children;
+    List<GameObject *> children;
     GameObject *parent = nullptr;
     bool isStarted = false;
 
@@ -30,7 +30,7 @@ public:
     Scene *GetScene();
 
 	GameObject* GetParent() const { return parent; }
-	const Vector<GameObject*>& GetChildren() const { return children; }
+	const List<GameObject*>& GetChildren() const { return children; }
 
     void RemoveMeFromParent()
     {
@@ -67,7 +67,7 @@ public:
     const String &GetName() const;
     int GetTag() const;
     BaseTransform *GetTransform() const;
-    Vector<UniquePtr<BaseComponent>> &GetComponents();
+    List<UniquePtr<BaseComponent>> &GetComponents();
 
     template <typename T, typename... Args>
     T *AddComponent(Args &&...args)

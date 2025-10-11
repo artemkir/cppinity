@@ -33,13 +33,13 @@ void MazeGenerator::GenerateMaze(int startX, int startY)
 {
     std::mt19937 g(rd());
 
-    grid.resize(MAZE_HEIGHT, Vector<bool>(MAZE_WIDTH, true)); // All walls initially
+    grid.resize(MAZE_HEIGHT, List<bool>(MAZE_WIDTH, true)); // All walls initially
     std::stack<std::pair<int, int>> stack;
     stack.push({startX, startY});
     grid[startY][startX] = false; // Starting point is empty
 
     int _steps = 6;
-    Vector<std::pair<int, int>> directions = {{-_steps, 0}, {_steps, 0}, {0, -_steps}, {0, _steps}};
+    List<std::pair<int, int>> directions = {{-_steps, 0}, {_steps, 0}, {0, -_steps}, {0, _steps}};
 
     while (!stack.empty())
     {

@@ -22,7 +22,7 @@ struct Vector2
 		return Vector2{ v.x / scalar, v.y / scalar }; 
 	}
 
-	Vector<float> to_vector() const { return { x, y }; }
+	List<float> to_vector() const { return { x, y }; }
 };
 
 class BaseTransform

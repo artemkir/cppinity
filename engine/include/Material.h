@@ -14,7 +14,7 @@ public:
 
     ~Material();
 
-    void SetUniform(const String& name, const Vector<float>& value);
+    void SetUniform(const String& name, const List<float>& value);
 
     void SetTexture(const String& name, SharedPtr<Texture> texture);
 
@@ -31,9 +31,9 @@ public:
 private:
     SharedPtr<Shader> shader_;
     uint32_t pipeline_id_ = 0;
-    UnorderedMapStringKey<Vector<float>> uniform_values_;
+    UnorderedMapStringKey<List<float>> uniform_values_;
     UnorderedMapStringKey<SharedPtr<Texture>> textures_;
-    mutable Vector<unsigned char> uniform_buffer_;
+    mutable List<unsigned char> uniform_buffer_;
     mutable bool dirty_ = true;
 };
 
