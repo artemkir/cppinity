@@ -44,13 +44,28 @@ endif()
 
 target_link_libraries(${TARGET_NAME} PRIVATE Engine)
 
-# Optional: copy assets next to the binary
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/assets)
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_CURRENT_SOURCE_DIR}/assets
-            $<TARGET_FILE_DIR:${TARGET_NAME}>
-    )
+if(EMSCRIPTEN)
+    # Example assets folder next to samples/snake/CMakeLists.txt
+    set(SNAKE_ASSETS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+    set(SNAKE_SHELL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/shell")
+
+    if(EXISTS "${SNAKE_ASSETS_DIR}")
+        # Map host assets dir -> in-app VFS path /assets
+        # Pass as two args to avoid quoting issues on Windows
+        target_link_options(${TARGET_NAME} PRIVATE
+            "--preload-file" "${SNAKE_ASSETS_DIR}/@/assets"
+            #"--shell-file" "${SNAKE_SHELL_DIR}/shell_empty.html"
+        )
+    endif()
+else()
+    # Optional: copy assets next to the binary
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/assets)
+        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_CURRENT_SOURCE_DIR}/assets
+                $<TARGET_FILE_DIR:${TARGET_NAME}>/assets
+        )
+    endif()
 endif()
 
 if(WIN32)

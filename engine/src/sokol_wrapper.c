@@ -426,12 +426,15 @@ void fetch_callback(const sfetch_response_t* response) {
         fetch_failed_callback(response->user_data);
     }
 
-#if defined(WIN32) && defined(_DEBUG)
-	char buffer[256];
-	sprintf(buffer, "Fetch completed: %s (fetched: %d, failed: %d, size: %zu)\n", response->path, response->fetched, response->failed, response->data.size);
+    char buffer[256];
+    sprintf(buffer, "Fetch completed: %s (fetched: %d, failed: %d, size: %zu, error: %d)\n", response->path, response->fetched, response->failed, response->data.size, response->error_code);
 
+#if defined(WIN32) && defined(_DEBUG)
 	OutputDebugStringA(buffer);
+#else
+    printf("%s",buffer);
 #endif
+
 }
 
 void sokol_fetch_request(const char* path, 

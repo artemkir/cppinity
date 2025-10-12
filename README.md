@@ -22,7 +22,13 @@ A lightweight, compact game engine written in C++ that compiles to WebAssembly (
 
 Note: The engine is not yet production-ready and is best suited for prototyping or small projects.
 
-## Getting Started
+### Component Lifecycle Comparison with Unity
+- The engine's BaseComponent provides lifecycle methods inspired by Unity to facilitate porting:
+- In this engine, Awake() is called when the object is added to the scene, similar to Unity's Awake() which runs when the script instance is loaded.
+- Start() is called at the first scene update, akin to Unity's Start() which executes before the first frame update.
+- Update(float deltaTime) is invoked every frame, matching Unity's Update() for per-frame logic.
+- OnCollide(GameObject* other) triggers on collision, comparable to Unity's OnCollisionEnter() or similar collision callbacks.
+- SetActive(bool) toggles component activity, with OnActive(bool) for custom activation logic, resembling Unity's enabled property and OnEnable()/OnDisable().
 
 ### Prerequisites
 - **Emscripten SDK**: Required for compiling C++ to WASM. Install from [emscripten.org](https://emscripten.org/docs/getting_started/downloads.html).

@@ -139,7 +139,6 @@ void SnakeLogic::OnCollide(GameObject *other)
         auto stateManager = gameObject->GetScene()->FindGameObjectByName("StateMachineRoot")->GetComponent<GameStateManager>();
         if (stateManager)
         {
-            // stateManager->SetFinalScore(score);
             stateManager->TransitionTo(GameState::EndScreen);
         }
     }
