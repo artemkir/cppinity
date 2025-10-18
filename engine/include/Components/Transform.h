@@ -4,6 +4,8 @@
 
 #include "BaseComponent.h"
 
+class Canvas;
+
 struct Vector2
 {
 	float x = 0.0f;
@@ -14,6 +16,11 @@ struct Vector2
 	friend Vector2 operator+(const Vector2& v1, const Vector2& v2) { return Vector2{ v1.x + v2.x, v1.y + v2.y }; }
 	friend Vector2 operator-(const Vector2& v1, const Vector2& v2) { return Vector2{ v1.x - v2.x, v1.y - v2.y }; }
 	friend Vector2 operator*(const Vector2& v1, const Vector2& v2) { return Vector2{ v1.x * v2.x, v1.y * v2.y }; }
+	friend Vector2 operator/(const Vector2& v1, const Vector2& v2)
+	{
+		assert(v2.x != 0.0f && v2.y != 0.0f && "Division by zero");
+		return Vector2{ v1.x / v2.x, v1.y / v2.y };
+	}
 
 	friend Vector2 operator*(const Vector2& v, float scalar) { return Vector2{ v.x * scalar, v.y * scalar }; }
 	friend Vector2 operator/(const Vector2& v, float scalar) 
@@ -37,6 +44,7 @@ public:
 
 	virtual ~BaseTransform() = default;
 	virtual Transform GetScreenTransform() const = 0;
+	virtual Transform GetFinalScreenTransform() const = 0; // With hierarchy and canvas
 	virtual float GetX() const = 0;
 	virtual float GetY() const = 0;
 	virtual float GetScaleX() const = 0;
@@ -51,7 +59,11 @@ public:
 
 class ScreenTransform : public BaseComponent, public BaseTransform
 {
-	Transform t;
+	Transform t{ {0.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 1.0f} };
+	ScreenTransform* parent = nullptr;
+
+	Canvas* GetAncestorCanvas() const;
+	Transform GetRelativeTransformToAncestor(const ScreenTransform* ancestor) const;
 
 public:
 	explicit ScreenTransform(float x_, float y_, float w, float h) :
@@ -70,7 +82,9 @@ public:
 	void SetScale(float x_, float y_) override {	t.scale = { x_,y_ }; }
 	float GetWidth() const override { return GetSize().x; }
 	float GetHeight() const override { return GetSize().y; }
+	
 	Transform GetScreenTransform() const override { return t; }
+	Transform GetFinalScreenTransform() const override;
 };
 
 // Grid transform component for snake
@@ -88,4 +102,6 @@ public:
 
 		return { { screenPos - shift}, { scaledSize }, {0,0} };
 	}
+
+	Transform GetFinalScreenTransform() const override;
 };
