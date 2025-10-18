@@ -10,7 +10,7 @@ struct TextureData {
     uint32_t view;
 };
 
-class Texture : public Resource
+class Texture final : public Resource
 {
 private:
 	TextureData _data{0,0};

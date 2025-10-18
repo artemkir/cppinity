@@ -16,12 +16,6 @@ void EndScreenLogic::Start()
              .WithComponent<Animation>(0.5f, 1.1f, 1.1f, -1)
              .AddToScene();
 
-    // Game Over Text
-    /*gameOverText = gameObject->CreateGameObjectBuilder("GameOverText", 0)
-        .WithComponent<GridTransform>(MAZE_WIDTH / 2 - 2, MAZE_HEIGHT / 2 - 4, 32, 32)
-        .WithComponent<SpriteRenderer>(texture)
-        .AddToScene();*/
-
     stateManager = scene->FindGameObjectByName("StateMachineRoot")
                        ->GetComponent<GameStateManager>();
 }
