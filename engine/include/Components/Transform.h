@@ -32,7 +32,7 @@ struct Vector2
 	List<float> to_vector() const { return { x, y }; }
 };
 
-class BaseTransform
+class BaseTransform : public BaseComponent
 {
 public:
 	struct Transform
@@ -57,7 +57,7 @@ public:
 	virtual void SetScale(float x_, float y_) = 0;
 };
 
-class ScreenTransform : public BaseComponent, public BaseTransform
+class ScreenTransform : public BaseTransform
 {
 	Transform t{ {0.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 1.0f} };
 	ScreenTransform* parent = nullptr;

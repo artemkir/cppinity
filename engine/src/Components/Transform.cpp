@@ -43,7 +43,7 @@ BaseTransform::Transform ScreenTransform::GetFinalScreenTransform() const {
     }
     else {
         // Has canvas: accumulate relative to canvas
-        const ScreenTransform* canvas_transform = dynamic_cast<ScreenTransform*>(canvas->gameObject->GetTransform());
+        const ScreenTransform* canvas_transform = dynamic_cast<ScreenTransform*>(canvas->GetGameObject()->GetTransform());
         Transform rel = GetRelativeTransformToAncestor(canvas_transform);
 
         // Get canvas's screen position and size (viewport relative)
