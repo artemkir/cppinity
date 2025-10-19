@@ -22,6 +22,7 @@ class Scene
 	MultiMap<int, RendererComponent *> gameObjectsRenderers;
 	List<SimpleCollider *> colliders;
 	List<GameObject*> pendingDestroy;
+	List<UniquePtr<GameObject>> pendingAdd;
 
 	IRenderer *renderer;
 	MaterialManager *materialManager;
@@ -35,11 +36,12 @@ class Scene
 
 	void DestroyImmediate(GameObject* go);
 	void ProcessPendingDestroys();
+	void ProcessPendingAdds();
 
 public:
 	Scene(IRenderer *r, MaterialManager *m, ResourceManager *tm);
 
-	void AddGameObject(UniquePtr<GameObject> go);
+	void AddGameObject(UniquePtr<GameObject> go, bool immediate);
 
 	void Destroy(GameObject* go);
 	

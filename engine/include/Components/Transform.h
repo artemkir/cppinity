@@ -61,6 +61,7 @@ class ScreenTransform : public BaseTransform
 {
 	Transform t{ {0.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 1.0f} };
 	ScreenTransform* parent = nullptr;
+	Canvas* canvas = nullptr;
 
 	Canvas* GetAncestorCanvas() const;
 	Transform GetRelativeTransformToAncestor(const ScreenTransform* ancestor) const;
@@ -85,6 +86,8 @@ public:
 	
 	Transform GetScreenTransform() const override { return t; }
 	Transform GetFinalScreenTransform() const override;
+
+	void Awake() override;
 };
 
 // Grid transform component for snake

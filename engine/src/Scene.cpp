@@ -11,8 +11,14 @@
 
 Scene::Scene(IRenderer *r, MaterialManager *m, ResourceManager *resourceManager) : renderer(r), materialManager(m), resourceManager(resourceManager) {}
 
-void Scene::AddGameObject(UniquePtr<GameObject> go)
+void Scene::AddGameObject(UniquePtr<GameObject> go, bool immediate)
 {
+    if (!immediate)
+    {
+        pendingAdd.push_back(std::move(go));
+        return;
+    }
+
     go->SetScene(this);
     gameObjectLookup[go->GetName()] = go.get();
 
@@ -118,6 +124,15 @@ void Scene::ProcessPendingDestroys()
     }
 }
 
+void Scene::ProcessPendingAdds()
+{
+    while (!pendingAdd.empty())
+    {
+        AddGameObject(std::move(pendingAdd.back()), true);
+        pendingAdd.pop_back();
+    }
+}
+
 GameObject *Scene::FindGameObjectByName(const String &name)
 {
     auto it = gameObjectLookup.find(name);
@@ -197,6 +212,7 @@ bool Scene::Frame(float deltaTime)
     Render();
 
     ProcessPendingDestroys();
+    ProcessPendingAdds();
 
     renderer->EndPass();
 

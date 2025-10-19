@@ -12,7 +12,7 @@ void EndScreenLogic::Start()
     // End Background
     bg = gameObject->CreateGameObjectBuilder("EndBackground", 0)
              .WithComponent<ScreenTransform>(0, 0, screenW, screenH)
-             .WithComponent<SpriteRenderer>("lose.png")
+             .WithComponent<SpriteRenderer>("lose.png",2)
              .WithComponent<Animation>(0.5f, 1.1f, 1.1f, -1)
              .AddToScene();
 

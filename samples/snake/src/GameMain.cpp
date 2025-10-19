@@ -9,11 +9,16 @@ void CreateInitialScene(Scene* scene)
 	scene->GetResourceManager()->Load<Texture>("lose.png");
 	scene->GetResourceManager()->Load<Texture>("start.png");
 
+	scene->CreateGameObjectBuilder("MainCanvas")
+		.WithComponent<Canvas>(Vector2{ -1.0f, 1.0f }, Vector2{ 0.5f, 0.5f }, AnchorType::Center, Vector2{ 1920.0f, 1080.0f })
+		.AddToScene();
+
 	// Main Menu Root 
 	scene->CreateGameObjectBuilder("MainMenuRoot", 0)
 		.WithComponent<MainMenuLogic>()
 		.AddToScene();
 
+	return;
 	// Maze Generator
 	scene->CreateGameObjectBuilder("maze_generator", 0)
 		.WithComponent<MazeGenerator>()

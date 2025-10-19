@@ -10,8 +10,10 @@ class SokolRenderer : public IRenderer
 {
     const Material* current_material_ = nullptr;
     uint32_t current_pipeline_ = 0;
-	int screen_width_;
-	int screen_height_;
+	int screen_width_ = 0;
+	int screen_height_ = 0;
+    float f_screen_width_ = .0f;
+    float f_screen_height_ = .0f;
 
 public:
     SokolRenderer(int, int);
@@ -22,6 +24,9 @@ public:
 
 	int GetW() const override { return screen_width_; }
 	int GetH() const override { return screen_height_; }
+
+    float GetFW() const override { return f_screen_width_; }
+    float GetFH() const override { return f_screen_height_; }
 
 	TextureData CreateTextureFromGrayscalePixelData(uint32_t view, int width, int height, const uint8_t* pixelData) const override;
     TextureData CreateRGBATextureFromPixelData(uint32_t view, int width, int height, const uint8_t* pixelData) const override;

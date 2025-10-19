@@ -6,9 +6,6 @@
 #include "MaterialManager.h"
 #include "ResourceManager.h"
 
-extern "C" int sokol_get_screen_width();
-extern "C" int sokol_get_screen_height();
-
 SpriteRenderer::SpriteRenderer(
     const String& texture_,
     int renderOrder_,
@@ -17,6 +14,8 @@ SpriteRenderer::SpriteRenderer(
 
 void SpriteRenderer::Awake()
 {
+    RendererComponent::Awake();
+
     material = gameObject->GetScene()->GetMaterialManager()->GetMaterial(materialName);
     texture = gameObject->GetScene()->GetResourceManager()->Get<Texture>(textureName);
 
@@ -27,15 +26,13 @@ void SpriteRenderer::Awake()
 
 void SpriteRenderer::Render()
 {
-    auto transform = gameObject->GetTransform()->GetScreenTransform();
+    auto transform = gameObject->GetTransform()->GetFinalScreenTransform();
     const auto& renderer = GetRenderer();
 
     material->SetUniform("u_color", { 1.0f, 1.0f, 1.0f, 1.0f });
     material->SetUniform("u_pixel_top_left", transform.pos.to_vector());
     material->SetUniform("u_pixel_size", transform.size.to_vector());
-    auto sw = static_cast<float>(sokol_get_screen_width());
-    auto sh = static_cast<float>(sokol_get_screen_height());
-    material->SetUniform("u_screen_size", { sw, sh });
+    material->SetUniform("u_screen_size", { renderer->GetFW(), renderer->GetFH()});
 
     renderer->ApplyMaterial(material.get());
     renderer->ApplyTexture(texture);

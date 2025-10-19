@@ -16,6 +16,8 @@ class RectRenderer : public RendererComponent
 	Color color;
     String materialName;
     SharedPtr<Material> material;
+    float screenW = 0.0f;
+    float screenH = 0.0f;
 
 public:
     RectRenderer(

@@ -147,7 +147,7 @@ static void event(const sapp_event *e)
     switch (e->type)
     {
     case SAPP_EVENTTYPE_KEY_DOWN:
-        custom.type = EventType_KeyDown; // Use enum values from CustomEvent.h (include it)
+        custom.type = EventType_KeyDown;
         custom.key_code = (int)e->key_code;
         break;
     case SAPP_EVENTTYPE_KEY_UP:
@@ -472,7 +472,7 @@ void sokol_setup()
 
 sapp_desc sokol_main(int argc, char *argv[])
 {
-    app_state.screen_width = 800;
+    app_state.screen_width = 1066;
     app_state.screen_height = 800;
 
     return (sapp_desc){

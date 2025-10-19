@@ -36,7 +36,7 @@ void GameObject::AddGameObject(UniquePtr<GameObject> go)
 {
     children.push_back(go.get());
     go->parent = this;
-    scene->AddGameObject(std::move(go));
+    scene->AddGameObject(std::move(go), false);
 }
 
 void GameObject::AddComponent(UniquePtr<BaseComponent> component)

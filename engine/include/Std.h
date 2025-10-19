@@ -4,6 +4,8 @@
 
 #if defined(USE_STD_HEADERS)
 
+#include "assert.h"
+
 #include <cassert>
 #include <algorithm>
 #include <memory>

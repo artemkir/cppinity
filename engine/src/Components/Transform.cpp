@@ -2,6 +2,15 @@
 #include "Components/Canvas.h"
 #include "GameObject.h"
 
+void ScreenTransform::Awake() {
+    if (gameObject->GetParent())
+    {
+        parent = gameObject->GetParent()->GetComponent<ScreenTransform>();
+    }
+
+    canvas = GetAncestorCanvas();
+}
+
 Canvas* ScreenTransform::GetAncestorCanvas() const {
     auto canvas = gameObject->GetComponent<Canvas>();
 
@@ -12,7 +21,13 @@ Canvas* ScreenTransform::GetAncestorCanvas() const {
     if (parent) {
         return parent->GetAncestorCanvas();
     }
-    return nullptr;
+
+    if (gameObject->GetParent())
+    {
+        canvas = gameObject->GetParent()->GetComponent<Canvas>();
+    }
+
+    return canvas;
 }
 
 BaseTransform::Transform ScreenTransform::GetRelativeTransformToAncestor(const ScreenTransform* ancestor) const {
@@ -33,7 +48,7 @@ BaseTransform::Transform ScreenTransform::GetRelativeTransformToAncestor(const S
 }
 
 BaseTransform::Transform ScreenTransform::GetFinalScreenTransform() const {
-    Canvas* canvas = GetAncestorCanvas();
+    
     if (!canvas) {
         // No canvas: accumulate hierarchy to root
         if (!parent) {
