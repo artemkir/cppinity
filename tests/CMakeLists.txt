@@ -1,6 +1,7 @@
 # tests/CMakeLists.txt
 add_executable(Tests
     test_scene.cpp
+	test_canvas.cpp
 )
 
 # Link against the engine library, Catch2, and platform dependencies

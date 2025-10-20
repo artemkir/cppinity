@@ -12,6 +12,11 @@ struct Vector2
 	float y = 0.0f;
 
 	Vector2(float x_, float y_) : x(x_), y(y_) {}
+
+	Vector2(int x_, int y_) {
+		x = static_cast<float>(x_);
+		y = static_cast<float>(y_);	
+	}
 	
 	friend Vector2 operator+(const Vector2& v1, const Vector2& v2) { return Vector2{ v1.x + v2.x, v1.y + v2.y }; }
 	friend Vector2 operator-(const Vector2& v1, const Vector2& v2) { return Vector2{ v1.x - v2.x, v1.y - v2.y }; }
@@ -67,8 +72,8 @@ class ScreenTransform : public BaseTransform
 	Transform GetRelativeTransformToAncestor(const ScreenTransform* ancestor) const;
 
 public:
-	explicit ScreenTransform(float x_, float y_, float w, float h) :
-		t{ { x_, y_ } , { w, h } , { 1.0f, 1.0f } }
+	explicit ScreenTransform(Vector2 pos, Vector2 size, Vector2 scale = Vector2{ 1.0f, 1.0f }) :
+		t{ pos , size , scale }
 	{}
 
 	const Vector2& GetPos() const { return t.pos; }

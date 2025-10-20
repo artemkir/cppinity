@@ -26,7 +26,7 @@ void CreateInitialScene(Scene* scene)
 
 	// Apple
 	scene->CreateGameObjectBuilder("apple", OBSTACLE_TAG)
-		.WithComponent<GridTransform>(0,0,1,1)
+		.WithComponent<GridTransform>(Vector2{ 0,0 }, Vector2{ 1, 1 })
 		.WithComponent<SimpleCollider>()
 		.WithComponent<AppleLogic>()
 		.WithComponent<RectRenderer>(255, 0, 0, 100)  
@@ -35,7 +35,7 @@ void CreateInitialScene(Scene* scene)
 
 	// Snake Head
 	scene->CreateGameObjectBuilder("snake_head", OBSTACLE_TAG)
-		.WithComponent<GridTransform>(0, 0, 1, 1)
+		.WithComponent<GridTransform>(Vector2{ 0, 0 }, Vector2{ 1, 1 })
 		.WithComponent<RectRenderer>(0, 255, 0)
 		.WithComponent<SimpleCollider>()
 		.WithComponent<InputHandler>()
@@ -44,7 +44,7 @@ void CreateInitialScene(Scene* scene)
 
 	// NPC Snake
 	scene->CreateGameObjectBuilder("npc_snake_head", OBSTACLE_TAG)
-		.WithComponent<GridTransform>(0, 0, 1, 1)
+		.WithComponent<GridTransform>(Vector2{ 0, 0 }, Vector2{ 1, 1 })
 		.WithComponent<RectRenderer>(170, 100, 200)
 		.WithComponent<SnakeLogic>()
 		.WithComponent<NPCInputHandler>()

@@ -26,7 +26,7 @@ public:
 
         // Menu Background
         bg = canvas->CreateGameObjectBuilder("MenuBackground", 0)
-            .WithComponent<ScreenTransform>(0.0f, 0.0f, screenW, screenH)
+            .WithComponent<ScreenTransform>(Vector2{ 0.0f, 0.0f }, Vector2{ screenW, screenH })
             .WithComponent<SpriteRenderer>("start.png",2)
             .WithComponent<Animation>(0.5f, 1.1f, 1.1f, -1)
             .AddToScene();

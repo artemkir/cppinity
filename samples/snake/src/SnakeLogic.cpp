@@ -123,7 +123,7 @@ void SnakeLogic::OnCollide(GameObject *other)
 
         auto newTail = gameObject->GetScene()->CreateGameObjectBuilder("tail_" + std::to_string(tail.size()), OBSTACLE_TAG)
 			.WithComponent<RectRenderer>((int)(color.r * 0.75f), (int)(color.g * 0.75f), (int)(color.b * 0.75f))
-			.WithComponent<GridTransform>(prevX, prevY, blockSizeW, blockSizeH)
+            .WithComponent<GridTransform>(Vector2{ prevX, prevY }, Vector2{ blockSizeW, blockSizeH })
 			.WithComponent<SimpleCollider>(false)
 			.AddToScene();        
 
