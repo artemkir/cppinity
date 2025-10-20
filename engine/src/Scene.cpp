@@ -15,11 +15,11 @@ void Scene::AddGameObject(UniquePtr<GameObject> go, bool immediate)
 {
     if (!immediate)
     {
+        go->SetScene(this);
         pendingAdd.push_back(std::move(go));
         return;
     }
-
-    go->SetScene(this);
+        
     gameObjectLookup[go->GetName()] = go.get();
 
     auto renderComponent = go->GetComponent<RendererComponent>();

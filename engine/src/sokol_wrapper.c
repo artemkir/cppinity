@@ -1,6 +1,4 @@
 
-//#define SOKOL_WIN32_FORCE_MAIN
-
 #if !defined(SOKOL_GLES3)
 #define SOKOL_GLCORE
 #endif
