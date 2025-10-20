@@ -44,7 +44,7 @@ endif()
 
 target_link_libraries(${TARGET_NAME} PRIVATE 
 	Engine
-	sokol
+	Sokol
 )
 
 if(EMSCRIPTEN)

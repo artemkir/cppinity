@@ -7,7 +7,7 @@ add_executable(Tests
 target_link_libraries(Tests PRIVATE
     Engine
     Catch2::Catch2WithMain
-    sokol-stub
+    SokolStub
 )
 
 # Include directories for engine and Catch2

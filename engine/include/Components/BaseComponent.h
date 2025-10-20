@@ -20,6 +20,7 @@ public:
 	virtual void Start() {} // Called at the first scene update
 	virtual void Update(float deltaTime) {}
 	virtual void OnCollide(GameObject *other) {}
+	virtual void OnDestroy() {}
 	
 	void SetActive(bool active_)
 	{

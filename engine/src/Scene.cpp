@@ -55,6 +55,9 @@ void Scene::DestroyImmediate(GameObject* go)
 {
     if (!go) return;
 
+    // Call OnDestroy for the GameObject before destruction
+    go->OnDestroy();
+
     // Remove from parent's children list if it has a parent
     if (auto parent = go->GetParent())
     {
@@ -104,7 +107,7 @@ void Scene::DestroyImmediate(GameObject* go)
     {
         if (it->get() == go)
         {
-             gos.erase(it);
+            gos.erase(it);
             break;
         }
     }

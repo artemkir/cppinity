@@ -88,6 +88,12 @@ void GameObject::OnCollide(GameObject *other) const
                            { comp->OnCollide(other); });
 }
 
+void GameObject::OnDestroy() const
+{
+    ForEachActiveComponent([](const auto& comp)
+        { comp->OnDestroy(); });
+}
+
 const String &GameObject::GetName() const
 {
     return name;

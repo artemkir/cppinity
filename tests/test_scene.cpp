@@ -70,11 +70,17 @@ public:
 	bool started = false;
 	int updates = 0;
 	bool active = true;
+	std::function<void()> onDestroyCallback;
 
 	void Awake() override { awoke = true; }
 	void Start() override { started = true; }
 	void Update(float deltaTime) override { if (active) updates++; }
 	void OnCollide(GameObject* other) override {}
+	void OnDestroy() override {
+		if (onDestroyCallback) {
+			onDestroyCallback();
+		}
+	}
 };
 
 // Custom component to destroy self during Update
@@ -200,7 +206,7 @@ TEST_CASE_METHOD(SceneTestFixture, "Lifecycle methods are called correctly", "[S
 	// Simulate: first frame: should call Awake only
 	scene.Frame(0.016f);
 
-	auto comp = dynamic_cast<FlagComponent*>(go->GetComponents()[0].get());
+	auto comp = go->GetComponent<FlagComponent>();
 
 	REQUIRE(comp != nullptr);
 	REQUIRE(comp->awoke == true);
@@ -233,8 +239,8 @@ TEST_CASE_METHOD(SceneTestFixture, "SetActive affects components and children", 
 	// Simulate first frame to actually add objects to scene
 	scene.Frame(0.016f);
 
-	auto parentComp = dynamic_cast<FlagComponent*>(parent->GetComponents()[0].get());
-	auto childComp = dynamic_cast<FlagComponent*>(child->GetComponents()[0].get());
+	auto parentComp = parent->GetComponent<FlagComponent>();
+	auto childComp = child->GetComponent<FlagComponent>();
 
 	REQUIRE(parentComp != nullptr);
 	REQUIRE(childComp != nullptr);
@@ -283,4 +289,76 @@ TEST_CASE_METHOD(SceneTestFixture, "Cycle detection in parent-child hierarchy", 
 	REQUIRE_NOTHROW(go1->CreateGameObjectBuilder("Child", 0).AddToScene());
 
 	REQUIRE_THROWS_AS(go1->CreateGameObjectBuilder("TestGO", 0).AddToScene(), std::runtime_error);
+}
+
+TEST_CASE_METHOD(SceneTestFixture, "Destroying parent deletes children", "[Scene]") {
+	auto parent = scene.CreateGameObjectBuilder("Parent", 0)
+		.AddToScene();
+
+	auto child = parent->CreateGameObjectBuilder("Child", 0)
+		.AddToScene();
+
+	// Simulate a frame to add objects
+	scene.Frame(0.016f);
+
+	REQUIRE(scene.FindGameObjectByName("Parent") != nullptr);
+	REQUIRE(scene.FindGameObjectByName("Child") != nullptr);
+
+	scene.Destroy(parent);
+
+	// Simulate a frame to process destruction
+	scene.Frame(0.016f);
+
+	REQUIRE(scene.FindGameObjectByName("Parent") == nullptr);
+	REQUIRE(scene.FindGameObjectByName("Child") == nullptr);
+}
+
+TEST_CASE_METHOD(SceneTestFixture, "Destroying child removes from parent", "[Scene]") {
+	auto parent = scene.CreateGameObjectBuilder("Parent", 0)
+		.AddToScene();
+
+	auto child = parent->CreateGameObjectBuilder("Child", 0)
+		.AddToScene();
+
+	// Simulate a frame to add objects
+	scene.Frame(0.016f);
+
+	REQUIRE(scene.FindGameObjectByName("Parent") != nullptr);
+	REQUIRE(scene.FindGameObjectByName("Child") != nullptr);
+	REQUIRE(!parent->GetChildren().empty());
+
+	scene.Destroy(child);
+
+	// Simulate a frame to process destruction
+	scene.Frame(0.016f);
+
+	REQUIRE(scene.FindGameObjectByName("Parent") != nullptr);
+	REQUIRE(scene.FindGameObjectByName("Child") == nullptr);
+	REQUIRE(parent->GetChildren().empty());
+}
+
+TEST_CASE_METHOD(SceneTestFixture, "OnDestroy called when object is about to be destroyed", "[Scene]") {
+	bool onDestroyCalled = false;
+
+	auto go = scene.CreateGameObjectBuilder("TestGO", 0)
+		.WithComponent<FlagComponent>()
+		.AddToScene();
+
+	// Simulate a frame to add object
+	scene.Frame(0.016f);
+
+	REQUIRE(scene.FindGameObjectByName("TestGO") != nullptr);
+
+	auto comp = go->GetComponent<FlagComponent>();
+	REQUIRE(comp != nullptr);
+
+	comp->onDestroyCallback = [&]() { onDestroyCalled = true; };
+
+	scene.Destroy(go);
+
+	// Simulate a frame to process destruction
+	scene.Frame(0.016f);
+
+	REQUIRE(scene.FindGameObjectByName("TestGO") == nullptr);
+	REQUIRE(onDestroyCalled);
 }

@@ -63,6 +63,7 @@ public:
     void Start();
     void Update(float deltaTime) const;
     void OnCollide(GameObject *other) const;
+    void OnDestroy() const;
 
     const String &GetName() const;
     int GetTag() const;

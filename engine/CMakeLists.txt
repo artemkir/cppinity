@@ -45,19 +45,19 @@ target_include_directories(Engine PUBLIC
 )
 
 # Sokol wrapper lib (actual)
-add_library(sokol STATIC ${CMAKE_CURRENT_SOURCE_DIR}/src/sokol_wrapper.c)
-target_include_directories(sokol PUBLIC
+add_library(Sokol STATIC ${CMAKE_CURRENT_SOURCE_DIR}/src/sokol_wrapper.c)
+target_include_directories(Sokol PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include"  # For sokol_wrapper.h
     "${sokol_SOURCE_DIR}"                 # For sokol headers
 )
-target_link_libraries(sokol PUBLIC platform_deps)  # Links real Sokol deps
+target_link_libraries(Sokol PUBLIC platform_deps)  # Links real Sokol deps
 
 # Sokol stub lib (for tests)
-add_library(sokol-stub STATIC ${CMAKE_CURRENT_SOURCE_DIR}/src/sokol_stub.c)
-target_include_directories(sokol-stub PUBLIC
+add_library(SokolStub STATIC ${CMAKE_CURRENT_SOURCE_DIR}/src/sokol_stub.c)
+target_include_directories(SokolStub PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include"  # For sokol_wrapper.h
 )
 
-# Engine does not link to sokol or sokol-stub (linked by consumers: samples or tests)
+# Engine does not link to sokol or sokol stub (linked by consumers: samples or tests)
 # No platform_deps for Engine, as they're handled by sokol for samples
 target_link_libraries(Engine PUBLIC)  # Empty, or add non-graphics deps if needed
