@@ -2,20 +2,7 @@
 #include "Shader.h"
 #include <algorithm>  // For std::find_if
 
-extern "C" uint32_t sokol_create_shader(
-    const char* vs_source, 
-    const char* fs_source,                                        
-    int num_attrs, 
-    const char** attr_names, 
-    const int* attr_formats,
-    int uniform_block_size,
-    int num_uniforms,
-    const char** uniform_names, 
-    const int* uniform_types,
-    int num_images, 
-    const char** image_names);
-
-extern "C" void sokol_destroy_shader(uint32_t id);
+#include "sokol_wrapper.h"
 
 Shader::Shader(const List<AttributeDesc>& _attrs,
                const UniformBlockDesc& _vs_uniform_block,

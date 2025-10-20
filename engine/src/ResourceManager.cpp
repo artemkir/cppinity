@@ -1,9 +1,7 @@
 // ResourceManager.cpp
 #include "ResourceManager.h"
 
-extern "C" void sokol_fetch_setup(int max_requests, int num_channels, int num_lanes);
-extern "C" void sokol_fetch_shutdown();
-extern "C" void sokol_fetch_update();
+#include "sokol_wrapper.h"
 
 ResourceManager::ResourceManager(IRenderer* renderer_) : renderer_(renderer_)
 {

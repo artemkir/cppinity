@@ -7,9 +7,6 @@
 #include "MaterialManager.h"
 #include "Scene.h"
 
-extern "C" int sokol_get_screen_width(); 
-extern "C" int sokol_get_screen_height();
-
 RectRenderer::RectRenderer(
     unsigned char r_, 
     unsigned char g_, 

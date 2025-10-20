@@ -4,8 +4,7 @@
 #include <cstring>  // For memcpy
 #include <stdexcept>
 
-extern "C" uint32_t sokol_create_pipeline(uint32_t shader_id, int num_attrs, const int* attr_formats, int index_type, bool alphaBlending);
-extern "C" void sokol_destroy_pipeline(uint32_t id);
+#include "sokol_wrapper.h"
 
 Material::Material(SharedPtr<Shader> shader)
 	: shader_(shader)

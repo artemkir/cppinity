@@ -9,7 +9,11 @@
 #include "ResourceManager.h"
 #include "Input.h"
 
-Scene::Scene(IRenderer *r, MaterialManager *m, ResourceManager *resourceManager) : renderer(r), materialManager(m), resourceManager(resourceManager) {}
+Scene::Scene(
+    IRenderer *r, 
+    MaterialManager *m, 
+    ResourceManager *resourceManager
+) : renderer(r), materialManager(m), resourceManager(resourceManager) {}
 
 void Scene::AddGameObject(UniquePtr<GameObject> go, bool immediate)
 {
