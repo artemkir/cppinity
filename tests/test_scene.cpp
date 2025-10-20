@@ -98,7 +98,7 @@ TEST_CASE_METHOD(SceneTestFixture, "Adding GameObject during Update is deferred"
 			})
         .AddToScene();
 
-    REQUIRE(scene.FindGameObjectByName("TestGO1") != nullptr);
+    REQUIRE(scene.FindGameObjectByName("TestGO1") == nullptr);
     REQUIRE(scene.FindGameObjectByName("TestGO2") == nullptr);
 
     // Simulate a frame

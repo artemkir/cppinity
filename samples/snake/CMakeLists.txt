@@ -42,7 +42,10 @@ if(EXISTS "${SAMPLE_INCLUDE_DIR}")
     )
 endif()
 
-target_link_libraries(${TARGET_NAME} PRIVATE Engine)
+target_link_libraries(${TARGET_NAME} PRIVATE 
+	Engine
+	sokol
+)
 
 if(EMSCRIPTEN)
     # Example assets folder next to samples/snake/CMakeLists.txt

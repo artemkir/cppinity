@@ -2,6 +2,11 @@
 file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.c)
 file(GLOB_RECURSE ENGINE_HEADERS CONFIGURE_DEPENDS include/*.h)
 
+# Exclude sokol_wrapper.c from ENGINE_SOURCES
+list(FILTER ENGINE_SOURCES EXCLUDE REGEX "sokol_wrapper\\.c$")
+list(FILTER ENGINE_SOURCES EXCLUDE REGEX "sokol_stub\\.c$")
+
+# Define Engine library
 add_library(Engine STATIC ${ENGINE_SOURCES} ${ENGINE_HEADERS})
 
 # Auto-generate umbrella header: Engine.h
@@ -31,14 +36,28 @@ foreach(rel ${ENGINE_PUBLIC_HEADERS_REL})
 endforeach()
 file(WRITE "${ENGINE_UMBRELLA}" "${_content}")
 
-# Make generated header visible to dependents
-target_include_directories(Engine
-    PUBLIC
-        "${ENGINE_INCLUDE_DIR}"          # your real headers
-        "${GENERATED_INCLUDE_DIR}"       # exposes Engine.h
-        "${sokol_SOURCE_DIR}"
-	    "oryol/Modules"
+# Make generated header and other includes visible to Engine and its dependents
+target_include_directories(Engine PUBLIC
+    "${ENGINE_INCLUDE_DIR}"          # Real headers
+    "${GENERATED_INCLUDE_DIR}"       # Exposes Engine.h
+    "${sokol_SOURCE_DIR}"            # For sokol headers (needed by sokol lib)
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"  # For sokol_wrapper.h
 )
 
-# Link platform/system deps once here
-target_link_libraries(Engine PUBLIC platform_deps)
+# Sokol wrapper lib (actual)
+add_library(sokol STATIC ${CMAKE_CURRENT_SOURCE_DIR}/src/sokol_wrapper.c)
+target_include_directories(sokol PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"  # For sokol_wrapper.h
+    "${sokol_SOURCE_DIR}"                 # For sokol headers
+)
+target_link_libraries(sokol PUBLIC platform_deps)  # Links real Sokol deps
+
+# Sokol stub lib (for tests)
+add_library(sokol-stub STATIC ${CMAKE_CURRENT_SOURCE_DIR}/src/sokol_stub.c)
+target_include_directories(sokol-stub PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"  # For sokol_wrapper.h
+)
+
+# Engine does not link to sokol or sokol-stub (linked by consumers: samples or tests)
+# No platform_deps for Engine, as they're handled by sokol for samples
+target_link_libraries(Engine PUBLIC)  # Empty, or add non-graphics deps if needed

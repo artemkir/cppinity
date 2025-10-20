@@ -1,4 +1,6 @@
 
+//#define SOKOL_WIN32_FORCE_MAIN
+
 #if !defined(SOKOL_GLES3)
 #define SOKOL_GLCORE
 #endif
@@ -16,6 +18,8 @@
 #include "sokol_log.h"
 #include "sokol_fetch.h"
 #include "stb/stb_image.h"
+
+#include "sokol_wrapper.h"
 
 extern void app_init(int w, int h);
 extern bool app_frame(float deltaTime);
@@ -429,12 +433,7 @@ void fetch_callback(const sfetch_response_t* response) {
     char buffer[256];
     sprintf(buffer, "Fetch completed: %s (fetched: %d, failed: %d, size: %zu, error: %d)\n", response->path, response->fetched, response->failed, response->data.size, response->error_code);
 
-#if defined(WIN32) && defined(_DEBUG)
-	OutputDebugStringA(buffer);
-#else
     printf("%s",buffer);
-#endif
-
 }
 
 void sokol_fetch_request(const char* path, 
@@ -484,5 +483,8 @@ sapp_desc sokol_main(int argc, char *argv[])
         .height = app_state.screen_height,
         .high_dpi = true,
         .window_title = "Application",
+#if defined(WIN32) && defined(_DEBUG)
+		.win32_console_create = true,
+#endif
     };
 }

@@ -7,7 +7,7 @@ add_executable(Tests
 target_link_libraries(Tests PRIVATE
     Engine
     Catch2::Catch2WithMain
-    platform_deps
+    sokol-stub
 )
 
 # Include directories for engine and Catch2
@@ -30,19 +30,19 @@ if(EMSCRIPTEN)
     )
 endif()
 
-set_target_properties(Tests PROPERTIES
-    VS_DEBUGGER_COMMAND_ARGUMENTS "-break -o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/results.txt"
-)
+#set_target_properties(Tests PROPERTIES
+#    VS_DEBUGGER_COMMAND_ARGUMENTS "-o ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/results.txt"
+#)
 
 include(Catch)
-#catch_discover_tests(Tests)
+catch_discover_tests(Tests)
 
-if(WIN32)
-    add_custom_command(TARGET Tests POST_BUILD
-        COMMAND type "\"$<SHELL_PATH:${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/results.txt>\""
-    )
-elseif(APPLE)
-    add_custom_command(TARGET Tests POST_BUILD
-        COMMAND cat "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/results.txt"
-    )
-endif()
+#if(WIN32)
+#    add_custom_command(TARGET Tests POST_BUILD
+#        COMMAND type "\"$<SHELL_PATH:${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/results.txt>\""
+#    )
+#elseif(APPLE)
+#    add_custom_command(TARGET Tests POST_BUILD
+#        COMMAND cat "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/results.txt"
+#    )
+#endif()
