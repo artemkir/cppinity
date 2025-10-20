@@ -230,7 +230,7 @@ TEST_CASE_METHOD(SceneTestFixture, "SetActive affects components and children", 
 		.WithComponent<FlagComponent>()
 		.AddToScene();
 
-	// Simulate first frame to actually add to scene
+	// Simulate first frame to actually add objects to scene
 	scene.Frame(0.016f);
 
 	auto parentComp = dynamic_cast<FlagComponent*>(parent->GetComponents()[0].get());
