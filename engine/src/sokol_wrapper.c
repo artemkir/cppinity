@@ -470,7 +470,7 @@ void sokol_setup()
 sapp_desc sokol_main(int argc, char *argv[])
 {
     app_state.screen_width = 1066;
-    app_state.screen_height = 800;
+    app_state.screen_height = 600;
 
     return (sapp_desc){
         .init_cb = init,

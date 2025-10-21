@@ -2,12 +2,11 @@
 
 TEST_CASE_METHOD(SceneTestFixture, "Canvas with TopLeft anchor and full screen", "[Canvas]") {
     auto canvas_go = scene.CreateGameObjectBuilder("Canvas", 0)
-        //.WithComponent<ScreenTransform>(Vector2{ 0.0f, 0.0f }, Vector2{ 0.0f, 0.0f })
-        .WithComponent<Canvas>(Vector2{ 1.0f, 1.0f }, Vector2{ 0.0f, 0.0f }, AnchorType::TopLeft, Vector2{ 800.0f, 600.0f })
+        .WithComponent<Canvas>(Vector2{ 1.0f, 1.0f }, Vector2{ 0.0f, 0.0f }, AnchorType::TopLeft, Vector2{ 1600.0f, 1200.0f })
         .AddToScene();
 
     auto child = canvas_go->CreateGameObjectBuilder("Child", 0)
-        .WithComponent<ScreenTransform>(Vector2{ 100.0f, 200.0f }, Vector2{ 50.0f, 60.0f })
+        .WithComponent<ScreenTransform>(Vector2{ 200.0f, 400.0f }, Vector2{ 100.0f, 120.0f })
         .AddToScene();
 
     scene.Frame(0.016f);
@@ -24,12 +23,11 @@ TEST_CASE_METHOD(SceneTestFixture, "Canvas with TopLeft anchor and full screen",
 
 TEST_CASE_METHOD(SceneTestFixture, "Canvas with Center anchor and partial screen", "[Canvas]") {
     auto canvas_go = scene.CreateGameObjectBuilder("Canvas", 0)
-        .WithComponent<ScreenTransform>(Vector2{ 0.0f, 0.0f }, Vector2{ 0.0f, 0.0f })
-        .WithComponent<Canvas>(Vector2{ 0.5f, 0.5f }, Vector2{ 0.5f, 0.5f }, AnchorType::Center, Vector2{ 400.0f, 300.0f })
+        .WithComponent<Canvas>(Vector2{ 0.5f, 0.5f }, Vector2{ 0.5f, 0.5f }, AnchorType::Center, Vector2{ 1600.0f, 1200.0f })
         .AddToScene();
 
     auto child = canvas_go->CreateGameObjectBuilder("Child", 0)
-        .WithComponent<ScreenTransform>(Vector2{ 200.0f, 150.0f }, Vector2{ 100.0f, 100.0f })
+        .WithComponent<ScreenTransform>(Vector2{ 800.0f, 600.0f }, Vector2{ 400.0f, 400.0f })
         .AddToScene();
 
     scene.Frame(0.016f);
@@ -46,7 +44,6 @@ TEST_CASE_METHOD(SceneTestFixture, "Canvas with Center anchor and partial screen
 
 TEST_CASE_METHOD(SceneTestFixture, "Canvas with TopLeft anchor and offset position", "[Canvas]") {
     auto canvas_go = scene.CreateGameObjectBuilder("Canvas", 0)
-        .WithComponent<ScreenTransform>(Vector2{ 0.0f, 0.0f }, Vector2{ 0.0f, 0.0f })
         .WithComponent<Canvas>(Vector2{ 0.8f, 0.8f }, Vector2{ 0.1f, 0.1f }, AnchorType::TopLeft, Vector2{ 800.0f, 600.0f })
         .AddToScene();
 
@@ -68,7 +65,6 @@ TEST_CASE_METHOD(SceneTestFixture, "Canvas with TopLeft anchor and offset positi
 
 TEST_CASE_METHOD(SceneTestFixture, "Canvas with parent-child hierarchy and scale", "[Canvas]") {
     auto canvas_go = scene.CreateGameObjectBuilder("Canvas", 0)
-        .WithComponent<ScreenTransform>(Vector2{ 0.0f, 0.0f }, Vector2{ 0.0f, 0.0f })
         .WithComponent<Canvas>(Vector2{ 1.0f, 1.0f }, Vector2{ 0.0f, 0.0f }, AnchorType::TopLeft, Vector2{ 800.0f, 600.0f })
         .AddToScene();
 
@@ -94,7 +90,6 @@ TEST_CASE_METHOD(SceneTestFixture, "Canvas with parent-child hierarchy and scale
 
 TEST_CASE_METHOD(SceneTestFixture, "Canvas with aspect-preserving relative size", "[Canvas]") {
     auto canvas_go = scene.CreateGameObjectBuilder("Canvas", 0)
-        .WithComponent<ScreenTransform>(Vector2{ 0.0f, 0.0f }, Vector2{ 0.0f, 0.0f })
         .WithComponent<Canvas>(Vector2{ -1.0f, 0.5f }, Vector2{ 0.0f, 0.0f }, AnchorType::TopLeft, Vector2{ 400.0f, 300.0f })
         .AddToScene();
 
@@ -116,7 +111,6 @@ TEST_CASE_METHOD(SceneTestFixture, "Canvas with aspect-preserving relative size"
 
 TEST_CASE_METHOD(SceneTestFixture, "Nested parent-child under Canvas with Center anchor", "[Canvas]") {
     auto canvas_go = scene.CreateGameObjectBuilder("Canvas", 0)
-        .WithComponent<ScreenTransform>(Vector2{ 0.0f, 0.0f }, Vector2{ 0.0f, 0.0f })
         .WithComponent<Canvas>(Vector2{ 0.5f, 0.5f }, Vector2{ 0.5f, 0.5f }, AnchorType::Center, Vector2{ 400.0f, 300.0f })
         .AddToScene();
 
@@ -142,7 +136,6 @@ TEST_CASE_METHOD(SceneTestFixture, "Nested parent-child under Canvas with Center
 
 TEST_CASE_METHOD(SceneTestFixture, "Canvas with GridTransform and TopLeft anchor", "[Canvas][GridTransform]") {
     auto canvas_go = scene.CreateGameObjectBuilder("Canvas", 0)
-        .WithComponent<ScreenTransform>(Vector2{ 0.0f, 0.0f }, Vector2{ 0.0f, 0.0f })
         .WithComponent<Canvas>(Vector2{ 1.0f, 1.0f }, Vector2{ 0.0f, 0.0f }, AnchorType::TopLeft, Vector2{ 800.0f, 600.0f })
         .AddToScene();
 
