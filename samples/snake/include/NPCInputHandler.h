@@ -5,7 +5,7 @@
 class NPCInputHandler : public IInputHandler
 {
     Direction dir;
-    Vector<Vector2i> path;
+    List<Vector2i> path;
 
     struct Node
     {
@@ -27,7 +27,7 @@ class NPCInputHandler : public IInputHandler
         }
     };
 
-    Vector<Vector2i> FindPath(int startX, int startY, int goalX, int goalY);
+    List<Vector2i> FindPath(int startX, int startY, int goalX, int goalY);
 
 public:
     NPCInputHandler();

@@ -4,6 +4,8 @@
 
 #if defined(USE_STD_HEADERS)
 
+#include "assert.h"
+
 #include <cassert>
 #include <algorithm>
 #include <memory>
@@ -41,7 +43,7 @@ struct StringHash {
 
 template <typename T> using SharedPtr = std::shared_ptr<T>;
 template <typename T> using UniquePtr = std::unique_ptr<T>;
-template <typename T> using Vector = std::vector<T>;
+template <typename T> using List = std::vector<T>;
 template <typename T, size_t S> using Array = std::array<T, S>;
 template <typename V> using UnorderedMapStringKey = std::unordered_map<String, V, StringHash, std::equal_to<>>;
 template <typename K, typename V> using UnorderedMap = std::unordered_map < K, V >;

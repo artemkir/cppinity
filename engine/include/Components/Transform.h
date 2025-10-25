@@ -1,91 +1,70 @@
 #pragma once
 
 #include "Std.h"
-
+#include "Math/Vector2.h"
 #include "BaseComponent.h"
 
-struct Vector2
-{
-	float x = 0.0f;
-	float y = 0.0f;
+class Canvas;
 
-	Vector2(float x_, float y_) : x(x_), y(y_) {}
-	
-	friend Vector2 operator+(const Vector2& v1, const Vector2& v2) { return Vector2{ v1.x + v2.x, v1.y + v2.y }; }
-	friend Vector2 operator-(const Vector2& v1, const Vector2& v2) { return Vector2{ v1.x - v2.x, v1.y - v2.y }; }
-	friend Vector2 operator*(const Vector2& v1, const Vector2& v2) { return Vector2{ v1.x * v2.x, v1.y * v2.y }; }
-
-	friend Vector2 operator*(const Vector2& v, float scalar) { return Vector2{ v.x * scalar, v.y * scalar }; }
-	friend Vector2 operator/(const Vector2& v, float scalar) 
-	{ 
-		assert(scalar != 0.0f && "Division by zero");
-		return Vector2{ v.x / scalar, v.y / scalar }; 
-	}
-
-	Vector<float> to_vector() const { return { x, y }; }
-};
-
-class BaseTransform
+class BaseTransform : public BaseComponent
 {
 public:
-	struct Transform
-	{
-		Vector2 pos;
-		Vector2 size;
-		Vector2 scale;
-	};
+    struct Transform
+    {
+        Vector2 pos;
+        Vector2 size;
+        Vector2 scale;
+        Vector2 pivot;
+    };
 
-	virtual ~BaseTransform() = default;
-	virtual Transform GetScreenTransform() const = 0;
-	virtual float GetX() const = 0;
-	virtual float GetY() const = 0;
-	virtual float GetScaleX() const = 0;
-	virtual float GetScaleY() const = 0;
-	virtual float GetWidth() const = 0;
-	virtual float GetHeight() const = 0;
+    Transform t{ {0.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f} };
+    
+    explicit BaseTransform(Vector2 pos, Vector2 size, Vector2 scale = Vector2{ 1.0f, 1.0f }, Vector2 pivot = Vector2{ 0.0f, 0.0f })
+        : t{ pos, size, scale, pivot } {
+    }
 
-	virtual void SetSize(float width_, float height_) = 0;
-	virtual void SetPosition(float x_, float y_) = 0;
-	virtual void SetScale(float x_, float y_) = 0;
+    const Vector2& GetPos() const { return t.pos; }
+    const Vector2& GetSize() const { return t.size; }
+    const Vector2& GetScale() const { return t.scale; }
+    const Vector2& GetPivot() const { return t.pivot; } // New
+    void SetSize(float width_, float height_) { t.size = { width_, height_ }; }
+    void SetPosition(float x_, float y_) { t.pos = { x_, y_ }; }
+    void SetScale(float x_, float y_) { t.scale = { x_, y_ }; }
+    void SetPivot(float x_, float y_) { t.pivot = { x_, y_ }; } // New
+
+    virtual Transform GetScreenTransform() const = 0;
+    virtual Transform GetFinalScreenTransform() const = 0;
 };
 
-class ScreenTransform : public BaseComponent, public BaseTransform
+class ScreenTransform : public BaseTransform
 {
-	Transform t;
+    ScreenTransform* parent = nullptr;
+    Canvas* canvas = nullptr;
+
+    Canvas* GetAncestorCanvas() const;
+    Transform GetRelativeTransformToAncestor(const ScreenTransform* ancestor) const;
 
 public:
-	explicit ScreenTransform(float x_, float y_, float w, float h) :
-		t{ { x_, y_ } , { w, h } , { 1.0f, 1.0f } }
-	{}
+    using BaseTransform::BaseTransform;
+  
+    Transform GetScreenTransform() const override;
+    Transform GetFinalScreenTransform() const override;
 
-	const Vector2& GetPos() const { return t.pos; }
-	const Vector2& GetSize() const { return t.size; }
-	const Vector2& GetScale() const { return t.scale; }
-	float GetX() const override { return GetPos().x; }
-	float GetY() const override { return GetPos().y; }
-	float GetScaleX() const override { return GetScale().x; }
-	float GetScaleY() const override { return GetScale().y; }
-	void SetSize(float width_, float height_) override { t.size = { width_, height_ }; }
-	void SetPosition(float x_, float y_) override {	t.pos = { x_,y_ }; }
-	void SetScale(float x_, float y_) override {	t.scale = { x_,y_ }; }
-	float GetWidth() const override { return GetSize().x; }
-	float GetHeight() const override { return GetSize().y; }
-	Transform GetScreenTransform() const override { return t; }
+    void Awake() override;
 };
 
-// Grid transform component for snake
 class GridTransform : public ScreenTransform
 {
 public:
-	using ScreenTransform::ScreenTransform;
+    using ScreenTransform::ScreenTransform;
 
-	Transform GetScreenTransform() const override
-	{
-		Vector2 one{ 1.0f, 1.0f };
-		Vector2 scaledSize = GetSize() * GetScale();
-		Vector2 shift = (GetScale() - one) * GetSize() * 0.5f;
-		Vector2 screenPos = GetPos() * GetSize();
+    Transform GetScreenTransform() const override
+    {
+		auto pivot = GetPivot();
 
-		return { { screenPos - shift}, { scaledSize }, {0,0} };
-	}
+        Vector2 scaledSize = GetSize() * GetScale();
+        Vector2 pivotOffset = scaledSize * pivot;
+        Vector2 screenPos = GetPos() * GetSize() - pivotOffset;
+        return { screenPos, GetSize(), GetScale(), pivot };
+    }
 };

@@ -1,23 +1,14 @@
 #include "SokolRenderer.h"
 #include "Material.h"
 
-extern "C" uint32_t sokol_create_texture_from_grayscale(int width, int height, const uint8_t* pixelData);
-extern "C" uint32_t sokol_create_rgba_texture(int width, int height, const uint8_t * pixelData);
-extern "C" void sokol_begin_pass();
-extern "C" void sokol_end_pass();
-extern "C" void sokol_setup();
-extern "C" void sokol_draw_screen_quad(const float pos[2], const float size[2], const float color[4]);
-extern "C" void sokol_apply_pipeline(uint32_t id);
-extern "C" void sokol_apply_uniforms(const void* data, int size);
-extern "C" void sokol_apply_view(uint32_t view_id);
-extern "C" void sokol_draw(int num_elements);
-extern "C" uint32_t sokol_create_texture_from_memory_file(const void* data, size_t size);
-extern "C" uint32_t sokol_create_view(uint32_t view, uint32_t texture_id);
-extern "C" uint32_t sokol_alloc_empty_view();
-extern "C" void sokol_destroy_texture(uint32_t id);
-extern "C" void sokol_destroy_view(uint32_t id);
+#include "sokol_wrapper.h"
 
-SokolRenderer::SokolRenderer(int screen_width, int screen_height) : screen_width_(screen_width), screen_height_(screen_height) {
+SokolRenderer::SokolRenderer(int screen_width, int screen_height) : 
+    screen_width_(screen_width), 
+    screen_height_(screen_height),
+    f_screen_width_(static_cast<float>(screen_width_)),
+    f_screen_height_(static_cast<float>(screen_height))
+{
     sokol_setup();
 }
 

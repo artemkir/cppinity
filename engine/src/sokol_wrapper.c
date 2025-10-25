@@ -17,6 +17,8 @@
 #include "sokol_fetch.h"
 #include "stb/stb_image.h"
 
+#include "sokol_wrapper.h"
+
 extern void app_init(int w, int h);
 extern bool app_frame(float deltaTime);
 extern void app_cleanup(void);
@@ -147,7 +149,7 @@ static void event(const sapp_event *e)
     switch (e->type)
     {
     case SAPP_EVENTTYPE_KEY_DOWN:
-        custom.type = EventType_KeyDown; // Use enum values from CustomEvent.h (include it)
+        custom.type = EventType_KeyDown;
         custom.key_code = (int)e->key_code;
         break;
     case SAPP_EVENTTYPE_KEY_UP:
@@ -429,12 +431,7 @@ void fetch_callback(const sfetch_response_t* response) {
     char buffer[256];
     sprintf(buffer, "Fetch completed: %s (fetched: %d, failed: %d, size: %zu, error: %d)\n", response->path, response->fetched, response->failed, response->data.size, response->error_code);
 
-#if defined(WIN32) && defined(_DEBUG)
-	OutputDebugStringA(buffer);
-#else
     printf("%s",buffer);
-#endif
-
 }
 
 void sokol_fetch_request(const char* path, 
@@ -463,8 +460,8 @@ void sokol_setup()
         .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {0.2f, 0.3f, 0.3f, 1.0f}}};
 
     app_state.bind.samplers[0] = sg_make_sampler(&(sg_sampler_desc) {
-        .min_filter = SG_FILTER_NEAREST,
-        .mag_filter = SG_FILTER_NEAREST,
+        .min_filter = SG_FILTER_LINEAR,
+        .mag_filter = SG_FILTER_LINEAR,
     });
 
     create_default_quad_buffers();
@@ -472,8 +469,8 @@ void sokol_setup()
 
 sapp_desc sokol_main(int argc, char *argv[])
 {
-    app_state.screen_width = 800;
-    app_state.screen_height = 800;
+    app_state.screen_width = 1066;
+    app_state.screen_height = 600;
 
     return (sapp_desc){
         .init_cb = init,
@@ -484,5 +481,8 @@ sapp_desc sokol_main(int argc, char *argv[])
         .height = app_state.screen_height,
         .high_dpi = true,
         .window_title = "Application",
+#if defined(WIN32) && defined(_DEBUG)
+		.win32_console_create = true,
+#endif
     };
 }

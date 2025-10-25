@@ -2,8 +2,6 @@
 #include "GameObject.h"
 #include "Components/Transform.h"
 
-//#include "Scripts/GameConsts.h"
-
 SimpleCollider::SimpleCollider(bool active_)
 {
     SetActive(active_);

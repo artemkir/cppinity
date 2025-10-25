@@ -3,9 +3,9 @@
 #include <stdexcept>
 
 SharedPtr<Shader> ShaderManager::CreateShader(const String& id,
-                                                    const Vector<Shader::AttributeDesc>& attrs,
+                                                    const List<Shader::AttributeDesc>& attrs,
                                                     const Shader::UniformBlockDesc& vs_uniform_block,
-                                                    const Vector<String>& fs_image_names,
+                                                    const List<String>& fs_image_names,
                                                     const String& vs_source,
                                                     const String& fs_source) {
     if (shaders_.find(id) != shaders_.end()) {
@@ -58,11 +58,11 @@ void ShaderManager::CreateUnlitColorPixelRectShader()
         "  frag_color = color;\n"
         "}\n";
 
-    Vector<Shader::AttributeDesc> attrs = {
+    List<Shader::AttributeDesc> attrs = {
         {"pos", VertexFormat::FLOAT2}
     };
 
-    Vector<Shader::UniformDesc> unis = {
+    List<Shader::UniformDesc> unis = {
         {"u_pixel_top_left", UniformType::FLOAT2},
         {"u_pixel_size", UniformType::FLOAT2},
         {"u_screen_size", UniformType::FLOAT2},
@@ -70,7 +70,7 @@ void ShaderManager::CreateUnlitColorPixelRectShader()
     };
     Shader::UniformBlockDesc ub = { 0, unis };
 
-    Vector<String> image_names;  // Empty for color rect
+    List<String> image_names;  // Empty for color rect
 
     CreateShader("unlit_color_pixel", attrs, ub, image_names, vs, fs);
 }
@@ -108,12 +108,12 @@ void ShaderManager::CreateUnlitTextureScreenShader()
         "  frag_color = texture(tex, uv) * color;\n"
         "}\n";
 
-    Vector<Shader::AttributeDesc> attrs = {
+    List<Shader::AttributeDesc> attrs = {
         {"pos", VertexFormat::FLOAT2},
         //{"texcoord0", VertexFormat::FLOAT2}
     };
 
-    Vector<Shader::UniformDesc> unis = {
+    List<Shader::UniformDesc> unis = {
         {"u_pixel_top_left", UniformType::FLOAT2},
         {"u_pixel_size", UniformType::FLOAT2},
         {"u_screen_size", UniformType::FLOAT2},
@@ -121,7 +121,7 @@ void ShaderManager::CreateUnlitTextureScreenShader()
     };
     Shader::UniformBlockDesc ub = { 0, unis };
 
-    Vector<String> image_names = {
+    List<String> image_names = {
         "tex"
     };  
 

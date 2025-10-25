@@ -2,16 +2,19 @@
 
 #include "Game.h"
 
-void SnakeLogic::Awake()
+void SnakeLogic::Start()
 {
-    blockSizeW = (float)gameObject->GetScene()->GetRenderer()->GetW() / MAZE_WIDTH;
-    blockSizeH = (float)gameObject->GetScene()->GetRenderer()->GetH() / MAZE_HEIGHT;
-
     inputHandler = gameObject->GetComponent<IInputHandler>();
     mazeGenerator = gameObject->GetScene()->FindGameObjectByName("maze_generator")->GetComponent<MazeGenerator>();
     apple = gameObject->GetScene()->FindGameObjectByName("apple")->GetComponent<AppleLogic>();
     rect = gameObject->GetComponent<RectRenderer>();
     
+    auto scene = gameObject->GetScene();
+    auto canvas = scene->FindGameObjectByName("MainCanvas");
+    auto canvasSize = canvas->GetComponent<Canvas>()->GetCanvasSize();
+
+    blockSize = canvasSize / Vector2{ MAZE_WIDTH, MAZE_HEIGHT };
+
 	gameObject->SetActive(false);
 }
 
@@ -22,7 +25,7 @@ void SnakeLogic::OnActive(bool active)
     {
         auto pos = mazeGenerator->GetRandomEmptyPosition();
         gameObject->GetTransform()->SetPosition(pos.x, pos.y);
-        gameObject->GetTransform()->SetSize(blockSizeW, blockSizeH);
+        gameObject->GetTransform()->SetSize(blockSize.x, blockSize.y);
 		inputHandler->Stop();
     }
     else
@@ -53,8 +56,8 @@ void SnakeLogic::Update(float deltaTime)
     if (dir == Direction::STOP)
         return;
 
-    int prevX = headTransform->GetX();
-    int prevY = headTransform->GetY();
+    int prevX = headTransform->GetPos().x;
+    int prevY = headTransform->GetPos().y;
 
     switch (dir)
     {
@@ -75,20 +78,20 @@ void SnakeLogic::Update(float deltaTime)
     }
 
     // Wrap around logic
-    if (headTransform->GetX() < 0)
-        headTransform->SetPosition(MAZE_WIDTH - 1, headTransform->GetY());
-    if (headTransform->GetX() >= MAZE_WIDTH)
-        headTransform->SetPosition(0, headTransform->GetY());
-    if (headTransform->GetY() < 0)
-        headTransform->SetPosition(headTransform->GetX(), MAZE_HEIGHT - 1);
-    if (headTransform->GetY() >= MAZE_HEIGHT)
-        headTransform->SetPosition(headTransform->GetX(), 0);
+    if (headTransform->GetPos().x < 0)
+        headTransform->SetPosition(MAZE_WIDTH - 1, headTransform->GetPos().y);
+    if (headTransform->GetPos().x >= MAZE_WIDTH)
+        headTransform->SetPosition(0, headTransform->GetPos().y);
+    if (headTransform->GetPos().y < 0)
+        headTransform->SetPosition(headTransform->GetPos().x, MAZE_HEIGHT - 1);
+    if (headTransform->GetPos().y >= MAZE_HEIGHT)
+        headTransform->SetPosition(headTransform->GetPos().x, 0);
 
     for (size_t i = 0; i < tail.size(); i++)
     {
         auto tailTransform = tail[i]->GetTransform();
-        int tempX = tailTransform->GetX();
-        int tempY = tailTransform->GetY();
+        int tempX = tailTransform->GetPos().x;
+        int tempY = tailTransform->GetPos().y;
         tailTransform->SetPosition(prevX, prevY);
         prevX = tempX;
         prevY = tempY;
@@ -110,20 +113,23 @@ void SnakeLogic::OnCollide(GameObject *other)
 
         auto headTransform = gameObject->GetTransform();
         
-        int prevX = headTransform->GetX();
-        int prevY = headTransform->GetY();
+        int prevX = headTransform->GetPos().x;
+        int prevY = headTransform->GetPos().y;
         
         if (!tail.empty())
         {
-            prevX = tail.back()->GetTransform()->GetX();
-            prevY = tail.back()->GetTransform()->GetY();
+            prevX = tail.back()->GetTransform()->GetPos().x;
+            prevY = tail.back()->GetTransform()->GetPos().y;
         }
+        
+        auto scene = gameObject->GetScene();
+        auto canvas = scene->FindGameObjectByName("MainCanvas");
        
         auto color = rect->GetColor();
 
-        auto newTail = gameObject->GetScene()->CreateGameObjectBuilder("tail_" + std::to_string(tail.size()), OBSTACLE_TAG)
+        auto newTail = canvas->CreateGameObjectBuilder("tail_" + std::to_string(tail.size()), OBSTACLE_TAG)
 			.WithComponent<RectRenderer>((int)(color.r * 0.75f), (int)(color.g * 0.75f), (int)(color.b * 0.75f))
-			.WithComponent<GridTransform>(prevX, prevY, blockSizeW, blockSizeH)
+            .WithComponent<GridTransform>(Vector2{ prevX, prevY }, blockSize)
 			.WithComponent<SimpleCollider>(false)
 			.AddToScene();        
 

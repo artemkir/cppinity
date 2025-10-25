@@ -4,8 +4,7 @@
 #include <cstring>  // For memcpy
 #include <stdexcept>
 
-extern "C" uint32_t sokol_create_pipeline(uint32_t shader_id, int num_attrs, const int* attr_formats, int index_type, bool alphaBlending);
-extern "C" void sokol_destroy_pipeline(uint32_t id);
+#include "sokol_wrapper.h"
 
 Material::Material(SharedPtr<Shader> shader)
 	: shader_(shader)
@@ -18,7 +17,7 @@ Material::Material(SharedPtr<Shader> shader)
 
 	// Prepare layout from shader attrs
 	const auto& attrs = shader->GetAttributes();
-	Vector<int> attr_formats(attrs.size());
+	List<int> attr_formats(attrs.size());
 	for (size_t i = 0; i < attrs.size(); ++i) {
 		attr_formats[i] = static_cast<int>(attrs[i].format);
 	}
@@ -42,7 +41,7 @@ Material::~Material()
 	}
 }
 
-void Material::SetUniform(const String& name, const Vector<float>& value) 
+void Material::SetUniform(const String& name, const List<float>& value) 
 {
 	uniform_values_[name] = value;
 	dirty_ = true;

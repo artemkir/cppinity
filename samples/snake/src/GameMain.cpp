@@ -9,28 +9,36 @@ void CreateInitialScene(Scene* scene)
 	scene->GetResourceManager()->Load<Texture>("lose.png");
 	scene->GetResourceManager()->Load<Texture>("start.png");
 
+	// Main Canvas: Square canvas centered in screen
+	// Relative size: Vector2{ -1.0f, 1.0f } - Full height, width adjusted to keep aspect ratio
+	// Relative position: Vector2{ 0.5f, 0.5f } - Centered
+	// AnchorType::Center - Position is center of screen
+	// Canvas size: Vector2{ 1000.0f, 1000.0f } - Virtual resolution for internal layout
+	auto canvas = scene->CreateGameObjectBuilder("MainCanvas")
+		.WithComponent<Canvas>(Vector2{ -1.0f, 1.0f }, Vector2{ 0.5f, 0.5f }, AnchorType::Center, Vector2{ 1000.0f, 1000.0f })
+		.AddToScene();
+
 	// Main Menu Root 
 	scene->CreateGameObjectBuilder("MainMenuRoot", 0)
 		.WithComponent<MainMenuLogic>()
 		.AddToScene();
-
+		
 	// Maze Generator
 	scene->CreateGameObjectBuilder("maze_generator", 0)
 		.WithComponent<MazeGenerator>()
 		.AddToScene();
 
 	// Apple
-	scene->CreateGameObjectBuilder("apple", OBSTACLE_TAG)
-		.WithComponent<GridTransform>(0,0,1,1)
+	canvas->CreateGameObjectBuilder("apple", OBSTACLE_TAG)
+		.WithComponent<GridTransform>(Vector2{ 0,0 }, Vector2{ 1, 1 }, Vector2{ 1, 1 })
 		.WithComponent<SimpleCollider>()
 		.WithComponent<AppleLogic>()
 		.WithComponent<RectRenderer>(255, 0, 0, 100)  
-		.WithComponent<Animation>(0.25f, 1.25f, 1.25f, -1)
 		.AddToScene();
 
 	// Snake Head
-	scene->CreateGameObjectBuilder("snake_head", OBSTACLE_TAG)
-		.WithComponent<GridTransform>(0, 0, 1, 1)
+	canvas->CreateGameObjectBuilder("snake_head", OBSTACLE_TAG)
+		.WithComponent<GridTransform>(Vector2{ 0, 0 }, Vector2{ 1, 1 })
 		.WithComponent<RectRenderer>(0, 255, 0)
 		.WithComponent<SimpleCollider>()
 		.WithComponent<InputHandler>()
@@ -38,8 +46,8 @@ void CreateInitialScene(Scene* scene)
 		.AddToScene();
 
 	// NPC Snake
-	scene->CreateGameObjectBuilder("npc_snake_head", OBSTACLE_TAG)
-		.WithComponent<GridTransform>(0, 0, 1, 1)
+	canvas->CreateGameObjectBuilder("npc_snake_head", OBSTACLE_TAG)
+		.WithComponent<GridTransform>(Vector2{ 0, 0 }, Vector2{ 1, 1 })
 		.WithComponent<RectRenderer>(170, 100, 200)
 		.WithComponent<SnakeLogic>()
 		.WithComponent<NPCInputHandler>()

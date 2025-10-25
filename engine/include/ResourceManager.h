@@ -43,7 +43,11 @@ public:
         FetchUser u{ id };
 		size_t user_size = sizeof(FetchUser);
 
+#if defined(__EMSCRIPTEN__)
 		String fetch_path = "/assets/" + path;
+#else
+        String fetch_path = "assets/" + path;
+#endif
 
         sokol_fetch_request(fetch_path.c_str(), &u, user_size);
 

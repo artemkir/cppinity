@@ -9,6 +9,6 @@ class AppleLogic : public BaseComponent
     MazeGenerator *mazeGenerator = nullptr;
 
 public:
-    void Awake() override;
+    void Start() override;
     void RegenerateApple();
 };

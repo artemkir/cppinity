@@ -14,19 +14,23 @@ protected:
 public:
 	virtual ~BaseComponent() = default;
 	void SetGameObject(GameObject *go) { gameObject = go; }
-	GameObject *GetGameObject() { return gameObject; }
 	
 	// Lifecycle methods, can be overridden by derived classes
 	virtual void Awake() {} // Called when object added to scene
 	virtual void Start() {} // Called at the first scene update
 	virtual void Update(float deltaTime) {}
 	virtual void OnCollide(GameObject *other) {}
+	virtual void OnDestroy() {}
 	
 	void SetActive(bool active_)
-	{
+	{		
 		active = active_;
 		OnActive(active);
 	}
+
 	bool IsActive() const { return active; }
 	virtual void OnActive(bool active_) {}
+
+    // Add this public getter to access gameObject from derived classes
+    GameObject* GetGameObject() const { return gameObject; }
 };

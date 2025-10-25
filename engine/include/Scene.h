@@ -17,11 +17,12 @@ class ResourceManager;
 // Scene Class
 class Scene
 {
-	Vector<UniquePtr<GameObject>> gameObjects;			// preserves order
+	List<UniquePtr<GameObject>> gameObjects;			// preserves order
 	UnorderedMapStringKey<GameObject *> gameObjectLookup; // fast lookup
 	MultiMap<int, RendererComponent *> gameObjectsRenderers;
-	Vector<SimpleCollider *> colliders;
-	Vector<GameObject*> pendingDestroy;
+	List<SimpleCollider *> colliders;
+	List<GameObject*> pendingDestroy;
+	List<UniquePtr<GameObject>> pendingAdd;
 
 	IRenderer *renderer;
 	MaterialManager *materialManager;
@@ -35,11 +36,12 @@ class Scene
 
 	void DestroyImmediate(GameObject* go);
 	void ProcessPendingDestroys();
+	void ProcessPendingAdds();
 
 public:
 	Scene(IRenderer *r, MaterialManager *m, ResourceManager *tm);
 
-	void AddGameObject(UniquePtr<GameObject> go);
+	void AddGameObject(UniquePtr<GameObject> go, bool immediate);
 
 	void Destroy(GameObject* go);
 	
@@ -60,7 +62,7 @@ public:
 
 	void HandleEvent(const InputEvent *event);
 
-	const Vector<UniquePtr<GameObject>>& GetGameObjects() const { return gameObjects;	}
+	const List<UniquePtr<GameObject>>& GetGameObjects() const { return gameObjects;	}
 	
 	const IRenderer* GetRenderer() const { return renderer;	}
 

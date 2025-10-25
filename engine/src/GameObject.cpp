@@ -21,6 +21,8 @@ Scene *GameObject::GetScene()
 
 void GameObject::SetActive(bool active)
 {
+	isActive = active;
+
     for (const auto &comp : GetComponents())
     {
         comp->SetActive(active);
@@ -36,7 +38,7 @@ void GameObject::AddGameObject(UniquePtr<GameObject> go)
 {
     children.push_back(go.get());
     go->parent = this;
-    scene->AddGameObject(std::move(go));
+    scene->AddGameObject(std::move(go), false);
 }
 
 void GameObject::AddComponent(UniquePtr<BaseComponent> component)
@@ -88,6 +90,12 @@ void GameObject::OnCollide(GameObject *other) const
                            { comp->OnCollide(other); });
 }
 
+void GameObject::OnDestroy() const
+{
+    ForEachActiveComponent([](const auto& comp)
+        { comp->OnDestroy(); });
+}
+
 const String &GameObject::GetName() const
 {
     return name;
@@ -103,7 +111,7 @@ BaseTransform *GameObject::GetTransform() const
     return transform;
 }
 
-Vector<UniquePtr<BaseComponent>> &GameObject::GetComponents()
+List<UniquePtr<BaseComponent>> &GameObject::GetComponents()
 {
     return components;
 }

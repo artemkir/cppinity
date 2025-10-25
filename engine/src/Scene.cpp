@@ -1,4 +1,4 @@
-// Scene.cpp (updated: remove SDL, update for Sokol timing/input integration)
+// Scene.cpp
 #include "Scene.h"
 #include "GameObject.h"
 #include "Components/RendererComponent.h"
@@ -9,11 +9,22 @@
 #include "ResourceManager.h"
 #include "Input.h"
 
-Scene::Scene(IRenderer *r, MaterialManager *m, ResourceManager *resourceManager) : renderer(r), materialManager(m), resourceManager(resourceManager) {}
+Scene::Scene(
+    IRenderer *r, 
+    MaterialManager *m, 
+    ResourceManager *resourceManager
+) : renderer(r), materialManager(m), resourceManager(resourceManager) {}
 
-void Scene::AddGameObject(UniquePtr<GameObject> go)
+void Scene::AddGameObject(UniquePtr<GameObject> go, bool immediate)
 {
-    go->SetScene(this);
+    if (!immediate)
+    {
+        go->SetScene(this);
+
+        pendingAdd.push_back(std::move(go));
+        return;
+    }
+        
     gameObjectLookup[go->GetName()] = go.get();
 
     auto renderComponent = go->GetComponent<RendererComponent>();
@@ -38,6 +49,14 @@ void Scene::Destroy(GameObject* go) {
         return;
     }
 
+    // If the object is scheduled for addition, cancel that instead.
+    for (auto it = pendingAdd.begin(); it != pendingAdd.end(); ++it) {
+        if (it->get() == go) {
+            pendingAdd.erase(it);
+            return;
+        }
+    }
+
     if (std::find(pendingDestroy.begin(), pendingDestroy.end(), go) != pendingDestroy.end()) {
         return;
     }
@@ -49,6 +68,9 @@ void Scene::DestroyImmediate(GameObject* go)
 {
     if (!go) return;
 
+    // Call OnDestroy for the GameObject before destruction
+    go->OnDestroy();
+
     // Remove from parent's children list if it has a parent
     if (auto parent = go->GetParent())
     {
@@ -56,7 +78,7 @@ void Scene::DestroyImmediate(GameObject* go)
     }
         
     // Recursively destroy all children first
-    Vector<GameObject*> childrenCopy = go->GetChildren();
+    List<GameObject*> childrenCopy = go->GetChildren();
     for (auto child : childrenCopy)
     {
         if (!child)
@@ -98,7 +120,7 @@ void Scene::DestroyImmediate(GameObject* go)
     {
         if (it->get() == go)
         {
-             gos.erase(it);
+            gos.erase(it);
             break;
         }
     }
@@ -115,6 +137,23 @@ void Scene::ProcessPendingDestroys()
         {
             DestroyImmediate(goPtr);
         }
+    }
+}
+
+void Scene::ProcessPendingAdds()
+{
+    if (pendingAdd.empty())
+        return;
+
+    // Swap pendingAdd with an empty list to collect new additions during Awake
+    List<UniquePtr<GameObject>> currentPending;
+    currentPending.swap(pendingAdd);
+
+    while (!currentPending.empty())
+    {
+        auto go = std::move(currentPending.back());
+        currentPending.pop_back();
+        AddGameObject(std::move(go), true);
     }
 }
 
@@ -143,6 +182,11 @@ void Scene::Update(float deltaTime)
 {
     for (auto &go : gameObjects)
     {
+        if (go->IsActive() == false)
+        {
+            continue;
+        }
+
         if (!go->HasStarted())
         {
             go->Start(); // called only once
@@ -197,6 +241,7 @@ bool Scene::Frame(float deltaTime)
     Render();
 
     ProcessPendingDestroys();
+    ProcessPendingAdds();
 
     renderer->EndPass();
 

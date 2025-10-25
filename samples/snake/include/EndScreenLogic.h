@@ -17,4 +17,5 @@ public:
 
     void Start() override;
     void Update(float deltaTime) override;
+	void OnActive(bool isActive) override;
 };

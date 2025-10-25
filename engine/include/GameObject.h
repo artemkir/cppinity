@@ -15,11 +15,12 @@ class GameObject
     Scene *scene = nullptr;
     unsigned tag;
     String name;
-    Vector<UniquePtr<BaseComponent>> components;
+    List<UniquePtr<BaseComponent>> components;
     BaseTransform *transform = nullptr;
-    Vector<GameObject *> children;
+    List<GameObject *> children;
     GameObject *parent = nullptr;
     bool isStarted = false;
+	bool isActive = true;
 
 public:
     // GameObject() = delete;
@@ -30,7 +31,7 @@ public:
     Scene *GetScene();
 
 	GameObject* GetParent() const { return parent; }
-	const Vector<GameObject*>& GetChildren() const { return children; }
+	const List<GameObject*>& GetChildren() const { return children; }
 
     void RemoveMeFromParent()
     {
@@ -42,14 +43,17 @@ public:
 		}
     }
 
+	bool IsActive() const { return isActive; }
     void SetActive(bool active);
     void AddGameObject(UniquePtr<GameObject> go);
     void AddComponent(UniquePtr<BaseComponent> component);
 
     bool HasStarted() const { return isStarted; }
 
+    
+
     template <typename T>
-    T *GetComponent()
+    T *GetComponent() const
     {
         for (const auto &comp : components)
         {
@@ -63,11 +67,12 @@ public:
     void Start();
     void Update(float deltaTime) const;
     void OnCollide(GameObject *other) const;
+    void OnDestroy() const;
 
     const String &GetName() const;
     int GetTag() const;
     BaseTransform *GetTransform() const;
-    Vector<UniquePtr<BaseComponent>> &GetComponents();
+    List<UniquePtr<BaseComponent>> &GetComponents();
 
     template <typename T, typename... Args>
     T *AddComponent(Args &&...args)

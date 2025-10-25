@@ -22,10 +22,10 @@ void NPCInputHandler::Update(float deltaTime)
     if (!apple || !apple->GetTransform())
         return;
 
-    int startX = head->GetX();
-    int startY = head->GetY();
-    int goalX = apple->GetTransform()->GetX();
-    int goalY = apple->GetTransform()->GetY();
+    int startX = head->GetPos().x;
+    int startY = head->GetPos().y;
+    int goalX = apple->GetTransform()->GetPos().x;
+    int goalY = apple->GetTransform()->GetPos().y;
 
     path = FindPath(startX, startY, goalX, goalY);
     if (path.size() > 1)
@@ -57,9 +57,9 @@ Direction NPCInputHandler::GetDirection()
     return dir;
 }
 
-Vector<Vector2i> NPCInputHandler::FindPath(int startX, int startY, int goalX, int goalY)
+List<Vector2i> NPCInputHandler::FindPath(int startX, int startY, int goalX, int goalY)
 {
-    std::priority_queue<SharedPtr<Node>, Vector<SharedPtr<Node>>, NodeComparator> openList;
+    std::priority_queue<SharedPtr<Node>, List<SharedPtr<Node>>, NodeComparator> openList;
     Set<Vector2i> closedList;
 
     auto startNode = MakeShared<Node>(startX, startY, 0, std::abs(goalX - startX) + std::abs(goalY - startY));
@@ -72,7 +72,7 @@ Vector<Vector2i> NPCInputHandler::FindPath(int startX, int startY, int goalX, in
 
         if (current->x == goalX && current->y == goalY)
         {
-            Vector<Vector2i> path;
+            List<Vector2i> path;
             for (auto node = current; node != nullptr; node = node->parent)
             {
                 path.push_back({node->x, node->y});
@@ -86,7 +86,7 @@ Vector<Vector2i> NPCInputHandler::FindPath(int startX, int startY, int goalX, in
 
         closedList.insert({current->x, current->y});
 
-        Vector<Vector2i> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+        List<Vector2i> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
         for (auto& [dx, dy] : directions)
         {
             int nx = current->x + dx;
@@ -99,7 +99,7 @@ Vector<Vector2i> NPCInputHandler::FindPath(int startX, int startY, int goalX, in
             for (const auto &go : gameObject->GetScene()->GetGameObjects())
             {
                 if ((go->GetName().find("maze_block_") == 0 || go->GetName().find("tail_") == 0) &&
-                    go->GetTransform()->GetX() == nx && go->GetTransform()->GetY() == ny)
+                    go->GetTransform()->GetPos().x == nx && go->GetTransform()->GetPos().y == ny)
                 {
                     isObstacle = true;
                     break;

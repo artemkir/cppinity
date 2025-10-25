@@ -16,7 +16,7 @@ GameObject *GameObjectBuilder::AddToScene()
     }
     else if (scene)
     {
-        scene->AddGameObject(std::move(go)); // Add to scene
+        scene->AddGameObject(std::move(go), false); // Add to scene
         return ptr;
     }
         

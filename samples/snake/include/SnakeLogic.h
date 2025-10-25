@@ -9,19 +9,18 @@ class SnakeLogic : public BaseComponent
 	AppleLogic *apple = nullptr;
 	RectRenderer *rect = nullptr;
 
-	Vector<GameObject *> tail;
+	List<GameObject *> tail;
 	int score = 0;
 	float updateTimer = 0.0f;
 	float update_interval = 0.2f;
 	float min_update_interval = 0.05f;
 	float tail_change_interval = 0.005f;
-	float blockSizeW = 0.0f;
-	float blockSizeH = 0.0f;
-
+	Vector2 blockSize = { 0.0f, 0.0f };
+	
 	IInputHandler *inputHandler = nullptr;
 
 public:
-	void Awake() override;
+	void Start() override;
 	void Update(float deltaTime) override;
 	void OnCollide(GameObject *other) override;
 	int GetScore();
