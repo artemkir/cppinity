@@ -22,10 +22,10 @@ void NPCInputHandler::Update(float deltaTime)
     if (!apple || !apple->GetTransform())
         return;
 
-    int startX = head->GetX();
-    int startY = head->GetY();
-    int goalX = apple->GetTransform()->GetX();
-    int goalY = apple->GetTransform()->GetY();
+    int startX = head->GetPos().x;
+    int startY = head->GetPos().y;
+    int goalX = apple->GetTransform()->GetPos().x;
+    int goalY = apple->GetTransform()->GetPos().y;
 
     path = FindPath(startX, startY, goalX, goalY);
     if (path.size() > 1)
@@ -99,7 +99,7 @@ List<Vector2i> NPCInputHandler::FindPath(int startX, int startY, int goalX, int 
             for (const auto &go : gameObject->GetScene()->GetGameObjects())
             {
                 if ((go->GetName().find("maze_block_") == 0 || go->GetName().find("tail_") == 0) &&
-                    go->GetTransform()->GetX() == nx && go->GetTransform()->GetY() == ny)
+                    go->GetTransform()->GetPos().x == nx && go->GetTransform()->GetPos().y == ny)
                 {
                     isObstacle = true;
                     break;

@@ -21,6 +21,8 @@ Scene *GameObject::GetScene()
 
 void GameObject::SetActive(bool active)
 {
+	isActive = active;
+
     for (const auto &comp : GetComponents())
     {
         comp->SetActive(active);

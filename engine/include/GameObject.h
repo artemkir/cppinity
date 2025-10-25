@@ -20,6 +20,7 @@ class GameObject
     List<GameObject *> children;
     GameObject *parent = nullptr;
     bool isStarted = false;
+	bool isActive = true;
 
 public:
     // GameObject() = delete;
@@ -42,11 +43,14 @@ public:
 		}
     }
 
+	bool IsActive() const { return isActive; }
     void SetActive(bool active);
     void AddGameObject(UniquePtr<GameObject> go);
     void AddComponent(UniquePtr<BaseComponent> component);
 
     bool HasStarted() const { return isStarted; }
+
+    
 
     template <typename T>
     T *GetComponent()

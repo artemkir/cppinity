@@ -1,4 +1,4 @@
-// Scene.cpp (updated: remove SDL, update for Sokol timing/input integration)
+// Scene.cpp
 #include "Scene.h"
 #include "GameObject.h"
 #include "Components/RendererComponent.h"
@@ -20,6 +20,7 @@ void Scene::AddGameObject(UniquePtr<GameObject> go, bool immediate)
     if (!immediate)
     {
         go->SetScene(this);
+
         pendingAdd.push_back(std::move(go));
         return;
     }
@@ -133,10 +134,23 @@ void Scene::ProcessPendingDestroys()
 
 void Scene::ProcessPendingAdds()
 {
-    while (!pendingAdd.empty())
+    if (pendingAdd.empty())
+        return;
+
+    // Swap pendingAdd with an empty list to collect new additions during Awake
+    List<UniquePtr<GameObject>> currentPending;
+    currentPending.swap(pendingAdd);
+
+    while (!currentPending.empty())
     {
-        AddGameObject(std::move(pendingAdd.back()), true);
-        pendingAdd.pop_back();
+        auto go = std::move(currentPending.back());
+        currentPending.pop_back();
+        if (!go)
+        {
+            printf("Scene::ProcessPendingAdds: Found null GameObject in pendingAdd.\n");
+            continue;
+        }
+        AddGameObject(std::move(go), true);
     }
 }
 
@@ -165,6 +179,11 @@ void Scene::Update(float deltaTime)
 {
     for (auto &go : gameObjects)
     {
+        if (go->IsActive() == false)
+        {
+            continue;
+        }
+
         if (!go->HasStarted())
         {
             go->Start(); // called only once

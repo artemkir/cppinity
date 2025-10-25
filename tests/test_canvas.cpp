@@ -163,31 +163,6 @@ TEST_CASE_METHOD(SceneTestFixture, "Nested parent-child under Canvas with Center
     REQUIRE(final.pivot.y == Catch::Approx(0.0f));
 }
 
-TEST_CASE_METHOD(SceneTestFixture, "Canvas with GridTransform and TopLeft anchor", "[Canvas][GridTransform]") {
-    auto canvas_go = scene.CreateGameObjectBuilder("Canvas", 0)
-        .WithComponent<Canvas>(Vector2{ 1.0f, 1.0f }, Vector2{ 0.0f, 0.0f }, AnchorType::TopLeft, Vector2{ 800.0f, 600.0f })
-        .AddToScene();
-
-    auto child = canvas_go->CreateGameObjectBuilder("Child", 0)
-        .WithComponent<GridTransform>(Vector2{ 2.0f, 3.0f }, Vector2{ 50.0f, 50.0f }, Vector2{ 1.0f, 1.0f }, Vector2{ 0.0f, 0.0f })
-        .AddToScene();
-
-    scene.Frame(0.016f);
-
-    auto child_trans = child->GetComponent<GridTransform>();
-    REQUIRE(child_trans != nullptr);
-
-    auto final = child_trans->GetFinalScreenTransform();
-    // GridTransform: pos (2,3), size (50,50), scale (1,1), pivot (0,0)
-    // Screen pos = (2*50, 3*50) = (100,150), size = (50,50)
-    REQUIRE(final.pos.x == Catch::Approx(100.0f));
-    REQUIRE(final.pos.y == Catch::Approx(150.0f));
-    REQUIRE(final.size.x == Catch::Approx(50.0f));
-    REQUIRE(final.size.y == Catch::Approx(50.0f));
-    REQUIRE(final.pivot.x == Catch::Approx(0.0f));
-    REQUIRE(final.pivot.y == Catch::Approx(0.0f));
-}
-
 TEST_CASE_METHOD(SceneTestFixture, "ScreenTransform with Center pivot under Canvas", "[Canvas][ScreenTransform]") {
     auto canvas_go = scene.CreateGameObjectBuilder("Canvas", 0)
         .WithComponent<Canvas>(Vector2{ 1.0f, 1.0f }, Vector2{ 0.0f, 0.0f }, AnchorType::TopLeft, Vector2{ 800.0f, 600.0f })
@@ -273,6 +248,31 @@ TEST_CASE_METHOD(SceneTestFixture, "ScreenTransform with custom pivot and parent
     REQUIRE(final.pivot.y == Catch::Approx(0.5f));
 }
 
+TEST_CASE_METHOD(SceneTestFixture, "Canvas with GridTransform and TopLeft anchor", "[Canvas][GridTransform]") {
+    auto canvas_go = scene.CreateGameObjectBuilder("Canvas", 0)
+        .WithComponent<Canvas>(Vector2{ 1.0f, 1.0f }, Vector2{ 0.0f, 0.0f }, AnchorType::TopLeft, Vector2{ 800.0f, 600.0f })
+        .AddToScene();
+
+    auto child = canvas_go->CreateGameObjectBuilder("Child", 0)
+        .WithComponent<GridTransform>(Vector2{ 2.0f, 3.0f }, Vector2{ 50.0f, 50.0f }, Vector2{ 1.0f, 1.0f }, Vector2{ 0.0f, 0.0f })
+        .AddToScene();
+
+    scene.Frame(0.016f);
+
+    auto child_trans = child->GetComponent<GridTransform>();
+    REQUIRE(child_trans != nullptr);
+
+    auto final = child_trans->GetFinalScreenTransform();
+    // GridTransform: pos (2,3), size (50,50), scale (1,1), pivot (0,0)
+    // Screen pos = (2*50, 3*50) = (100,150), size = (50,50)
+    REQUIRE(final.pos.x == Catch::Approx(100.0f));
+    REQUIRE(final.pos.y == Catch::Approx(150.0f));
+    REQUIRE(final.size.x == Catch::Approx(50.0f));
+    REQUIRE(final.size.y == Catch::Approx(50.0f));
+    REQUIRE(final.pivot.x == Catch::Approx(0.0f));
+    REQUIRE(final.pivot.y == Catch::Approx(0.0f));
+}
+
 TEST_CASE_METHOD(SceneTestFixture, "GridTransform with Center pivot under Canvas", "[Canvas][GridTransform]") {
     auto canvas_go = scene.CreateGameObjectBuilder("Canvas", 0)
         .WithComponent<Canvas>(Vector2{ 1.0f, 1.0f }, Vector2{ 0.0f, 0.0f }, AnchorType::TopLeft, Vector2{ 800.0f, 600.0f })
@@ -297,4 +297,33 @@ TEST_CASE_METHOD(SceneTestFixture, "GridTransform with Center pivot under Canvas
     REQUIRE(final.size.y == Catch::Approx(50.0f));
     REQUIRE(final.pivot.x == Catch::Approx(0.5f));
     REQUIRE(final.pivot.y == Catch::Approx(0.5f));
+}
+
+TEST_CASE_METHOD(SceneTestFixture, "GridTransform under screen-centered Canvas", "[Canvas][GridTransform]") {
+    auto canvas_go = scene.CreateGameObjectBuilder("Canvas", 0)
+        .WithComponent<Canvas>(Vector2{ -1.0f, 1.0f }, Vector2{ 0.5f, 0.5f }, AnchorType::Center, Vector2{ 1000.0f, 1200.0f })
+        .AddToScene();
+
+    auto x = 2.0f;
+    auto y = 3.0f;
+    auto aw = (600.0f / 1000.0f);
+    auto ah = (600.0f / 1200.0f);
+	auto w = 50.0f * aw;
+    auto h = 50.0f * ah;
+	auto left_corner = (800.0f - 600.0f) / 2.0f; // 100 pixels
+
+    auto child = canvas_go->CreateGameObjectBuilder("Child", 0)
+        .WithComponent<GridTransform>(Vector2{ x, y }, Vector2{ 50.0f, 50.0f }, Vector2{ 1.0f, 1.0f }, Vector2{ 0.0f, 0.0f })
+        .AddToScene();
+
+    scene.Frame(0.016f);
+
+    auto child_trans = child->GetComponent<GridTransform>();
+    REQUIRE(child_trans != nullptr);
+
+    auto final = child_trans->GetFinalScreenTransform();
+    REQUIRE(final.pos.x == Catch::Approx(left_corner + x * w));
+    REQUIRE(final.pos.y == Catch::Approx(y * h));
+    REQUIRE(final.size.x == Catch::Approx(w));
+    REQUIRE(final.size.y == Catch::Approx(h));
 }

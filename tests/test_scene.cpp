@@ -48,6 +48,43 @@ public:
 	void OnCollide(GameObject* other) override {}
 };
 
+class AddInAwakeComponent : public BaseComponent {
+public:
+	void Awake() override {
+		for (int i = 0; i < 100; i++)
+		{
+			gameObject->GetScene()->CreateGameObjectBuilder("AddedInAwake"+i, 0)
+				.AddToScene();
+		}
+	}
+	void Start() override {}
+	void Update(float deltaTime) override {}
+	void OnCollide(GameObject* other) override {}
+};
+
+TEST_CASE_METHOD(SceneTestFixture, "Adding GameObject during Awake is deferred correctly", "[Scene]") {
+	auto go1 = scene.CreateGameObjectBuilder("TestGO1", 0)
+		.WithComponent<AddInAwakeComponent>()
+		.AddToScene();
+
+	// Initial state
+	REQUIRE(scene.FindGameObjectByName("TestGO1") == nullptr);
+	REQUIRE(scene.FindGameObjectByName("AddedInAwake") == nullptr);
+
+	// Simulate frame: Process pending adds, call Awake which adds another to pendingAdd
+	scene.Frame(0.016f);
+
+	// After first frame: TestGO1 added, AddedInAwake still pending
+	REQUIRE(scene.FindGameObjectByName("TestGO1") != nullptr);
+	REQUIRE(scene.FindGameObjectByName("AddedInAwake") == nullptr);
+
+	// Simulate another frame: Process the new pending add
+	scene.Frame(0.016f);
+
+	// Now AddedInAwake should be added
+	REQUIRE(scene.FindGameObjectByName("AddedInAwake") != nullptr);
+}
+
 TEST_CASE_METHOD(SceneTestFixture, "Adding GameObject during Update is deferred", "[Scene]") {
 	// Create a GameObject with a TestComponent that adds another GameObject in Update
 	auto go1 = scene.CreateGameObjectBuilder("TestGO1", 0)
@@ -295,4 +332,75 @@ TEST_CASE_METHOD(SceneTestFixture, "OnDestroy called when object is about to be 
 
 	REQUIRE(scene.FindGameObjectByName("TestGO") == nullptr);
 	REQUIRE(onDestroyCalled);
+}
+
+TEST_CASE_METHOD(SceneTestFixture, "Deactivating GameObject in another's Start prevents Start until reactivated", "[Scene]") {
+	// Component to deactivate another GameObject during Start
+	class DeactivateOtherComponent : public FlagComponent {
+	public:
+		GameObject* target = nullptr;
+
+		DeactivateOtherComponent(GameObject* target) : target(target) {}
+		void Awake() override {
+			FlagComponent::Awake();
+		}
+
+		void Start() override {
+			
+			FlagComponent::Start();
+
+			if (target) {
+				target->SetActive(false);
+			}
+		}
+		void Update(float deltaTime) override {}
+		void OnCollide(GameObject* other) override {}
+	};
+
+	// Create GO2 with FlagComponent to track lifecycle
+	auto go2 = scene.CreateGameObjectBuilder("TestGO2", 0)
+		.WithComponent<FlagComponent>()
+		.AddToScene();
+
+	// Create GO1 which will deactivate GO2 in its Start
+	auto go1 = scene.CreateGameObjectBuilder("TestGO1", 0)
+		.WithComponent<DeactivateOtherComponent>(go2)
+		.AddToScene();
+
+	// Simulate first frame: GO1 and GO2 added
+	scene.Frame(0.016f);
+
+	auto comp1 = go1->GetComponent<DeactivateOtherComponent>();
+	auto comp2 = go2->GetComponent<FlagComponent>();
+	REQUIRE(comp1 != nullptr);
+	REQUIRE(comp2 != nullptr);
+
+	REQUIRE(comp1->awoke == true);
+	REQUIRE(comp2->awoke == true);
+	REQUIRE(comp1->started == false);
+	REQUIRE(comp2->started == false);
+
+	// Verify initial state
+	REQUIRE(scene.FindGameObjectByName("TestGO1") != nullptr);
+	REQUIRE(scene.FindGameObjectByName("TestGO2") != nullptr);
+
+	// Simulate: GO1's Start deactivates GO2
+	scene.Frame(0.016f);
+	
+	REQUIRE(comp2->started == false);   // Start should not be called due to deactivation
+	REQUIRE(comp2->updates == 0);       // No updates while deactivated
+
+	// Simulate another frame: GO2 remains deactivated
+	scene.Frame(0.016f);
+	REQUIRE(comp2->started == false);   // Still no Start
+	REQUIRE(comp2->updates == 0);       // Still no updates
+
+	// Reactivate GO2
+	go2->SetActive(true);
+
+	// Simulate another frame: GO2 should now call Start and Update
+	scene.Frame(0.016f);
+	REQUIRE(comp2->awoke == true);
+	REQUIRE(comp2->started == true);    // Start should now be called
+	REQUIRE(comp2->updates == 1);       // Update should be called once
 }

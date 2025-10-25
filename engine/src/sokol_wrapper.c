@@ -460,8 +460,8 @@ void sokol_setup()
         .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {0.2f, 0.3f, 0.3f, 1.0f}}};
 
     app_state.bind.samplers[0] = sg_make_sampler(&(sg_sampler_desc) {
-        .min_filter = SG_FILTER_NEAREST,
-        .mag_filter = SG_FILTER_NEAREST,
+        .min_filter = SG_FILTER_LINEAR,
+        .mag_filter = SG_FILTER_LINEAR,
     });
 
     create_default_quad_buffers();

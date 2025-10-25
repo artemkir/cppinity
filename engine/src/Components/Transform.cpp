@@ -52,15 +52,17 @@ BaseTransform::Transform ScreenTransform::GetRelativeTransformToAncestor(const S
 }
 
 BaseTransform::Transform ScreenTransform::GetFinalScreenTransform() const {
-    if (!canvas) {
-        if (!parent) {
+    if (!canvas) 
+    {
+        if (!parent) 
+        {
             return GetScreenTransform();
         }
+    
         return GetRelativeTransformToAncestor(nullptr);
     }
     else {
-        const ScreenTransform* canvas_transform = dynamic_cast<ScreenTransform*>(canvas->GetGameObject()->GetTransform());
-        Transform rel = GetRelativeTransformToAncestor(canvas_transform);
+        Transform rel = GetRelativeTransformToAncestor(nullptr);
 
         Vector2 canvas_screen_pos = canvas->GetScreenPos();
         Vector2 canvas_screen_size = canvas->GetScreenSize();

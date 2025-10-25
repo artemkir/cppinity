@@ -23,10 +23,11 @@ public:
 	virtual void OnDestroy() {}
 	
 	void SetActive(bool active_)
-	{
+	{		
 		active = active_;
 		OnActive(active);
 	}
+
 	bool IsActive() const { return active; }
 	virtual void OnActive(bool active_) {}
 

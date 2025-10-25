@@ -60,3 +60,12 @@ public:
         , scene(&renderer, &materialManager, &resourceManager) {
     }
 };
+
+class MockTransform : public BaseTransform
+{
+public:
+    using BaseTransform::BaseTransform;
+      
+    Transform GetScreenTransform() const override { return t; }
+    Transform GetFinalScreenTransform() const override { return t; }  
+};

@@ -2,6 +2,7 @@
 add_executable(Tests
     test_scene.cpp
 	test_canvas.cpp
+    test_animation.cpp
 )
 
 # Link against the engine library, Catch2, and platform dependencies

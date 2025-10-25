@@ -1,12 +1,9 @@
-
-
 #include "Components/Animation.h"
-
 #include "GameObject.h"
 #include "Components/Transform.h"
 
-Animation::Animation(float duration_, float targetX_, float targetY_, int loops_)
-    : duration(duration_), targetX(targetX_), targetY(targetY_), loops(loops_)
+Animation::Animation(float duration_, Vector2 target_, int loops_)
+    : duration(duration_), target(target_), loops(loops_)
 {
     if (duration_ <= 0.0f)
     {
@@ -23,8 +20,7 @@ float Animation::EaseInOutQuad(float t) const
 void Animation::Awake()
 {
     auto transform = gameObject->GetTransform();
-    startX = transform->GetScaleX();
-    startY = transform->GetScaleY();
+    start = transform->GetScale();
 }
 
 void Animation::Update(float deltaTime)
@@ -43,18 +39,16 @@ void Animation::Update(float deltaTime)
         if (loops == 0)
         {
             active = false;
-            transform->SetScale(targetX, targetY);
+            transform->SetScale(target.x, target.y);
             return;
         }
 
-        std::swap(startX, targetX);
-        std::swap(startY, targetY);
+        std::swap(start, target);
         elapsedTime = 0.0f;
         t = t - 1.0f;
     }
 
     float easedT = EaseInOutQuad(t);
-    float newX = startX + (targetX - startX) * easedT;
-    float newY = startY + (targetY - startY) * easedT;
-    transform->SetScale(newX, newY);
+    Vector2 newScale = start + (target - start) * easedT;
+    transform->SetScale(newScale.x, newScale.y);
 }

@@ -7,8 +7,10 @@ void MazeGenerator::AddGridToScene()
 	std::mt19937 g(rd());
 	std::uniform_int_distribution<> color(100, 140);
 
-	float blockSizeW = (float)gameObject->GetScene()->GetRenderer()->GetW() / MAZE_WIDTH;
-	float blockSizeH = (float)gameObject->GetScene()->GetRenderer()->GetH() / MAZE_HEIGHT;
+	auto scene = gameObject->GetScene();
+	auto canvas = scene->FindGameObjectByName("MainCanvas");
+	auto canvasSize = canvas->GetComponent<Canvas>()->GetCanvasSize();
+	auto blockSize = canvasSize / Vector2{MAZE_WIDTH, MAZE_HEIGHT};
 
 	// Add walls to Scene
 	for (int y = 0; y < MAZE_HEIGHT; ++y)
@@ -19,8 +21,8 @@ void MazeGenerator::AddGridToScene()
 			{
 				int c = color(g);
 
-				gameObject->GetScene()->CreateGameObjectBuilder("maze_block_" + std::to_string(x) + "_" + std::to_string(y), OBSTACLE_TAG)
-					.WithComponent<GridTransform>(Vector2{ x, y }, Vector2{ blockSizeW, blockSizeH })
+				canvas->CreateGameObjectBuilder("maze_block_" + std::to_string(x) + "_" + std::to_string(y), OBSTACLE_TAG)
+					.WithComponent<GridTransform>(Vector2{ x, y }, blockSize)
 					.WithComponent<RectRenderer>(c, c, c)
 					.WithComponent<SimpleCollider>()
 					.AddToScene();
@@ -102,8 +104,8 @@ bool MazeGenerator::IsObstacle(int x, int y)
 	for (const auto& go : sceneObjects)
 	{
 		if (go->GetTag() & OBSTACLE_TAG &&
-			go->GetTransform()->GetX() == x &&
-			go->GetTransform()->GetY() == y)
+			go->GetTransform()->GetPos().x == x &&
+			go->GetTransform()->GetPos().y == y)
 		{
 			return true;
 		}
@@ -139,7 +141,8 @@ Vector2i MazeGenerator::GetRandomEmptyPosition()
 	return { x, y };
 }
 
-void MazeGenerator::Awake()
+//Using Start here to ensure maze generated after canvas is created
+void MazeGenerator::Start()
 {
 	GenerateMaze(MAZE_WIDTH / 2, MAZE_HEIGHT / 2);
 }

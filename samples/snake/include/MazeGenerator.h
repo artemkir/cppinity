@@ -29,5 +29,5 @@ public:
     MazeGenerator() = default;
     bool IsObstacle(int x, int y);
     Vector2i GetRandomEmptyPosition();
-    void Awake() override;
+    void Start() override;
 };

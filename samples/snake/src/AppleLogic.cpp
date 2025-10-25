@@ -2,13 +2,16 @@
 
 #include "Game.h"
 
-void AppleLogic::Awake()
+void AppleLogic::Start()
 {
-    float blockSizeW = (float)gameObject->GetScene()->GetRenderer()->GetW() / MAZE_WIDTH;
-    float blockSizeH = (float)gameObject->GetScene()->GetRenderer()->GetH() / MAZE_HEIGHT;
+    auto scene = gameObject->GetScene();
+    auto canvas = scene->FindGameObjectByName("MainCanvas");
+    auto canvasSize = canvas->GetComponent<Canvas>()->GetCanvasSize();
+
+    Vector2 blockSize = canvasSize / Vector2{ MAZE_WIDTH, MAZE_HEIGHT };
 
     mazeGenerator = gameObject->GetScene()->FindGameObjectByName("maze_generator")->GetComponent<MazeGenerator>();
-    gameObject->GetTransform()->SetSize(blockSizeW, blockSizeH);
+    gameObject->GetTransform()->SetSize(blockSize.x, blockSize.y);
     RegenerateApple();
 }
 

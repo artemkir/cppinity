@@ -19,16 +19,31 @@ AnchorType Canvas::GetAnchorType() const {
     return anchor_type_;
 }
 
-Vector2 Canvas::GetScreenSize() const {
+Vector2 Canvas::GetAdjustedRelativeCanvasSize() const
+{
     float sw = static_cast<float>(gameObject->GetScene()->GetRenderer()->GetW());
     float sh = static_cast<float>(gameObject->GetScene()->GetRenderer()->GetH());
 
-    // Compute size based on relative values
     Vector2 size = relative_size_;
     // Special case: if width is -1, set equal to height (e.g., square canvas)
     if (relative_size_.x < 0.0f) {
         size.x = relative_size_.y * (sh / sw); // Maintain aspect
     }
+    if (relative_size_.y < 0.0f) {
+        size.y = relative_size_.x * (sw / sh); // Maintain aspect
+    }
+
+    return size;
+}
+
+Vector2 Canvas::GetScreenSize() const {
+    
+    float sw = static_cast<float>(gameObject->GetScene()->GetRenderer()->GetW());
+    float sh = static_cast<float>(gameObject->GetScene()->GetRenderer()->GetH());
+
+    // Compute size based on relative values
+    Vector2 size = GetAdjustedRelativeCanvasSize();
+
     return Vector2{ size.x * sw, size.y * sh }; // Convert to pixels
 }
 
