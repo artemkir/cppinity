@@ -10,7 +10,7 @@ void CreateInitialScene(Scene* scene)
 	scene->GetResourceManager()->Load<Texture>("start.png");
 
 	scene->CreateGameObjectBuilder("MainCanvas")
-		.WithComponent<Canvas>(Vector2{ -1.0f, 1.0f }, Vector2{ 0.5f, 0.5f }, AnchorType::Center, Vector2{ 1920.0f, 1080.0f })
+		.WithComponent<Canvas>(Vector2{ -1.0f, 1.0f }, Vector2{ 0.5f, 0.5f }, AnchorType::Center, Vector2{ 1000.0f, 1000.0f })
 		.AddToScene();
 
 	// Main Menu Root 
