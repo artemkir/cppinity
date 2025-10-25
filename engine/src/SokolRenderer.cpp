@@ -3,11 +3,12 @@
 
 #include "sokol_wrapper.h"
 
-SokolRenderer::SokolRenderer(int screen_width, int screen_height) : screen_width_(screen_width), screen_height_(screen_height) {
-
-    f_screen_width_ = static_cast<float>(screen_width_);
-    f_screen_height_ = static_cast<float>(screen_height);
-
+SokolRenderer::SokolRenderer(int screen_width, int screen_height) : 
+    screen_width_(screen_width), 
+    screen_height_(screen_height),
+    f_screen_width_(static_cast<float>(screen_width_)),
+    f_screen_height_(static_cast<float>(screen_height))
+{
     sokol_setup();
 }
 

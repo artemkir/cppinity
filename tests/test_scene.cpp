@@ -26,9 +26,9 @@ public:
 	bool active = true;
 	std::function<void()> onDestroyCallback;
 
-	void Awake() override { awoke = true; }
-	void Start() override { started = true; }
-	void Update(float deltaTime) override { if (active) updates++; }
+	void virtual Awake() override { awoke = true; }
+	void virtual Start() override { started = true; }
+	void virtual Update(float deltaTime) override { if (active) updates++; }
 	void OnCollide(GameObject* other) override {}
 	void OnDestroy() override {
 		if (onDestroyCallback) {

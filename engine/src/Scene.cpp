@@ -49,6 +49,14 @@ void Scene::Destroy(GameObject* go) {
         return;
     }
 
+    // If the object is scheduled for addition, cancel that instead.
+    for (auto it = pendingAdd.begin(); it != pendingAdd.end(); ++it) {
+        if (it->get() == go) {
+            pendingAdd.erase(it);
+            return;
+        }
+    }
+
     if (std::find(pendingDestroy.begin(), pendingDestroy.end(), go) != pendingDestroy.end()) {
         return;
     }
@@ -145,11 +153,6 @@ void Scene::ProcessPendingAdds()
     {
         auto go = std::move(currentPending.back());
         currentPending.pop_back();
-        if (!go)
-        {
-            printf("Scene::ProcessPendingAdds: Found null GameObject in pendingAdd.\n");
-            continue;
-        }
         AddGameObject(std::move(go), true);
     }
 }

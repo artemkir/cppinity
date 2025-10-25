@@ -24,6 +24,10 @@ Vector2 Canvas::GetAdjustedRelativeCanvasSize() const
     float sw = static_cast<float>(gameObject->GetScene()->GetRenderer()->GetW());
     float sh = static_cast<float>(gameObject->GetScene()->GetRenderer()->GetH());
 
+    // Ensure at least one dimension is positive
+    assert((relative_size_.x >= 0.0f || relative_size_.y >= 0.0f) && 
+        "At least one canvas dimension must be positive");
+
     Vector2 size = relative_size_;
     // Special case: if width is -1, set equal to height (e.g., square canvas)
     if (relative_size_.x < 0.0f) {

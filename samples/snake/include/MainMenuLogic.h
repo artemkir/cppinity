@@ -17,9 +17,10 @@ public:
     {
         auto scene = gameObject->GetScene();
         auto canvas = scene->FindGameObjectByName("MainCanvas");
-		auto canvasSize = canvas->GetComponent<Canvas>()->GetCanvasSize();
 
         assert(canvas);
+
+		auto canvasSize = canvas->GetComponent<Canvas>()->GetCanvasSize();
 
         // Menu Background
         bg = canvas->CreateGameObjectBuilder("MenuBackground", 0)

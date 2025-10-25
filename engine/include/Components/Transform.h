@@ -67,6 +67,4 @@ public:
         Vector2 screenPos = GetPos() * GetSize() - pivotOffset;
         return { screenPos, GetSize(), GetScale(), pivot };
     }
-
-    Transform GetFinalScreenTransform() const override;
 };

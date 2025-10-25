@@ -17,7 +17,7 @@ private:
 
 class MockResourceManager : public ResourceManager {
 public:
-    MockResourceManager(IRenderer* renderer) : ResourceManager(renderer) {}
+    explicit MockResourceManager(IRenderer* renderer) : ResourceManager(renderer) {}
 };
 
 class MockRenderer : public IRenderer {

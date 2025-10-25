@@ -21,13 +21,17 @@ public:
         List<UniformDesc> uniforms;
     };
 
-    Shader(const List<AttributeDesc>& attrs,
+    explicit Shader(const List<AttributeDesc>& attrs,
            const UniformBlockDesc& vs_uniform_block,
            const List<String>& fs_image_names,
            const String& vs_source,
            const String& fs_source);
 
     ~Shader();
+    Shader(const Shader&) = delete;
+    Shader & operator=(const Shader&) = delete;
+    Shader(Shader&&) noexcept;
+    Shader & operator=(Shader&&) noexcept;
 
     uint32_t GetID() const { return id; }
     const List<AttributeDesc>& GetAttributes() const { return attrs; }

@@ -57,6 +57,29 @@ Shader::Shader(const List<AttributeDesc>& _attrs,
     );
 }
 
+Shader::Shader(Shader&& other) noexcept
+    : attrs(std::move(other.attrs)),
+    vsUniformBlock(std::move(other.vsUniformBlock)),
+    fsImageNames(std::move(other.fsImageNames)),
+    imageSlots(std::move(other.imageSlots)),
+    vsSource(std::move(other.vsSource)),
+    fsSource(std::move(other.fsSource)),
+    id(std::exchange(other.id, 0)) {}
+
+Shader& Shader::operator=(Shader&& other) noexcept {
+    if (this != &other) {
+        if (id) sokol_destroy_shader(id);
+        attrs = std::move(other.attrs);
+        vsUniformBlock = std::move(other.vsUniformBlock);
+        fsImageNames = std::move(other.fsImageNames);
+        imageSlots = std::move(other.imageSlots);
+        vsSource = std::move(other.vsSource);
+        fsSource = std::move(other.fsSource);
+        id = std::exchange(other.id, 0);
+    }
+    return *this;
+}
+
 Shader::~Shader() {
     if (id != 0) {
         sokol_destroy_shader(id);

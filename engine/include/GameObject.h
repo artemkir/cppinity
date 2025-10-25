@@ -53,7 +53,7 @@ public:
     
 
     template <typename T>
-    T *GetComponent()
+    T *GetComponent() const
     {
         for (const auto &comp : components)
         {

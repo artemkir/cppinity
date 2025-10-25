@@ -11,18 +11,15 @@ void ScreenTransform::Awake() {
 }
 
 Canvas* ScreenTransform::GetAncestorCanvas() const {
-    auto canvas = gameObject->GetComponent<Canvas>();
-    if (canvas) {
-        return canvas;
+    const GameObject * go = gameObject;
+    
+    while (go) {
+        if (auto c = go->GetComponent<Canvas>()) {
+            return c;
+        }
+        go = go->GetParent();
     }
-    if (parent) {
-        return parent->GetAncestorCanvas();
-    }
-    if (gameObject->GetParent())
-    {
-        canvas = gameObject->GetParent()->GetComponent<Canvas>();
-    }
-    return canvas;
+    return nullptr;
 }
 
 BaseTransform::Transform ScreenTransform::GetScreenTransform() const {
@@ -73,8 +70,4 @@ BaseTransform::Transform ScreenTransform::GetFinalScreenTransform() const {
 
         return { final_pos, final_size, {1.0f, 1.0f}, rel.pivot };
     }
-}
-
-BaseTransform::Transform GridTransform::GetFinalScreenTransform() const {
-    return ScreenTransform::GetFinalScreenTransform();
 }
