@@ -8,9 +8,11 @@ A lightweight, compact game engine written in C++ that compiles to WebAssembly (
 - **Scene Management**: Inspired by Unity's ECS style, organize and manage game scenes with game objects, including Scene, GameObject, and Components for structured game logic.
 - **Game Objects and Basic Components**: Entity-Component-System (ECS)-like architecture for flexible game logic, including transforms, colliders, input handlers, animations, and renderers (e.g., sprites and rectangles).
 - **Resource Management**: Basic asynchronous resource loading (only textures for now) with fetch integration.
+- **Simple UI Canvas System**: Added Canvas component for handling relative sizing, positioning, and anchoring (TopLeft or Center) with virtual resolutions. Supports aspect ratio maintenance for square or proportional canvases.
 - **Rendering**: 2D rendering support using shaders, materials, and textures. Includes unlit color and texture shaders.
 - **Input Handling**: Basic keyboard input support.
 - **Example Game**: A simple Snake game demonstrating core features.
+- **Testing**: Integrated Catch2 tests for some components and scene management logic.
 
 ### In Progress / Planned Features
 - Basically everything!
@@ -18,6 +20,7 @@ A lightweight, compact game engine written in C++ that compiles to WebAssembly (
 - Support for 3D models and rendering.
 - Audio playback and management.
 - Advanced physics and collision detection.
+- More tests.
 - More examples and demos.
 
 Note: The engine is not yet production-ready and is best suited for prototyping or small projects.
