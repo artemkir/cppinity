@@ -434,7 +434,45 @@ void fetch_callback(const sfetch_response_t* response) {
     printf("%s",buffer);
 }
 
-void sokol_fetch_request(const char* path, 
+void sokol_fetch_request(
+    const char* path,
+    void* user_data,
+    size_t buffer_size)
+{
+	//Sokol for some reason can't fetch embedded files in WASM builds, so we do a sync load here 
+    FILE* file = fopen(path, "rb");
+
+    if (file) {
+        fseek(file, 0, SEEK_END);
+        size_t size = ftell(file);
+        fseek(file, 0, SEEK_SET);
+
+        if (size > sizeof(app_state.file_buffer)) {
+            fclose(file);
+            fetch_failed_callback(user_data);
+            printf("File too large for buffer: %s (size: %zu, buffer: %zu)\n", path, size, buffer_size);
+            return;
+        }
+
+        fread(app_state.file_buffer, 1, size, file);
+        fclose(file);
+        fetch_loaded_callback(app_state.file_buffer, size, user_data);
+        printf("Sync load completed: %s (size: %zu)\n", path, size);
+    }
+    else {
+        sfetch_request_t req = {
+        .path = path,
+        .callback = fetch_callback,
+        .user_data = (sfetch_range_t){.ptr = user_data, .size = buffer_size},
+        .buffer = SFETCH_RANGE(app_state.file_buffer),
+        };
+        sfetch_handle_t f = sfetch_send(&req);
+        printf("Fetch request sent: %s (handle: %d)\n", path, f.id);
+    }
+}
+
+
+void _sokol_fetch_request(const char* path, 
                          void* user_data,
                          size_t buffer_size)
 {
@@ -482,7 +520,7 @@ sapp_desc sokol_main(int argc, char *argv[])
         .high_dpi = true,
         .window_title = "Application",
 #if defined(WIN32) && defined(_DEBUG)
-		.win32_console_create = true,
+			.win32.console_create = true,
 #endif
     };
 }
