@@ -19,10 +19,15 @@ class GameObject
     BaseTransform *transform = nullptr;
     List<GameObject *> children;
     GameObject *parent = nullptr;
-    bool isStarted = false;
+    //bool isStarted = false;
 	bool isActive = true;
 
 public:
+    bool awoke = false;
+    bool started = false;
+    void CallOnEnable() const;
+    void CallOnDisable() const;
+
     // GameObject() = delete;
 
     explicit GameObject(const String &name_, unsigned tag_ = 0);
@@ -48,7 +53,7 @@ public:
     void AddGameObject(UniquePtr<GameObject> go);
     void AddComponent(UniquePtr<BaseComponent> component);
 
-    bool HasStarted() const { return isStarted; }
+    bool HasStarted() const { return started; }
 
     
 

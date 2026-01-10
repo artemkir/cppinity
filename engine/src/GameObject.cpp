@@ -21,9 +21,17 @@ Scene *GameObject::GetScene()
 
 void GameObject::SetActive(bool active)
 {
-	isActive = active;
+    if (active == isActive)
+        return;
 
-    for (const auto &comp : GetComponents())
+    isActive = active;
+
+    if (active)
+        CallOnEnable();
+    else
+        CallOnDisable();
+
+    for (const auto& comp : components)
     {
         comp->SetActive(active);
     }
@@ -34,11 +42,21 @@ void GameObject::SetActive(bool active)
     }
 }
 
+void GameObject::CallOnEnable() const
+{
+    ForEachActiveComponent([](const auto& comp) { comp->OnEnable(); });
+}
+
+void GameObject::CallOnDisable() const
+{
+    ForEachActiveComponent([](const auto& comp) { comp->OnDisable(); });
+}
+
 void GameObject::AddGameObject(UniquePtr<GameObject> go)
 {
     children.push_back(go.get());
     go->parent = this;
-    scene->AddGameObject(std::move(go), false);
+    scene->AddGameObject(std::move(go), true); // Changed to true
 }
 
 void GameObject::AddComponent(UniquePtr<BaseComponent> component)
@@ -75,7 +93,7 @@ void GameObject::Start()
 {
     ForEachActiveComponent([](const auto &comp)
                            { comp->Start(); });
-    isStarted = true;
+    //isStarted = true;
 }
 
 void GameObject::Update(float deltaTime) const

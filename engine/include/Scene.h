@@ -17,7 +17,21 @@ class ResourceManager;
 // Scene Class
 class Scene
 {
-	List<UniquePtr<GameObject>> gameObjects;			// preserves order
+	//List<UniquePtr<GameObject>> gameObjects;			// preserves order
+
+	std::deque<UniquePtr<GameObject>> gameObjects; // Changed from List (assume std::vector) to deque
+	std::set<GameObject*> startedThisFrame;
+	std::set<GameObject*> awokeThisFrame;
+
+	bool isInAwake = false;
+	bool isInStart = false;
+	bool isInUpdate = false;
+	bool IsInLifecycle() const { return isInAwake || isInStart || isInUpdate; }
+
+	void CallAllAwake();
+	void CallAllStart();
+	void CallAllUpdate(float deltaTime);
+
 	UnorderedMapStringKey<GameObject *> gameObjectLookup; // fast lookup
 	MultiMap<int, RendererComponent *> gameObjectsRenderers;
 	List<SimpleCollider *> colliders;
@@ -62,7 +76,7 @@ public:
 
 	void HandleEvent(const InputEvent *event);
 
-	const List<UniquePtr<GameObject>>& GetGameObjects() const { return gameObjects;	}
+	const std::deque<UniquePtr<GameObject>>& GetGameObjects() const { return gameObjects;	}
 	
 	const IRenderer* GetRenderer() const { return renderer;	}
 

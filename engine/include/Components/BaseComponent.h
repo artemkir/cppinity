@@ -22,6 +22,9 @@ public:
 	virtual void OnCollide(GameObject *other) {}
 	virtual void OnDestroy() {}
 	
+	virtual void OnEnable() {}
+	virtual void OnDisable() {}
+
 	void SetActive(bool active_)
 	{		
 		active = active_;

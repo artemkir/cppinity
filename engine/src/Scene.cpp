@@ -17,31 +17,33 @@ Scene::Scene(
 
 void Scene::AddGameObject(UniquePtr<GameObject> go, bool immediate)
 {
-    if (!immediate)
-    {
+    if (!immediate) {
         go->SetScene(this);
-
         pendingAdd.push_back(std::move(go));
         return;
     }
-        
+
+    go->SetScene(this); // Moved up
+
+    if (IsInLifecycle()) {
+        pendingAdd.push_back(std::move(go));
+        return;
+    }
+
     gameObjectLookup[go->GetName()] = go.get();
 
     auto renderComponent = go->GetComponent<RendererComponent>();
-    if (renderComponent != nullptr)
-    {
+    if (renderComponent != nullptr) {
         renderComponent->SetRenderer(renderer);
-        gameObjectsRenderers.insert({renderComponent->GetRenderOrder(), renderComponent});
+        gameObjectsRenderers.insert({ renderComponent->GetRenderOrder(), renderComponent });
     }
 
     auto collider = go->GetComponent<SimpleCollider>();
-    if (collider != nullptr)
-    {
+    if (collider != nullptr) {
         colliders.push_back(collider);
     }
 
-    go->Awake();
-    gameObjects.push_back(std::move(go));
+    gameObjects.push_front(std::move(go));
 }
 
 void Scene::Destroy(GameObject* go) {
@@ -145,12 +147,10 @@ void Scene::ProcessPendingAdds()
     if (pendingAdd.empty())
         return;
 
-    // Swap pendingAdd with an empty list to collect new additions during Awake
     List<UniquePtr<GameObject>> currentPending;
     currentPending.swap(pendingAdd);
 
-    while (!currentPending.empty())
-    {
+    while (!currentPending.empty()) {
         auto go = std::move(currentPending.back());
         currentPending.pop_back();
         AddGameObject(std::move(go), true);
@@ -178,6 +178,46 @@ void Scene::CheckCollisions()
     }
 }
 
+void Scene::CallAllAwake() {
+    isInAwake = true;
+    for (auto& go : gameObjects) {
+        if (!go->awoke) {
+            go->Awake();
+            go->awoke = true;
+            awokeThisFrame.insert(go.get());
+            if (go->IsActive()) {
+                go->CallOnEnable();
+            }
+        }
+    }
+    isInAwake = false;
+}
+
+void Scene::CallAllStart() {
+    isInStart = true;
+    for (auto& go : gameObjects) {
+        if (go->IsActive() && !go->started) {
+            go->Start();
+            go->started = true;
+            if (awokeThisFrame.find(go.get()) != awokeThisFrame.end()) {
+                startedThisFrame.insert(go.get());
+            }
+        }
+    }
+    isInStart = false;
+}
+
+void Scene::CallAllUpdate(float deltaTime) {
+    isInUpdate = true;
+    for (auto& go : gameObjects) {
+        if (go->IsActive() && go->started && startedThisFrame.find(go.get()) == startedThisFrame.end()) {
+            go->Update(deltaTime);
+        }
+    }
+    isInUpdate = false;
+}
+
+
 void Scene::Update(float deltaTime)
 {
     for (auto &go : gameObjects)
@@ -194,6 +234,7 @@ void Scene::Update(float deltaTime)
 
         go->Update(deltaTime);
     }
+
 }
 
 void Scene::Render()
@@ -225,23 +266,25 @@ void Scene::Stop()
     running = false;
 }
 
-bool Scene::Frame(float deltaTime)
-{    
+bool Scene::Frame(float deltaTime) {
     inputHandler.BeginFrame(); // Prepare input for frame (compute pressed/released)
 
-    if (inputHandler.WasQuitRequested())
-    {
+    if (inputHandler.WasQuitRequested()) {
         Stop();
     }
 
     renderer->BeginPass();
 
-    Update(deltaTime);
+    ProcessPendingDestroys();
+    ProcessPendingAdds();
+    CallAllAwake();
+    CallAllStart();
+    CallAllUpdate(deltaTime);
     CheckCollisions();
     Render();
 
-    ProcessPendingDestroys();
-    ProcessPendingAdds();
+    awokeThisFrame.clear();
+    startedThisFrame.clear();
 
     renderer->EndPass();
 
