@@ -56,8 +56,8 @@ if(EMSCRIPTEN)
         # Map host assets dir -> in-app VFS path /assets
         # Pass as two args to avoid quoting issues on Windows
         target_link_options(${TARGET_NAME} PRIVATE
-            "--preload-file" "${SNAKE_ASSETS_DIR}/@/assets"
-            #"--shell-file" "${SNAKE_SHELL_DIR}/shell_empty.html"
+            "--embed-file" "${SNAKE_ASSETS_DIR}/@/assets"
+            "--shell-file" "${SNAKE_SHELL_DIR}/shell_empty.html"
         )
     endif()
 else()
